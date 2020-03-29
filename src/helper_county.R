@@ -19,6 +19,8 @@ dir <- "../data/covid-19-data/"
 df<-read_csv(file.path(dir, "us-counties.csv"))%>%
   select(-c(state,county))
 
+latest_day = df$date%>%max()
+
 #utiity function
 named_group_split <- function(.tbl, ...) {
   grouped <- group_by(.tbl, ...)
@@ -115,9 +117,9 @@ calc_county_underreport<-function(fips){
   #calculate the underreporting factor using case fatality rate, following methods in (TW Russell, 2020)
   true_mortality_rate <-0.0138 # a big study from China
   #number of death today
-  n_death_today<-get_county_deathcount(fips, Sys.Date()-1)
+  n_death_today<-get_county_deathcount(fips, latest_day)
   #number of infected cases 13 days ago
-  n_case_13d<-get_county_casecount(fips, Sys.Date()-1-13)
+  n_case_13d<-get_county_casecount(fips, latest_day-13)
   #calculate case fatality rate
   cfr <- n_death_today/n_case_13d
   #calculate underreporting rate
