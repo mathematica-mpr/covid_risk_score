@@ -33,7 +33,6 @@ server <- function(input, output) {
     fips = input$fips
     county_pop = get_county_pop(fips)
     county_name = get_county_name(fips)
-    county_pop = get_county_pop(fips)
     county_casecount = get_county_casecount(fips, Sys.Date()-1)
     county_underreport = calc_county_underreport(fips)
     res = 1-(1-county_casecount/county_pop/county_underreport)^input$nppl

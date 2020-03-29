@@ -15,7 +15,7 @@ fips_codes<-fips_codes%>%
 
 #Read in NYT covid-19 county-level data
 dir <- "../data/covid-19-data/"
-#NTY county-level data
+#NYT county-level data
 df<-read_csv(file.path(dir, "us-counties.csv"))%>%
   select(-c(state,county))
 
@@ -122,8 +122,8 @@ calc_county_underreport<-function(fips){
   cfr <- n_death_today/n_case_13d
   #calculate underreporting rate
   fac_underreport<-true_mortality_rate/cfr
-  #if cfr is zero, the underreporting factor is NA, then force it to be 1.
-  return(if_else(!is.na(fac_underreport), fac_underreport, 1))
+  #if cfr is zero, the underreporting factor is NA, then force it to be US average, 0.17.
+  return(if_else(!is.na(fac_underreport), fac_underreport, 0.17))
 }
 assertthat::assert_that(calc_county_underreport("06001")<=1)
 assertthat::assert_that(calc_county_underreport("36067")<=1)
