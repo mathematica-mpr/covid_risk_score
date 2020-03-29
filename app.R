@@ -1,4 +1,5 @@
-source('helper_county.R')
+library('shiny')
+source("src/helper_county.R")
 # Global variables can go here
 fips <- '06001'
 nppl <- 20

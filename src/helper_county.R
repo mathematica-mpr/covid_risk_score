@@ -16,7 +16,8 @@ fips_codes<-fips_codes%>%
   mutate(fips = paste0(state_code, county_code))
 
 #Read in NYT covid-19 county-level data
-dir <- "../data/covid-19-data/"
+# path is relative to app.R
+dir <- "data/covid-19-data/"
 #NYT county-level data
 df<-read_csv(file.path(dir, "us-counties.csv"))%>%
   select(-c(state,county))
