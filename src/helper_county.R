@@ -3,9 +3,11 @@ if(!require(pacman)){
   install.packages('pacman')
 }
 library(pacman)
+p_load(shiny)
 p_load(tidyverse)
 p_load(tidycensus)
 p_load(assertr)
+p_load(flexdashboard)
 census_api_key("341b9e8939115fe9fcd94897d70d826fe1b945be")
 
 #FIPS data from censue
