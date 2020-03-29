@@ -3,9 +3,10 @@
 #   install.packages('pacman')
 # }
 # library(pacman)
-install.packages(c("shiny", "tidyverse", "tidycensus", "assertr", "flexdashboard"))
+#install.packages(c("shiny", "tidyverse", "tidycensus", "assertr", "flexdashboard"))
 library(shiny)
 library(tidyverse)
+library(tidycensus)
 library(assertr)
 library(flexdashboard)
 census_api_key("341b9e8939115fe9fcd94897d70d826fe1b945be")
