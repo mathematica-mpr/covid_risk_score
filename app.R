@@ -19,7 +19,7 @@ ui <- fluidPage(theme=shinytheme("superhero"),
       helpText("Answer a few questions to see your COVID-19 risk score:", class = "lead"),
       textInput('fips', label =  '5-digit FIPS code of your county', fips),
       textInput('zip', label =  "If you don't know your county FIPS code, what's your 5-digit zip code?", zip),
-      numericInput('nppl', 'How many in-person social interactions will you have over the next week?', nppl),
+      sliderInput('nppl', 'How many in-person social interactions will you have over the next week?', min = 0, max = 50, value = nppl, step =1),
       #sliderInput('fac_underreport', "Choose what percentage of cases are tested?", min = 0.01, max = 1, value = 0.15, step = 0.01),
       checkboxInput('is_sick', "Are you sick already?"),
       #checkboxInput('in_hosp', "Do you work in a hospital?"),
@@ -65,6 +65,20 @@ server <- function(input, output) {
     county_name <- get_county_name(fips)
     county_casecount <- get_county_casecount(fips, latest_day)
     county_underreport <- calc_county_underreport(fips)
+    
+    unlist(list("fips" = fips,
+                "county_pop" = county_pop,
+                "county_name" = county_name,
+                "county_casecount" = county_casecount,
+                "county_underreport" = county_underreport
+    ))
+  })
+  
+  output$gauge <-renderGauge({
+    temp <- temp()
+    county_casecount<-temp['county_casecount']%>%as.numeric()
+    county_pop<-temp['county_pop']%>%as.numeric()
+    county_underreport<-temp['county_underreport']%>%as.numeric()
     if (input$nppl>0){
       risk <- 1-(1-county_casecount/county_pop/county_underreport)^input$nppl
     } else{
@@ -81,41 +95,54 @@ server <- function(input, output) {
     }
     score<-if_else(risk>0, g(risk), 0)
     # use the checkboxInput
-     if(input$is_sick | input$in_highriskzone){
-       score<-max(50, score)
-     }
-    unlist(list("fips" = fips,
-                "county_pop" = county_pop,
-                "county_name" = county_name,
-                "county_casecount" = county_casecount,
-                "county_underreport" = county_underreport,
-                "risk"= risk,
-                "score" = score
-    ))
-  })
-  output$gauge <-renderGauge({
-    temp <- temp()
-    score <- round(as.numeric(temp['score']))
+    if(input$is_sick | input$in_highriskzone){
+      score<-max(50, score)
+    }
+   
     gauge(case_when(score > 100 ~ 100,
                     score < 0 ~ 0,
-                    TRUE ~ score), 
+                    TRUE ~ round(score)), 
           min = 0, max = 100, 
           sectors = gaugeSectors(success = c(0, 30),
                                  warning = c(30, 70),
                                  danger = c(70, 100)),
           label = "")
   })
+  
   output$res <-renderText({
     temp <- temp()
+    county_casecount<-temp['county_casecount']%>%as.numeric()
+    county_pop<-temp['county_pop']%>%as.numeric()
+    county_underreport<-temp['county_underreport']%>%as.numeric()
+    if (input$nppl>0){
+      risk <- 1-(1-county_casecount/county_pop/county_underreport)^input$nppl
+    } else{
+      risk <- 0
+    }
+    g<-function(x){
+      # a mapping function to address nonlinearity between probability and score
+      prob_flu<- 35.5/327.2/52
+      normalized<-log10(x/prob_flu)*25+50 
+      # 50 means equal likelihood of flu
+      # 1 means 1/100 times probability of flu
+      # 100 means 100 times probability of flu
+      return(normalized)
+    }
+    score<-if_else(risk>0, g(risk), 0)
+    # use the checkboxInput
+    if(input$is_sick | input$in_highriskzone){
+      score<-max(50, score)
+    }
     prob_flu<- 35.5/327.2/52
     paste('You live in county:', temp['county_name'], '.',
           'Your county has', temp['county_casecount'], 'cases out of a population of', 
           format(temp['county_pop']%>%as.numeric(), big.mark = ','), '.',
           "We estimated that your county's sepcific under-reporting factor is", scales::percent(temp['county_underreport']%>%as.numeric()), '.',
-          "Our estimation of the probability of you being exposed to COVID-19 through community transmission is", scales::percent(temp['risk']%>%as.numeric()), '.',
+          "Our estimation of the probability of you being exposed to COVID-19 through community transmission is", scales::percent(risk), '.',
           "For comparison, your risk of being exposed to flu is", scales::percent(prob_flu), '.', 
-          "On a scale of 0  (low risk) to 100 (high risk), your risk score is", round(temp['score']%>%as.numeric()), '.')
+          "On a scale of 0  (low risk) to 100 (high risk), your risk score is", round(score), '.')
   })
+  
   output$methods <-renderUI({
     tagList(tags$p(""),
             div(
