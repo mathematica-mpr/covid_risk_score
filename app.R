@@ -103,14 +103,17 @@ server <- function(input, output) {
   })
   output$methods <-renderUI({
     myList <- c(
-      "There's a lot that is still unknown about COVID-19, so we had to make some big assumptions to estimate your risk of exposure.",
+      "We used published county-level data of COVID-19 cases & deaths to estimate the prevalence of infected people within your county. Based on this likely prevalence, and the amount of social distancing you're able to accomplish, we can determine the likelihood you'll be exposed to COVID-19.",
       "",
-      "#1: Above and beyond the official cases reported by your county, there are additional unconfirmed cases of COVID-19 distributed throughout your community.",
-      "#2: These cases are infectious.",
-      "#3: If you come into close contact with one of these cases, you risk infection with a probability of 1.",
-      "#4: Other methods of becoming infected (e.g. touching an infected surface) are not accounted for by this calculator.",
+      "Assumptions:",
+      "#1: Above and beyond the official cases reported by your county, there are additional unreported cases of COVID-19 distributed throughout your community.",
+      "#2: Other methods of becoming infected (e.g. touching an infected surface) are not accounted for by this calculator.",
       "",
-      "As a result, we'll be doing our best to update them as additional knowledge about the virus becomes available."
+      "We'll be doing our best to update these assumptions as additional knowledge about the virus becomes available.",
+      "",
+      "Sources:",
+      "County-level COVID-19 data: https://www.nytimes.com/article/coronavirus-county-data-us.html",
+      "Under-reporting factor: https://cmmid.github.io/topics/covid19/severity/global_cfr_estimates.html"
     )
     HTML(paste(myList, sep = "", collapse = '<br/>'))
   })
