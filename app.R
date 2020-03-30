@@ -52,10 +52,6 @@ server <- function(input, output) {
     #read in FIPS or get it from ZIP
     fips<-get_fips_from_zip(input$zip)
     #get county-level characteristics
-    #county_pop<-1e6
-    #county_name<-"Alameda"
-    #county_casecount<-500
-    #county_underreport<-0.2
     county_pop <- get_county_pop(fips)
     county_name <- get_county_name(fips)
     county_casecount <- get_county_casecount(fips, latest_day)
@@ -129,37 +125,36 @@ server <- function(input, output) {
       score<-max(50, score)
     }
     prob_flu<- 35.5/327.2/52
-    paste('You live in county:', temp['county_name'], '.',
-          'Your county has', temp['county_casecount'], 'cases out of a population of', 
-          format(temp['county_pop']%>%as.numeric(), big.mark = ','), '.',
-          "We estimated that your county's sepcific under-reporting factor is", scales::percent(temp['county_underreport']%>%as.numeric()), '.',
-          "Our estimation of the probability of you being exposed to COVID-19 through community transmission is", scales::percent(risk), '.',
-          "For comparison, your risk of being exposed to flu is", scales::percent(prob_flu), '.', 
-          "On a scale of 0  (low risk) to 100 (high risk), your risk score is", round(score), '.')
+    prob_flu_string<- formatC(signif(100*prob_flu,digits=2), digits=2,format="fg")
+    county_underreport_string<-formatC(signif(100*temp['county_underreport']%>%as.numeric(),digits=2), digits=2,format="fg")
+    risk_string = formatC(signif(100*risk,digits=2), digits=2,format="fg")
+    paste0('You live in county: ', temp['county_name'], '. ',
+          'Your county has ', temp['county_casecount'], ' cases out of a population of ', 
+          format(temp['county_pop']%>%as.numeric(), big.mark = ','), '. ',
+          "We estimated that your county's sepcific under-reporting factor is ", county_underreport_string, '%. ',
+          "Our estimation of the probability of you being exposed to COVID-19 through community transmission is ", risk_string, '%. ',
+          "For comparison, your risk of being exposed to flu is ", prob_flu_string, '%. ', 
+          "On a scale of 0  (low risk) to 100 (high risk), your risk score is ", round(score), '.')
   })
   
   output$methods <-renderUI({
-    tagList(tags$p(""),
-            div(
-              "We used published ",
-              tags$a("county-level data of COVID-19 cases & deaths", href="https://www.nytimes.com/article/coronavirus-county-data-us.html"),
-              " to estimate the prevalence of infected people within your county. Based on this likely prevalence, and the amount of social distancing you're able to accomplish, we can determine the likelihood you'll be exposed to COVID-19."
-            ),
-            tags$p(""),
-            tags$h3("Assumptions:"),
-            tags$li(
-              "Above and beyond the official cases reported by your county, there are additional unreported cases of COVID-19. We followed methodology reported",
-              tags$a("by Russell et al (2020)", href="https://cmmid.github.io/topics/covid19/severity/global_cfr_estimates.html"),
-              "to calculate the % of cases that are current detected. This goes into our calculation of the estimated number of cases distributed throughout your community."),
-            tags$li("Other methods of becoming infected (e.g. touching an infected surface) are not accounted for by this calculator."),
-            tags$p(""),
-            tags$p("We'll be doing our best to update these assumptions as additional knowledge about the virus becomes available."),
+    tagList(
+      tags$p(""),
+        div(
+          "We used published ",
+          tags$a("county-level data of COVID-19 cases & deaths", href="https://www.nytimes.com/article/coronavirus-county-data-us.html"),
+          " to estimate the prevalence of infected people within your county. Based on this likely prevalence, and the amount of social distancing you're able to accomplish, we can determine the likelihood you'll be exposed to COVID-19."
+        ),
+        tags$p(""),
+        tags$h3("Assumptions:"),
+        tags$li(
+          "Above and beyond the official cases reported by your county, there are additional unreported cases of COVID-19. We followed methodology reported",
+          tags$a("by Russell et al (2020)", href="https://cmmid.github.io/topics/covid19/severity/global_cfr_estimates.html"),
+          "to calculate the percentage of cases that are currently detected. We then estimate the number of cases distributed throughout your community."),
+        tags$li("Other methods of becoming infected (e.g. touching an infected surface) are not accounted for by this calculator."),
+        tags$p(""),
+          tags$p("We'll be doing our best to update these assumptions as additional knowledge about the virus becomes available."),
     )
-#      
-#      "",
-#      "Sources:",
-#      "County-level COVID-19 data: ",
-#      "Under-reporting factor: "
   })
 }
 
