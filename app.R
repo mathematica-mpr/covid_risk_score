@@ -57,12 +57,16 @@ server <- function(input, output) {
       fips<-get_fips_from_zip(input$zip)
     }
     #get county-level characteristics
+    #county_pop<-1e6
+    #county_name<-"Alameda"
+    #county_casecount<-500
+    #county_underreport<-0.2
     county_pop <- get_county_pop(fips)
     county_name <- get_county_name(fips)
     county_casecount <- get_county_casecount(fips, latest_day)
     county_underreport <- calc_county_underreport(fips)
     if (input$nppl>0){
-      risk <- 1-(1-get_county_casecount(fips, latest_day)/get_county_pop(fips)/calc_county_underreport(fips))^input$nppl
+      risk <- 1-(1-county_casecount/county_pop/county_underreport)^input$nppl
     } else{
       risk <- 0
     }
