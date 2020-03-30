@@ -19,7 +19,7 @@ ui <- fluidPage(theme=shinytheme("superhero"),
       helpText("Answer a few questions to see your COVID-19 risk score:", class = "lead"),
       textInput('fips', label =  '5-digit FIPS code of your county', fips),
       textInput('zip', label =  "If you don't know your county FIPS code, what's your 5-digit zip code?", zip),
-      numericInput('nppl', 'Number of contacts you have had in the past two weeks', nppl),
+      numericInput('nppl', 'How many social interactions will you have over the next week?', nppl),
       #sliderInput('fac_underreport', "Choose what percentage of cases are tested?", min = 0.01, max = 1, value = 0.15, step = 0.01),
       checkboxInput('is_sick', "Are you sick already?"),
       #checkboxInput('in_hosp', "Do you work in a hospital?"),
@@ -35,7 +35,7 @@ ui <- fluidPage(theme=shinytheme("superhero"),
                  fluidRow(textOutput("res"), style = "width:800px")),
         #tabPanel("Map"),
         tabPanel("Methodology",
-                 textOutput("methods"))),
+                 htmlOutput("methods"))),
       width = 9
     )
   )
@@ -96,8 +96,18 @@ server <- function(input, output) {
           "The probability of you contracting COVID-19 is", scales::percent(temp['risk']%>%as.numeric()), '.',
           "On a scale of 0 to 100, your risk score is", round(temp['score']%>%as.numeric()), '.')
   })
-  output$methods <-renderText({
-    "Methodology placeholder (George)."
+  output$methods <-renderUI({
+    myList <- c(
+      "There's a lot that is still unknown about COVID-19, so we had to make some big assumptions to estimate your risk of exposure.",
+      "",
+      "#1: Above and beyond the official cases reported by your county, there are additional unconfirmed cases of COVID-19 distributed throughout your community.",
+      "#2: These cases are infectious.",
+      "#3: If you come into close contact with one of these cases, you risk infection with a probability of 1.",
+      "#4: Other methods of becoming infected (e.g. touching an infected surface) are not accounted for by this calculator.",
+      "",
+      "As a result, we'll be doing our best to update them as additional knowledge about the virus becomes available."
+    )
+    HTML(paste(myList, sep = "", collapse = '<br/>'))
   })
 }
 
