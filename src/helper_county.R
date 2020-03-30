@@ -135,6 +135,16 @@ assertthat::assert_that(calc_county_underreport("06001")<=1)
 assertthat::assert_that(calc_county_underreport("36067")<=1)
 
 
-
+get_fips_from_zip<-function(zip){
+  #get FIPS code given zip code, using crosswalk from census
+  crosswalk<-"https://www2.census.gov/geo/docs/maps-data/data/rel/zcta_county_rel_10.txt"%>%
+    read.table(header=T, sep=",")%>%
+    select(ZCTA5, GEOID)%>%
+    mutate_all(.funs = stringr::str_pad, width = 5, pad = "0")
+  fips<-crosswalk%>%
+    filter(ZCTA5 == zip)%>%
+    pull(GEOID)
+  return(fips)
+}
 
 
