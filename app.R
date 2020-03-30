@@ -3,7 +3,6 @@ library(shinythemes)
 library(shinycssloaders)
 source("src/helper_county.R")
 # Global variables can go here
-fips <- ''
 zip <- "94587"
 nppl <- 20
 
@@ -17,9 +16,9 @@ ui <- fluidPage(theme=shinytheme("superhero"),
   sidebarLayout(
     sidebarPanel(
       helpText("Answer a few questions to see your COVID-19 risk score:", class = "lead"),
-      textInput('fips', label =  '5-digit FIPS code of your county', fips),
-      textInput('zip', label =  "If you don't know your county FIPS code, what's your 5-digit zip code?", zip),
-      sliderInput('nppl', 'How many in-person social interactions will you have over the next week?', min = 0, max = 50, value = nppl, step =1),
+      #textInput('fips', label =  '5-digit FIPS code of your county', fips),
+      textInput('zip', label =  "What's your 5-digit zip code?", zip),
+      sliderInput('nppl', 'How many people will you see in person in a week? (Play with me after you click the button!)', min = 0, max = 50, value = nppl, step =1),
       #sliderInput('fac_underreport', "Choose what percentage of cases are tested?", min = 0.01, max = 1, value = 0.15, step = 0.01),
       checkboxInput('is_sick', "Are you sick already?"),
       #checkboxInput('in_hosp', "Do you work in a hospital?"),
@@ -47,15 +46,11 @@ server <- function(input, output) {
   temp<- eventReactive(input$go, {
     #validate input types
     validate(
-      need(input$fips!="" | input$zip!="", 'Provide at least one of the two: FIPS and zip code.'),
+      need(input$zip!="", 'Please provide a zip code.'),
       need(input$nppl, 'Please provide the number of contacts.')
     )
     #read in FIPS or get it from ZIP
-    if(input$fips!=""){
-      fips<-input$fips
-    }else{
-      fips<-get_fips_from_zip(input$zip)
-    }
+    fips<-get_fips_from_zip(input$zip)
     #get county-level characteristics
     #county_pop<-1e6
     #county_name<-"Alameda"
