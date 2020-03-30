@@ -102,20 +102,27 @@ server <- function(input, output) {
           "On a scale of 0 to 100, your risk score is", round(temp['score']%>%as.numeric()), '.')
   })
   output$methods <-renderUI({
-    myList <- c(
-      "We used published county-level data of COVID-19 cases & deaths to estimate the prevalence of infected people within your county. Based on this likely prevalence, and the amount of social distancing you're able to accomplish, we can determine the likelihood you'll be exposed to COVID-19.",
-      "",
-      "Assumptions:",
-      "#1: Above and beyond the official cases reported by your county, there are additional unreported cases of COVID-19 distributed throughout your community.",
-      "#2: Other methods of becoming infected (e.g. touching an infected surface) are not accounted for by this calculator.",
-      "",
-      "We'll be doing our best to update these assumptions as additional knowledge about the virus becomes available.",
-      "",
-      "Sources:",
-      "County-level COVID-19 data: https://www.nytimes.com/article/coronavirus-county-data-us.html",
-      "Under-reporting factor: https://cmmid.github.io/topics/covid19/severity/global_cfr_estimates.html"
+    tagList(tags$p(""),
+            div(
+              "We used published ",
+              tags$a("county-level data of COVID-19 cases & deaths", href="https://www.nytimes.com/article/coronavirus-county-data-us.html"),
+              " to estimate the prevalence of infected people within your county. Based on this likely prevalence, and the amount of social distancing you're able to accomplish, we can determine the likelihood you'll be exposed to COVID-19."
+            ),
+            tags$p(""),
+            tags$h3("Assumptions:"),
+            tags$li(
+              "Above and beyond the official cases reported by your county, there are ",
+              tags$a("additional unreported cases of COVID-19", href="https://cmmid.github.io/topics/covid19/severity/global_cfr_estimates.html"),
+              "distributed throughout your community."),
+            tags$li("Other methods of becoming infected (e.g. touching an infected surface) are not accounted for by this calculator."),
+            tags$p(""),
+            tags$p("We'll be doing our best to update these assumptions as additional knowledge about the virus becomes available."),
     )
-    HTML(paste(myList, sep = "", collapse = '<br/>'))
+#      
+#      "",
+#      "Sources:",
+#      "County-level COVID-19 data: ",
+#      "Under-reporting factor: "
   })
 }
 
