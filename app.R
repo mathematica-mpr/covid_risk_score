@@ -45,6 +45,11 @@ ui <- fluidPage(theme=shinytheme("superhero"),
 # Define the server code
 server <- function(input, output) {
   temp<- eventReactive(input$go, {
+    #validate input types
+    validate(
+      need(input$fips!="" | input$zip!="", 'Provide at least one of the two: FIPS and zip code.'),
+      need(input$nppl, 'Please provide the number of contacts.')
+    )
     #read in FIPS or get it from ZIP
     if(input$fips!=""){
       fips<-input$fips
