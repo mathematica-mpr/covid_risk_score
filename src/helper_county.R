@@ -21,6 +21,9 @@ fips_codes<-fips_codes%>%
 dir <- "data/covid-19-data/"
 #NYT county-level data
 df<-read_csv(file.path(dir, "us-counties.csv"))%>%
+  mutate(fips = case_when(county == "New York City" & state == "New York" ~ "36061",
+                          county == "Kansas City" & state == "Missouri" ~ "29095",
+                          TRUE ~ fips))%>%
   select(-c(state,county))
 
 latest_day = df$date%>%max()
@@ -97,7 +100,12 @@ get_county_casecount<-function(key, date){
   res<-df_ls[[as.character(date)]]%>%
     filter(fips == key)%>%
     pull(cases)
-  return(res)
+  if(length(res)==1){
+    return(res)
+  }else{
+    return(max(res))
+  }
+  
 }
 assertthat::assert_that(get_county_casecount("06001", as.Date("2020-03-27"))>220)
 
@@ -111,7 +119,11 @@ get_county_deathcount<-function(key, date){
   res<-df_ls[[as.character(date)]]%>%
     filter(fips == key)%>%
     pull(deaths)
-  return(res)
+  if(length(res)==1){
+    return(res)
+  }else{
+    return(max(res))
+  }
 }
 assertthat::assert_that(get_county_deathcount("06001", as.Date("2020-03-27"))>1)
 assertthat::assert_that(get_county_deathcount("06001", as.Date("2020-03-27"))<
@@ -129,11 +141,14 @@ calc_county_underreport<-function(fips){
   #calculate underreporting rate
   fac_underreport<-true_mortality_rate/cfr
   #if cfr is zero, the underreporting factor is NA, then force it to be US average, 0.17.
-  return(if_else(!is.na(fac_underreport), fac_underreport, 0.17))
+  return(case_when(is.infinite(fac_underreport) ~ 0.17,
+                   is.na(fac_underreport) ~ 0.17,
+                   fac_underreport<0.1 ~ 0.1,
+                   TRUE ~ fac_underreport))
 }
 assertthat::assert_that(calc_county_underreport("06001")<=1)
 assertthat::assert_that(calc_county_underreport("36067")<=1)
-
+assertthat::assert_that(calc_county_underreport("30031")<=1)
 
 get_fips_from_zip<-function(zip){
   #get FIPS code given zip code, using crosswalk from census
@@ -144,7 +159,12 @@ get_fips_from_zip<-function(zip){
   fips<-crosswalk%>%
     filter(ZCTA5 == zip)%>%
     pull(GEOID)
-  return(fips)
+  if(length(fips)==1){
+    #zipcode maps to one county
+    return(fips)
+  } else{
+    return(fips[1])
+  }
 }
 
 
