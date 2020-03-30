@@ -105,8 +105,14 @@ server <- function(input, output) {
     county_casecount<-temp['county_casecount']%>%as.numeric()
     county_pop<-temp['county_pop']%>%as.numeric()
     county_underreport<-temp['county_underreport']%>%as.numeric()
+    # TODO, ASSUMPTION: Detected cases are not circulating in the community.
+    # TODO, ASSUMPTION: Undetected cases cannot be less than 10% of the detected cases.
     if (input$nppl>0){
-      risk <- 1-(1-county_casecount/county_pop/county_underreport)^input$nppl
+      undetected_casecount<- county_casecount/county_underreport - county_casecount
+      if (undetected_casecount < 0.1 * county_casecount) {
+        undetected_casecount<- 0.1 * county_casecount
+      }
+      risk <- 1-(1-undetected_casecount/county_pop)^input$nppl
     } else{
       risk <- 0
     }
@@ -120,18 +126,19 @@ server <- function(input, output) {
       return(normalized)
     }
     score<-if_else(risk>0, g(risk), 0)
+    score<-min(score, 100)
     # use the checkboxInput
     if(input$is_sick | input$in_highriskzone){
       score<-max(50, score)
     }
     prob_flu<- 35.5/327.2/52
     prob_flu_string<- formatC(signif(100*prob_flu,digits=2), digits=2,format="fg")
-    county_underreport_string<-formatC(signif(100*temp['county_underreport']%>%as.numeric(),digits=2), digits=2,format="fg")
+    county_underreport_string<-formatC(signif(1/temp['county_underreport']%>%as.numeric(),digits=2), digits=2,format="fg")
     risk_string = formatC(signif(100*risk,digits=2), digits=2,format="fg")
     paste0('You live in county: ', temp['county_name'], '. ',
           'Your county has ', temp['county_casecount'], ' cases out of a population of ', 
           format(temp['county_pop']%>%as.numeric(), big.mark = ','), '. ',
-          "We estimated that your county's sepcific under-reporting factor is ", county_underreport_string, '%. ',
+          "We estimated that your county's sepcific under-reporting factor is ", county_underreport_string, 'x. ',
           "Our estimation of the probability of you being exposed to COVID-19 through community transmission is ", risk_string, '%. ',
           "For comparison, your risk of being exposed to flu is ", prob_flu_string, '%. ', 
           "On a scale of 0  (low risk) to 100 (high risk), your risk score is ", round(score), '.')
