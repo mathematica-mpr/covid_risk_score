@@ -7,7 +7,7 @@ zip <- "94587"
 nppl <- 20
 prob_flu<- 35.5/327.2/52
 
-css <- HTML(".html-widget.gauge svg {height: 350px;width: 900px;}")
+css <- HTML(".html-widget.gauge svg {height: 90%;width: 90%;}")
 
 # Define the UI
 ui <- fluidPage(theme=shinytheme("superhero"),
@@ -31,8 +31,8 @@ ui <- fluidPage(theme=shinytheme("superhero"),
     mainPanel(
       tabsetPanel(
         tabPanel("Plot",
-                 fluidRow(withSpinner(gaugeOutput("gauge"), type = 1), style = "height:350px;"),
-                 fluidRow(htmlOutput("res"), style = "width:800px")),
+                 fluidRow(withSpinner(gaugeOutput("gauge", height = '800%'), type = 1)),
+                 fluidRow(textOutput("res"))),
         #tabPanel("Map"),
         tabPanel("Methodology",
                  htmlOutput("methods"))),
