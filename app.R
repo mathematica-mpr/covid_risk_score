@@ -5,6 +5,7 @@ source("src/helper_county.R")
 # Global variables can go here
 zip <- "94587"
 nppl <- 20
+prob_flu<- 35.5/327.2/52
 
 css <- HTML(".html-widget.gauge svg {height: 350px;width: 900px;}")
 
@@ -31,7 +32,7 @@ ui <- fluidPage(theme=shinytheme("superhero"),
       tabsetPanel(
         tabPanel("Plot",
                  fluidRow(withSpinner(gaugeOutput("gauge"), type = 1), style = "height:350px;"),
-                 fluidRow(textOutput("res"), style = "width:800px")),
+                 fluidRow(htmlOutput("res"), style = "width:800px")),
         #tabPanel("Map"),
         tabPanel("Methodology",
                  htmlOutput("methods"))),
@@ -65,23 +66,28 @@ server <- function(input, output) {
     ))
   })
   
-  output$gauge <-renderGauge({
-    temp <- temp()
+  temp2<-reactive({
+    temp<-temp()  
     county_casecount<-temp['county_casecount']%>%as.numeric()
     county_pop<-temp['county_pop']%>%as.numeric()
     county_underreport<-temp['county_underreport']%>%as.numeric()
     if (input$nppl>0){
-      risk <- 1-(1-county_casecount/county_pop/county_underreport)^input$nppl
+      # TODO, ASSUMPTION: diagnosed cases are not active
+      active_casecount<- county_casecount/county_underreport - county_casecount
+      # TODO, ASSUMPTION: active community case count cannot be less than 10% of reported cases
+      if (active_casecount < 0.1 * county_casecount) {
+        active_casecount = 0.1 * county_casecount
+      }
+      risk <- 1-(1-active_casecount/county_pop)^input$nppl
     } else{
       risk <- 0
     }
     g<-function(x){
       # a mapping function to address nonlinearity between probability and score
-      prob_flu<- 35.5/327.2/52
-      normalized<-log10(x/prob_flu)*25+50 
+      normalized<-log10(x/prob_flu)*50/3+50 
       # 50 means equal likelihood of flu
-      # 1 means 1/100 times probability of flu
-      # 100 means 100 times probability of flu
+      # 1 means 1/1000 times probability of flu
+      # 100 means 1000 times probability of flu
       return(normalized)
     }
     score<-if_else(risk>0, g(risk), 0)
@@ -89,7 +95,13 @@ server <- function(input, output) {
     if(input$is_sick | input$in_highriskzone){
       score<-max(50, score)
     }
-   
+    unlist(list("risk" = risk,
+                "score" = score))
+  })
+  
+  output$gauge <-renderGauge({
+    temp2<-temp2()
+    score<-temp2['score']%>%as.numeric()
     gauge(case_when(score > 100 ~ 100,
                     score < 0 ~ 0,
                     TRUE ~ round(score)), 
@@ -100,48 +112,24 @@ server <- function(input, output) {
           label = "")
   })
   
-  output$res <-renderText({
-    temp <- temp()
+  output$res <-renderUI({
+    temp <-temp()
+    temp2 <- temp2()
     county_casecount<-temp['county_casecount']%>%as.numeric()
-    county_pop<-temp['county_pop']%>%as.numeric()
     county_underreport<-temp['county_underreport']%>%as.numeric()
-    # TODO, ASSUMPTION: Detected cases are not circulating in the community.
-    # TODO, ASSUMPTION: Undetected cases cannot be less than 10% of the detected cases.
-    if (input$nppl>0){
-      undetected_casecount<- county_casecount/county_underreport - county_casecount
-      if (undetected_casecount < 0.1 * county_casecount) {
-        undetected_casecount<- 0.1 * county_casecount
-      }
-      risk <- 1-(1-undetected_casecount/county_pop)^input$nppl
-    } else{
-      risk <- 0
-    }
-    g<-function(x){
-      # a mapping function to address nonlinearity between probability and score
-      prob_flu<- 35.5/327.2/52
-      normalized<-log10(x/prob_flu)*25+50 
-      # 50 means equal likelihood of flu
-      # 1 means 1/100 times probability of flu
-      # 100 means 100 times probability of flu
-      return(normalized)
-    }
-    score<-if_else(risk>0, g(risk), 0)
-    score<-min(score, 100)
-    # use the checkboxInput
-    if(input$is_sick | input$in_highriskzone){
-      score<-max(50, score)
-    }
-    prob_flu<- 35.5/327.2/52
     prob_flu_string<- formatC(signif(100*prob_flu,digits=2), digits=2,format="fg")
     county_underreport_string<-formatC(signif(1/temp['county_underreport']%>%as.numeric(),digits=2), digits=2,format="fg")
-    risk_string = formatC(signif(100*risk,digits=2), digits=2,format="fg")
-    paste0('You live in county: ', temp['county_name'], '. ',
-          'Your county has ', temp['county_casecount'], ' cases out of a population of ', 
-          format(temp['county_pop']%>%as.numeric(), big.mark = ','), '. ',
-          "We estimated that your county's sepcific under-reporting factor is ", county_underreport_string, 'x. ',
-          "Our estimation of the probability of you being exposed to COVID-19 through community transmission is ", risk_string, '%. ',
-          "For comparison, your risk of being exposed to flu is ", prob_flu_string, '%. ', 
-          "On a scale of 0  (low risk) to 100 (high risk), your risk score is ", round(score), '.')
+    risk_string = formatC(signif(100*temp2['risk']%>%as.numeric(),digits=2), digits=2,format="fg")
+    county_pop<-temp['county_pop']%>%as.numeric()
+    
+    tagList(
+      tags$li('You live in county: ', temp['county_name'], '. '),
+      tags$li('Your county has ', temp['county_casecount']%>%as.numeric(), ' cases out of a population of ', format(county_pop%>%as.numeric(), big.mark = ','), '. '),
+      tags$li("We estimated that your county's sepcific under-reporting factor is ", county_underreport_string, 'x. '),
+      tags$li("Our estimation of the probability of you being exposed to COVID-19 through community transmission is ", risk_string, '%. '),
+      tags$li("For comparison, your risk of being exposed to flu is ", prob_flu_string, '%. '), 
+      tags$li("On a scale of 0  (low risk) to 100 (high risk), your risk score is ", round(temp2['score']%>%as.numeric()), '.')
+    )
   })
   
   output$methods <-renderUI({
