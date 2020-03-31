@@ -7,7 +7,12 @@ zip <- "94587"
 nppl <- 20
 prob_flu<- 35.5/327.2/52
 
-css <- HTML(".html-widget.gauge svg {height: 90%;width: 90%;}")
+css <- HTML(".html-widget.gauge svg {height: 75%; width: 75%; display: block; margin-left: auto;margin-right: auto; margin-bottom:-10%;}
+            .irs-bar {background: #DF691A;}
+            .irs-single {background: #DF691A;}
+            .irs-bar-edge {background: #DF691A;}
+            .irs-from {background: #DF691A;}
+            .irs-to {background: #DF691A;}")
 
 # Define the UI
 ui <- fluidPage(theme=shinytheme("superhero"),
@@ -19,7 +24,9 @@ ui <- fluidPage(theme=shinytheme("superhero"),
       helpText("Answer a few questions to see your COVID-19 risk score:", class = "lead"),
       #textInput('fips', label =  '5-digit FIPS code of your county', fips),
       textInput('zip', label =  "What is your 5-digit zip code?", zip),
-      sliderInput('nppl', 'How many people do you see in person in a week? (Try different #\'s after you hit "Calculate")', min = 0, max = 50, value = nppl, step =1),
+      sliderInput('nppl', 
+                  'How many people do you see in person in a week? (Try different #\'s after you hit "Calculate")', 
+                  min = 0, max = 50, value = nppl, step =1),
       #sliderInput('fac_underreport', "Choose what percentage of cases are tested?", min = 0.01, max = 1, value = 0.15, step = 0.01),
       checkboxInput('is_sick', "Do you have flu-like symptoms?"),
       #checkboxInput('in_hosp', "Do you work in a hospital?"),
@@ -32,7 +39,7 @@ ui <- fluidPage(theme=shinytheme("superhero"),
       tabsetPanel(
         tabPanel("Plot",
                  fluidRow(withSpinner(gaugeOutput("gauge", height = '800%'), type = 1)),
-                 fluidRow(textOutput("res"))),
+                 fluidRow(column(9, offset = 1, htmlOutput("res")))),
         #tabPanel("Map"),
         tabPanel("Methodology",
                  htmlOutput("methods"))),
@@ -123,32 +130,33 @@ server <- function(input, output) {
     county_pop<-temp['county_pop']%>%as.numeric()
     
     tagList(
-      tags$li('You live in county: ', temp['county_name'], '. '),
-      tags$li('Your county has ', temp['county_casecount']%>%as.numeric(), ' cases out of a population of ', format(county_pop%>%as.numeric(), big.mark = ','), '. '),
-      tags$li("We estimated that your county's sepcific under-reporting factor is ", county_underreport_string, 'x. '),
-      tags$li("Our estimation of the probability of you being exposed to COVID-19 through community transmission is ", risk_string, '%. '),
-      tags$li("For comparison, your risk of being exposed to flu is ", prob_flu_string, '%. '), 
-      tags$li("On a scale of 0  (low risk) to 100 (high risk), your risk score is ", round(temp2['score']%>%as.numeric()), '.')
+      tags$p(""),
+      div('You live in county:', temp['county_name'], '.',
+             'Your county has ', temp['county_casecount']%>%as.numeric(), ' cases out of a population of ', format(county_pop%>%as.numeric(), big.mark = ','), '. '),
+      tags$p("We estimated that your county's sepcific under-reporting factor is ", county_underreport_string, 'x. '),
+      tags$p("Our estimation of the probability of you being exposed to COVID-19 through community transmission is ", risk_string, '%.',
+             "For comparison, your risk of being exposed to flu is ", prob_flu_string, '%.'), 
+      tags$p("On a scale of 0  (low risk) to 100 (high risk), your risk score is ", round(temp2['score']%>%as.numeric()), '.')
     )
   })
   
   output$methods <-renderUI({
     tagList(
       tags$p(""),
-        div(
-          "We used published ",
-          tags$a("county-level data of COVID-19 cases & deaths", href="https://www.nytimes.com/article/coronavirus-county-data-us.html"),
-          " to estimate the prevalence of infected people within your county. Based on this likely prevalence, and the amount of social distancing you're able to accomplish, we can determine the likelihood you'll be exposed to COVID-19."
-        ),
-        tags$p(""),
-        tags$h3("Assumptions:"),
-        tags$li(
-          "Above and beyond the official cases reported by your county, there are additional unreported cases of COVID-19. We followed methodology reported",
-          tags$a("by Russell et al (2020)", href="https://cmmid.github.io/topics/covid19/severity/global_cfr_estimates.html"),
-          "to calculate the percentage of cases that are currently detected. We then estimate the number of cases distributed throughout your community."),
-        tags$li("Other methods of becoming infected (e.g. touching an infected surface) are not accounted for by this calculator."),
-        tags$p(""),
-          tags$p("We'll be doing our best to update these assumptions as additional knowledge about the virus becomes available."),
+      div(
+        "We used published ",
+        tags$a("county-level data of COVID-19 cases & deaths", href="https://www.nytimes.com/article/coronavirus-county-data-us.html"),
+        " to estimate the prevalence of infected people within your county. Based on this likely prevalence, and the amount of social distancing you're able to accomplish, we can determine the likelihood you'll be exposed to COVID-19."
+      ),
+      tags$p(""),
+      tags$h3("Assumptions:"),
+      tags$li(
+        "Above and beyond the official cases reported by your county, there are additional unreported cases of COVID-19. We followed methodology reported",
+        tags$a("by Russell et al (2020)", href="https://cmmid.github.io/topics/covid19/severity/global_cfr_estimates.html"),
+        "to calculate the percentage of cases that are currently detected. We then estimate the number of cases distributed throughout your community."),
+      tags$li("Other methods of becoming infected (e.g. touching an infected surface) are not accounted for by this calculator."),
+      tags$p(""),
+      tags$p("We'll be doing our best to update these assumptions as additional knowledge about the virus becomes available."),
     )
   })
 }
