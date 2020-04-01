@@ -28,16 +28,27 @@ ui <- fluidPage(theme=shinytheme("superhero"),
                   'How many people do you see in person in a week? (Try different #\'s after you hit "Calculate")', 
                   min = 0, max = 100, value = nppl, step =1),
       #sliderInput('fac_underreport', "Choose what percentage of cases are tested?", min = 0.01, max = 1, value = 0.15, step = 0.01),
-      checkboxInput('is_sick', "Do you have flu-like symptoms?"),
-      #checkboxInput('in_hosp', "Do you work in a hospital?"),
-      checkboxInput('in_highriskzone', "Do you live in or have you visited in the past two weeks an area where the transmission is widespread?"),
-      actionButton('go', "Calculate my risk score", class = "btn-primary"),
+      checkboxInput('is_sick', 
+                    HTML(paste0(
+                      "Do you have ", 
+                      tags$a(
+                        "flu-like symptoms",
+                        href = "https://www.cdc.gov/coronavirus/2019-ncov/symptoms-testing/symptoms.html"),
+                      "?"))),
+      checkboxInput('have_preexisting', 
+                    HTML(paste0(
+                      "Do you have ", 
+                      tags$a(
+                        "underlying medical complications",
+                        href = "https://www.cdc.gov/coronavirus/2019-ncov/need-extra-precautions/people-at-higher-risk.html"),
+                      "?"))),
+      actionButton('go', "Calculate", class = "btn-primary"),
       width =3
     ),
     #OUTPUT
     mainPanel(
       tabsetPanel(
-        tabPanel("Plot",
+        tabPanel("Score",
                  fluidRow(withSpinner(gaugeOutput("gauge", height = '600%'), type = 1)),
                  fluidRow(column(9, offset = 1, htmlOutput("res")))),
         #tabPanel("Map"),
@@ -82,7 +93,7 @@ server <- function(input, output) {
       if (active_casecount < 0.1 * county_casecount) {
         active_casecount = 0.1 * county_casecount
       }
-      if(input$is_sick | input$in_highriskzone){
+      if(input$is_sick | input$have_preexisting){
         # if you're already sick with flu-like symptoms, your likelihood of having covid is P(C19) / (P(C19) + P(flu))
         total_covid_probability = total_covid_count / county_pop
         risk = total_covid_probability / (total_covid_probability + prob_flu)
