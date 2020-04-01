@@ -9,9 +9,13 @@ library(tidyverse)
 library(tidycensus)
 library(assertr)
 library(flexdashboard)
-census_api_key("341b9e8939115fe9fcd94897d70d826fe1b945be")
 
-#FIPS data from censue
+#Population data from census
+census_api_key("341b9e8939115fe9fcd94897d70d826fe1b945be")
+census_pop<-get_estimates(geography = "county", product = "population")%>%
+  filter(variable == "POP")
+
+#FIPS data from census
 data("fips_codes")
 fips_codes<-fips_codes%>%
   mutate(fips = paste0(state_code, county_code))
@@ -19,14 +23,23 @@ fips_codes<-fips_codes%>%
 #Read in NYT covid-19 county-level data
 # path is relative to app.R
 dir <- "data/covid-19-data/"
+setwd(dir)
+system('git pull')
 #NYT county-level data
-df<-read_csv(file.path(dir, "us-counties.csv"))%>%
+df<-read_csv("us-counties.csv")%>%
   mutate(fips = case_when(county == "New York City" & state == "New York" ~ "36061",
                           county == "Kansas City" & state == "Missouri" ~ "29095",
                           TRUE ~ fips))%>%
   select(-c(state,county))
-
+setwd("../..")
 latest_day = df$date%>%max()
+
+#get FIPS code given zip code, using crosswalk from census
+crosswalk<-"https://www2.census.gov/geo/docs/maps-data/data/rel/zcta_county_rel_10.txt"%>%
+  read.table(header=T, sep=",")%>%
+  select(ZCTA5, GEOID)%>%
+  mutate_all(.funs = stringr::str_pad, width = 5, pad = "0")
+
 
 #utiity function
 named_group_split <- function(.tbl, ...) {
@@ -80,8 +93,6 @@ get_county_pop<-function(key){
   ##key: string, five digit
   #output:
   ##ctypop: numeric, county population
-  census_pop<-get_estimates(geography = "county", product = "population")%>%
-    filter(variable == "POP")
   res<-census_pop%>%
     filter(GEOID==key)%>%
     pull(value)
@@ -151,11 +162,6 @@ assertthat::assert_that(calc_county_underreport("36067")<=1)
 assertthat::assert_that(calc_county_underreport("30031")<=1)
 
 get_fips_from_zip<-function(zip){
-  #get FIPS code given zip code, using crosswalk from census
-  crosswalk<-"https://www2.census.gov/geo/docs/maps-data/data/rel/zcta_county_rel_10.txt"%>%
-    read.table(header=T, sep=",")%>%
-    select(ZCTA5, GEOID)%>%
-    mutate_all(.funs = stringr::str_pad, width = 5, pad = "0")
   fips<-crosswalk%>%
     filter(ZCTA5 == zip)%>%
     pull(GEOID)

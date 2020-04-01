@@ -5,9 +5,9 @@ source("src/helper_county.R")
 # Global variables can go here
 zip <- "94587"
 nppl <- 20
-prob_flu<- 35.5/327.2/52
+prob_flu<- 35.5/327.2/26 #assume 26 weeks of flu season
 
-css <- HTML(".html-widget.gauge svg {height: 75%; width: 75%; display: block; margin-left: auto;margin-right: auto; margin-bottom:-10%;}
+css <- HTML(".html-widget.gauge svg {height: 66%; width: 66%; display: block; margin-left: auto;margin-right: auto; margin-bottom:-10%;}
             .irs-bar {background: #DF691A;}
             .irs-single {background: #DF691A;}
             .irs-bar-edge {background: #DF691A;}
@@ -26,7 +26,7 @@ ui <- fluidPage(theme=shinytheme("superhero"),
       textInput('zip', label =  "What is your 5-digit zip code?", zip),
       sliderInput('nppl', 
                   'How many people do you see in person in a week? (Try different #\'s after you hit "Calculate")', 
-                  min = 0, max = 50, value = nppl, step =1),
+                  min = 0, max = 100, value = nppl, step =1),
       #sliderInput('fac_underreport', "Choose what percentage of cases are tested?", min = 0.01, max = 1, value = 0.15, step = 0.01),
       checkboxInput('is_sick', "Do you have flu-like symptoms?"),
       #checkboxInput('in_hosp', "Do you work in a hospital?"),
@@ -38,7 +38,7 @@ ui <- fluidPage(theme=shinytheme("superhero"),
     mainPanel(
       tabsetPanel(
         tabPanel("Plot",
-                 fluidRow(withSpinner(gaugeOutput("gauge", height = '800%'), type = 1)),
+                 fluidRow(withSpinner(gaugeOutput("gauge", height = '600%'), type = 1)),
                  fluidRow(column(9, offset = 1, htmlOutput("res")))),
         #tabPanel("Map"),
         tabPanel("Methodology",
@@ -52,13 +52,9 @@ ui <- fluidPage(theme=shinytheme("superhero"),
 # Define the server code
 server <- function(input, output) {
   temp<- eventReactive(input$go, {
-    #validate input types
-    validate(
-      need(input$zip!="", 'Please provide a zip code.'),
-      need(input$nppl, 'Please provide the number of contacts.')
-    )
     #read in FIPS or get it from ZIP
     fips<-get_fips_from_zip(input$zip)
+    validate(need(!is.na(fips), "Sorry, we don't have data for your region."))
     #get county-level characteristics
     county_pop <- get_county_pop(fips)
     county_name <- get_county_name(fips)
@@ -74,7 +70,7 @@ server <- function(input, output) {
   })
   
   temp2<-reactive({
-    temp<-temp()  
+    temp<-temp()
     county_casecount<-temp['county_casecount']%>%as.numeric()
     county_pop<-temp['county_pop']%>%as.numeric()
     county_underreport<-temp['county_underreport']%>%as.numeric()
@@ -91,13 +87,13 @@ server <- function(input, output) {
     }
     g<-function(x){
       # a mapping function to address nonlinearity between probability and score
-      normalized<-log10(x/prob_flu)*50/3+50 
-      # 50 means equal likelihood of flu
-      # 1 means 1/1000 times probability of flu
+      normalized<-log10(x/prob_flu)*30+30 
+      # 25 means equal likelihood of flu
+      # 0 means 1/10 probability of flu
       # 100 means 1000 times probability of flu
       return(normalized)
     }
-    score<-if_else(risk>0, g(risk), 0)
+    score<-if_else(risk>0, g(risk), 1)
     # use the checkboxInput
     if(input$is_sick | input$in_highriskzone){
       score<-max(50, score)
@@ -106,12 +102,14 @@ server <- function(input, output) {
                 "score" = score))
   })
   
+
+  
   output$gauge <-renderGauge({
     temp2<-temp2()
     score<-temp2['score']%>%as.numeric()
-    gauge(case_when(score > 100 ~ 100,
-                    score < 0 ~ 0,
-                    TRUE ~ round(score)), 
+    gauge(case_when(score<1 ~ 1,
+                score>100 ~ 100,
+                TRUE ~round(score)), 
           min = 0, max = 100, 
           sectors = gaugeSectors(success = c(0, 30),
                                  warning = c(30, 70),
@@ -123,18 +121,20 @@ server <- function(input, output) {
     temp <-temp()
     temp2 <- temp2()
     county_casecount<-temp['county_casecount']%>%as.numeric()
-    county_underreport<-temp['county_underreport']%>%as.numeric()
-    prob_flu_string<- formatC(signif(100*prob_flu,digits=2), digits=2,format="fg")
-    county_underreport_string<-formatC(signif(1/temp['county_underreport']%>%as.numeric(),digits=2), digits=2,format="fg")
-    risk_string = formatC(signif(100*temp2['risk']%>%as.numeric(),digits=2), digits=2,format="fg")
     county_pop<-temp['county_pop']%>%as.numeric()
+    county_underreport<-temp['county_underreport']%>%as.numeric()
+    risk<-temp2['risk']%>%as.numeric()
+    
+    prob_flu_string<- formatC(signif(100*prob_flu,digits=2), digits=2,format="fg")
+    county_underreport_string<-formatC(signif((1/county_underreport),digits=2), digits=2,format="fg")
+    risk_string = formatC(signif(100*risk,digits=2), digits=2,format="fg")
     
     tagList(
       tags$p(""),
       div('You live in county:', temp['county_name'], '.',
              'Your county has ', temp['county_casecount']%>%as.numeric(), ' cases out of a population of ', format(county_pop%>%as.numeric(), big.mark = ','), '. '),
       tags$p("We estimated that your county's sepcific under-reporting factor is ", county_underreport_string, 'x. '),
-      tags$p("Our estimation of the probability of you being exposed to COVID-19 through community transmission is ", risk_string, '%.',
+      tags$p("The estimated probability of COVID-19 exposure through community transmission is ", risk_string, '%.',
              "For comparison, your risk of being exposed to flu is ", prob_flu_string, '%.'), 
       tags$p("On a scale of 0  (low risk) to 100 (high risk), your risk score is ", round(temp2['score']%>%as.numeric()), '.')
     )
