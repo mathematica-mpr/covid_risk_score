@@ -163,6 +163,7 @@ server <- function(input, output) {
     odds2risk<-function(odds) {
       return (odds / (1 + odds))
     }
+    validate(need(input$age >= 0, "Invalid age."))
     age_index = max(which(age_list <= input$age))
     hosp_prob = hosp_list[age_index]
     icu_prob = icu_list[age_index]
