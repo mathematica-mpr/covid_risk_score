@@ -128,29 +128,34 @@ server <- function(input, output) {
     county_underreport<-temp['county_underreport']%>%as.numeric()
     risk<-temp2['risk']%>%as.numeric()
     
-    prob_flu_string = tags$b(formatC(signif(100 * prob_flu,digits=2), digits=2,format="fg"))
-    county_underreport_string = tags$b(formatC(signif((1/county_underreport),digits=2), digits=2,format="fg"))
-    risk_string = tags$b(formatC(signif(100 * risk,digits=2), digits=2,format="fg"))
+    prob_flu_string = tags$b(HTML(paste0(formatC(signif(100 * prob_flu,digits=2), digits=2,format="fg"), "%")))
+    county_underreport_string = tags$b(HTML(paste0(formatC(signif((1/county_underreport),digits=2), digits=2,format="fg"), "x")))
+    risk_string = tags$b(HTML(paste0(formatC(signif(100 * risk,digits=2), digits=2,format="fg"), "%")))
 
-    sickness_html = tags$p("Your estimated probability of COVID-19 exposure through community transmission is ",
-                                  risk_string, '%.',
-                                  "For comparison, ", prob_flu_string, '% of Americans catch the flu every week during flu season.')
+    sickness_html = tags$p(HTML(paste0(
+      "Your estimated probability of COVID-19 exposure through community transmission is ", risk_string, '. ',
+      "For comparison, ", prob_flu_string, ' of Americans catch the flu every week during flu season.')))
+    
     if (input$is_sick == TRUE) {
-      sickness_html = tags$p("Since you're already sick, please immediately consult ", 
-                             tags$a("the CDC's instructions. ", 
-                                    href = "https://www.cdc.gov/coronavirus/2019-ncov/if-you-are-sick/steps-when-sick.html"),
-                             "The probability that you could have COVID-19 is ", risk_string, '%. ')
+      sickness_html = tags$p(HTML(paste0(
+        "Since you're already sick, please immediately consult ", 
+        tags$a("the CDC's instructions",
+          href = "https://www.cdc.gov/coronavirus/2019-ncov/if-you-are-sick/steps-when-sick.html"),
+        ". The probability that you could have COVID-19 is ", risk_string, '. ')))
     }
     
     tagList(
       tags$p(""),
-      tags$p('We found data from ', tags$b(temp['county_name']), ' for your zip code.',
-          'This county has ', tags$b(temp['county_casecount']%>%as.numeric()), ' cases out of a population of ', 
-          tags$b(format(county_pop%>%as.numeric(), big.mark = ',')), 
-          ", and we estimated that your county's sepcific under-reporting factor is ", 
-          county_underreport_string, 'x. '),
+      tags$p(HTML(paste0(
+        'We found data from ', tags$b(temp['county_name']), ' for your zip code.',
+        ' This county has ', tags$b(temp['county_casecount']%>%as.numeric()), ' cases out of a population of ', 
+        tags$b(format(county_pop%>%as.numeric(), big.mark = ',')), 
+        ", and we estimated that your county's sepcific under-reporting factor is ", 
+        county_underreport_string, '. '))),
       sickness_html,
-      tags$p("On a scale of 0  (low risk) to 100 (high risk), your risk score is ", tags$b(round(temp2['score']%>%as.numeric())), '.')
+      tags$p(HTML(paste0(
+        "On a scale of 0  (low risk) to 100 (high risk), your risk score is ", 
+        tags$b(round(temp2['score']%>%as.numeric())), '.')))
     )
   })
   
@@ -166,7 +171,7 @@ server <- function(input, output) {
       tags$p(""),
       tags$h3("Assumptions:"),
       tags$li(
-        "Above and beyond the official cases reported by your county, there are additional unreported cases of COVID-19. We followed methodology reported",
+        "Due to a insufficient testing, there are additional unreported cases of COVID-19 beyond the official cases reported by your county. We followed methodology reported",
         tags$a("by Russell et al (2020)", href="https://cmmid.github.io/topics/covid19/severity/global_cfr_estimates.html"),
         "to calculate the percentage of cases that are currently detected. We then estimate the number of cases distributed throughout your community."),
       tags$li("Other methods of becoming infected (e.g. touching an infected surface) are not accounted for by this calculator."),
