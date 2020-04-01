@@ -96,12 +96,12 @@ server <- function(input, output) {
       if(input$is_sick | input$have_preexisting){
         # if you're already sick with flu-like symptoms, your likelihood of having covid is P(C19) / (P(C19) + P(flu))
         total_covid_probability = total_covid_count / county_pop
-        risk = total_covid_probability / (total_covid_probability + prob_flu)
+        exposure_risk = total_covid_probability / (total_covid_probability + prob_flu)
       } else {
-        risk <- 1-(1-active_casecount/county_pop)^input$nppl
+        exposure_risk <- 1-(1-active_casecount/county_pop)^input$nppl
       }
     } else{
-      risk <- 0
+      exposure_risk <- 0
     }
     g<-function(x){
       # a mapping function to address nonlinearity between probability and score
@@ -111,8 +111,8 @@ server <- function(input, output) {
       # 100 means 1000 times probability of flu
       return(normalized)
     }
-    score<-if_else(risk>0, g(risk), 1)
-    unlist(list("risk" = risk,
+    score<-if_else(exposure_risk>0, g(exposure_risk), 1)
+    unlist(list("exposure_risk" = exposure_risk,
                 "score" = score))
   })
   
@@ -137,11 +137,11 @@ server <- function(input, output) {
     county_casecount<-temp['county_casecount']%>%as.numeric()
     county_pop<-temp['county_pop']%>%as.numeric()
     county_underreport<-temp['county_underreport']%>%as.numeric()
-    risk<-temp2['risk']%>%as.numeric()
+    exposure_risk<-temp2['exposure_risk']%>%as.numeric()
     
     prob_flu_string = tags$b(HTML(paste0(formatC(signif(100 * prob_flu,digits=2), digits=2,format="fg"), "%")))
     county_underreport_string = tags$b(HTML(paste0(formatC(signif((1/county_underreport),digits=2), digits=2,format="fg"), "x")))
-    risk_string = tags$b(HTML(paste0(formatC(signif(100 * risk,digits=2), digits=2,format="fg"), "%")))
+    risk_string = tags$b(HTML(paste0(formatC(signif(100 * exposure_risk,digits=2), digits=2,format="fg"), "%")))
 
     sickness_html = tags$p(HTML(paste0(
       "Your estimated probability of COVID-19 exposure through community transmission is ", risk_string, '. ',
