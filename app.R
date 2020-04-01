@@ -132,12 +132,12 @@ server <- function(input, output) {
     county_underreport_string = tags$b(formatC(signif((1/county_underreport),digits=2), digits=2,format="fg"))
     risk_string = tags$b(formatC(signif(100 * risk,digits=2), digits=2,format="fg"))
 
-    sickness_html_string = tags$p("Your estimated probability of COVID-19 exposure through community transmission is ",
+    sickness_html = tags$p("Your estimated probability of COVID-19 exposure through community transmission is ",
                                   risk_string, '%.',
                                   "For comparison, ", prob_flu_string, '% of Americans catch the flu every week during flu season.')
     if (input$is_sick == TRUE) {
-      sickness_html_string = tags$p("Since you're already sick, please immediately consult ", 
-                             tags$a("the CDC's guidelines. ", 
+      sickness_html = tags$p("Since you're already sick, please immediately consult ", 
+                             tags$a("the CDC's instructions. ", 
                                     href = "https://www.cdc.gov/coronavirus/2019-ncov/if-you-are-sick/steps-when-sick.html"),
                              "The probability that you could have COVID-19 is ", risk_string, '%. ')
     }
@@ -149,7 +149,7 @@ server <- function(input, output) {
           tags$b(format(county_pop%>%as.numeric(), big.mark = ',')), 
           ", and we estimated that your county's sepcific under-reporting factor is ", 
           county_underreport_string, 'x. '),
-      sickness_html_string,
+      sickness_html,
       tags$p("On a scale of 0  (low risk) to 100 (high risk), your risk score is ", tags$b(round(temp2['score']%>%as.numeric())), '.')
     )
   })
