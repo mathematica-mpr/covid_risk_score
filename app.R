@@ -41,12 +41,25 @@ css <- HTML(".html-widget.gauge svg {height: 66%; width: 66%; display: block; ma
 
 # Define the UI
 ui <- fluidPage(theme=shinytheme("superhero"),
+  # google analytics tracking
+  tags$script(HTML(
+    "<!-- Global site tag (gtag.js) - Google Analytics -->
+      <script async src=\"https://www.googletagmanager.com/gtag/js?id=UA-162518390-1\"></script>
+      <script>
+      window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    
+    gtag('config', 'UA-162518390-1');
+    </script>"
+  )),
   titlePanel("COVID-19 Risk Score Calculator"),
   tags$head(tags$style(css)),
   #INPUT
   sidebarLayout(
     sidebarPanel(
-      helpText("Please a few questions to see your COVID-19 risk score.", class = "lead"),
+      helpText("DISCLAIMER: this tool is NOT a qualified source of medical knowledge, NOR should it be used to inform policy decisions.", class = "text-danger"),
+      helpText("Please answer a few questions to see your COVID-19 risk score.", class = "lead"),
       #textInput('fips', label =  '5-digit FIPS code of your county', fips),
       textInput('zip', label =  "What is your 5-digit zip code?", default_zip),
       textInput('age', label =  "What is your age?", default_age),
@@ -83,7 +96,7 @@ ui <- fluidPage(theme=shinytheme("superhero"),
         checkboxInput('is_smoker', "Current or former smoker"),
       ),
       actionButton('go', "Calculate", class = "btn-primary"),
-      width = 3.5
+      width = 3
     ),
     #OUTPUT
     mainPanel(
@@ -206,11 +219,7 @@ server <- function(input, output) {
     if (input$has_preexisting) {
       death_odds = death_odds * all_conditions_death_or
     }
-    
-    print(hosp_odds)
-    print(icu_odds)
-    print(death_odds)
-    
+
     hosp_risk = odds2risk(hosp_odds)
     icu_risk = odds2risk(icu_odds)
     death_risk = odds2risk(death_odds)
@@ -231,8 +240,6 @@ server <- function(input, output) {
                 "death_risk" = death_risk,
                 "score" = score))
   })
-  
-
   
   output$gauge <-renderGauge({
     temp2<-temp2()
@@ -305,21 +312,36 @@ server <- function(input, output) {
   output$methods <-renderUI({
     tagList(
       tags$p(""),
-      div(
-        "We used published ",
-        tags$a("county-level data of COVID-19 cases & deaths", 
-               href="https://www.nytimes.com/article/coronavirus-county-data-us.html"),
-        " to estimate the prevalence of infected people within your county. Based on this likely prevalence, and the amount of social distancing you're able to accomplish, we can determine the likelihood you'll be exposed to COVID-19."
+      tags$p('Our "Risk Score" visualization is the quantity Exposure * Susceptibility, logarithmically scaled.'),
+      tags$p("Exposure represents how likely it is that you've come into contact with the virus. You can help decrease this factor by ",
+        tags$a("social distancing, practicing good hygiene, and closely following the directives of your local public health officials.",
+               href = "https://www.cdc.gov/coronavirus/2019-ncov/prevent-getting-sick/prevention.html"),
+        "Your personal susceptibility to COVID-19 is quantified by {P(hospitalization) + P(ICU) + P(mortality)}.",
+        "Please remember that even if your personal susceptibility is low, you can still help by preventing spread to others."
       ),
       tags$p(""),
-      tags$h3("Big Assumptions:"),
+      tags$h3("Assumptions:"),
       tags$li(
-        "Due to a insufficient testing, there are additional unreported cases of COVID-19 beyond the official cases reported by your county. We followed methodology reported",
-        tags$a("by Russell et al (2020)", href="https://cmmid.github.io/topics/covid19/severity/global_cfr_estimates.html"),
-        "to calculate the percentage of cases that are currently detected. We then estimate the number of cases distributed throughout your community."),
+        "To calculate exposure, we used ",
+        tags$a("the New York Times's published data on COVID-19 cases & deaths", 
+               href="https://www.nytimes.com/article/coronavirus-county-data-us.html"),
+        "to estimate the prevalence of infected people within your county.",
+      ),
+      tags$li(
+        "Due to rapid spread and insufficient testing during the COVID-19 pandemic, there are likely additional unreported cases beyond the officially reported cases.",
+        "We followed methodology reported by",
+        tags$a("Russell et al (2020)", href="https://cmmid.github.io/topics/covid19/severity/global_cfr_estimates.html"),
+        "to calculate the percentage of cases that are currently known, and presumably quarantined, versus the number of cases still distributed throughout the community."),
       tags$li("Other methods of becoming infected (e.g. touching an infected surface) are not accounted for by this calculator."),
-      tags$p(""),
-      tags$h3("Other Assumptions:"),
+      tags$li(
+        "Estimations of US hospitalization, ICU and morbidity data by age were obtained from",
+        tags$a("the CDC Morbidity and Mortality Weekly Report (MMWR), March 26th.", href = "https://www.cdc.gov/mmwr/volumes/69/wr/mm6912e2.htm"),
+      ),
+      tags$li("Estimations of risk factors associated with underlying medical conditions were obtained from",
+        tags$a("the CDC MMWR, March 31st,", href = "https://www.cdc.gov/mmwr/volumes/69/wr/mm6912e2.htm"),
+        "and gender from this preprint by", 
+        tags$a("Caramelo et al (2020).", href = "https://www.medrxiv.org/content/10.1101/2020.02.24.20027268v1")
+      ),
       tags$p(""),
       tags$p("We'll be doing our best to update these assumptions as additional knowledge about the virus becomes available."),
     )

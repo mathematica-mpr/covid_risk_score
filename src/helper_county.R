@@ -11,10 +11,10 @@ library(assertr)
 library(flexdashboard)
 
 #Population data from census
-census_api_key("341b9e8939115fe9fcd94897d70d826fe1b945be")
-census_pop<-get_estimates(geography = "county", product = "population")%>%
-  filter(variable == "POP")
-
+#census_api_key("341b9e8939115fe9fcd94897d70d826fe1b945be")
+#census_pop<-get_estimates(geography = "county", product = "population")%>%
+#  filter(variable == "POP")
+census_pop<-read_csv("data/county_pop.csv")
 #FIPS data from census
 data("fips_codes")
 fips_codes<-fips_codes%>%
@@ -94,8 +94,8 @@ get_county_pop<-function(key){
   #output:
   ##ctypop: numeric, county population
   res<-census_pop%>%
-    filter(GEOID==key)%>%
-    pull(value)
+    filter(fips==key)%>%
+    pull(POPESTIMATE2019)
   return(res)
 }
 assertthat::assert_that(get_county_pop("06001")>1.66*10^6)

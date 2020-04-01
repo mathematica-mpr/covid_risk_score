@@ -39,7 +39,7 @@ vignettes/*.pdf
 .Renviron
 
 # data
-/data
+/data/covid-19-data/
 
 # 
 .DS_Store
