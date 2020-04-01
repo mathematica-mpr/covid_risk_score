@@ -316,7 +316,7 @@ server <- function(input, output) {
       tags$p("Exposure represents how likely it is that you've come into contact with the virus. You can help decrease this factor by ",
         tags$a("social distancing, practicing good hygiene, and closely following the directives of your local public health officials.",
                href = "https://www.cdc.gov/coronavirus/2019-ncov/prevent-getting-sick/prevention.html"),
-        "Your personal susceptibility to COVID-19 is quantified by {P(hospitalization) + P(ICU) + P(mortality)}.",
+        "Your personal susceptibility to COVID-19 is quantified by {P(hospitalization) + P(ICU) + P(death)}.",
         "Please remember that even if your personal susceptibility is low, you can still help by preventing spread to others."
       ),
       tags$p(""),
