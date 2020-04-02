@@ -3,8 +3,6 @@ library(shinythemes)
 library(shinycssloaders)
 source("src/helper_county.R")
 # Global variables can go here
-default_zip <- "94587"
-default_age <- "35"
 nppl <- 20
 prob_flu<- 35.5/327.2/26 #assume 26 weeks of flu season
 
@@ -61,8 +59,8 @@ ui <- fluidPage(theme=shinytheme("superhero"),
       helpText("DISCLAIMER: this tool is NOT a qualified source of medical knowledge, NOR should it be used to inform policy decisions.", class = "text-danger"),
       helpText("Please answer a few questions to see your COVID-19 risk score.", class = "lead"),
       #textInput('fips', label =  '5-digit FIPS code of your county', fips),
-      textInput('zip', label =  "What is your 5-digit zip code?", default_zip),
-      textInput('age', label =  "What is your age?", default_age),
+      textInput('zip', label =  "What is your 5-digit zip code?"),
+      textInput('age', label =  "What is your age?"),
       radioButtons('gender', "Are you male?", c("Female" = "female", "Male" = "male")),
       sliderInput('nppl', 
                   'How many people do you see in person in a week?', 
@@ -105,7 +103,7 @@ ui <- fluidPage(theme=shinytheme("superhero"),
                  fluidRow(withSpinner(gaugeOutput("gauge", height = '600%'), type = 1)),
                  fluidRow(column(9, offset = 1, htmlOutput("res")))),
         #tabPanel("Map"),
-        tabPanel("For the Nerds",
+        tabPanel("Methodology",
                  htmlOutput("methods"))),
       width = 9
     )
