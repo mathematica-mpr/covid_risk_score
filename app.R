@@ -36,6 +36,7 @@ css <- HTML(".html-widget.gauge svg {height: 66%; width: 66%; display: block; ma
             .irs-bar-edge {background: #DF691A;}
             .irs-from {background: #DF691A;}
             .irs-to {background: #DF691A;}")
+#yellow = #F0AD4E
 
 # Define the UI
 ui <- fluidPage(theme=shinytheme("superhero"),
@@ -95,8 +96,7 @@ ui <- fluidPage(theme=shinytheme("superhero"),
         ),
         #tabPanel("Map"),
         tabPanel("Method", htmlOutput("methods")),
-        tabPanel("FAQ", htmlOutput("faq")),
-        tabPanel("Contact", htmlOutput("contact"))
+        tabPanel("FAQ", htmlOutput("faq"))
       ),
       width = 9
     )
@@ -258,8 +258,11 @@ server <- function(input, output) {
     county_underreport<-temp['county_underreport']%>%as.numeric()
     exposure_risk<-temp2['exposure_risk']%>%as.numeric()
     
+    formatDynamicString <- function(string) {
+      return (tags$b(tags$span(style="color:#F0AD4E",string)))
+    }
     formatNumber<-function(number, unit) {
-      return (tags$b(HTML(paste0(formatC(signif(number,digits=2), digits=2,format="fg"), unit))))
+      return (formatDynamicString(HTML(paste0(formatC(signif(number,digits=2), digits=2,format="fg"), unit))))
     }
     formatPercent<-function(probability) {
       return (formatNumber(100 * probability, "%"))
@@ -278,7 +281,7 @@ server <- function(input, output) {
     score = min(score, 100)
     score_string = tags$p(HTML(paste0(
       "Your risk score is ",
-      tags$b(round(score)), 
+      formatDynamicString(round(score)), 
       case_when(
         score<30 ~ paste0(
           ", which is (relatively) safe. Even so, it's a good time to make sure that you're ",
@@ -305,9 +308,9 @@ server <- function(input, output) {
     tagList(
       tags$p(""),
       tags$p(HTML(paste0(
-        'We found data from ', tags$b(temp['county_name']), ' for your zip code.',
-        ' This county has ', tags$b(temp['county_casecount']%>%as.numeric()), ' cases out of a population of ', 
-        tags$b(format(county_pop%>%as.numeric(), big.mark = ',')), 
+        'We found data from ', formatDynamicString(temp['county_name']), ' for your zip code.',
+        ' This county has ', formatDynamicString(temp['county_casecount']%>%as.numeric()), ' cases out of a population of ', 
+        formatDynamicString(format(county_pop%>%as.numeric(), big.mark = ',')), " as of ", formatDynamicString(latest_day), 
         ", and we estimated that your county's specific under-reporting factor is ", 
         county_underreport_string, '. '))),
       sickness_html,
@@ -362,10 +365,13 @@ server <- function(input, output) {
     )
   })
   
+  faqQuestion<- function(string) {
+    return (tags$li(tags$b(tags$span(style="color:#DF691A", string))))
+  }
   output$faq <- renderUI({
     tagList(
       tags$h3("Frequently Asked Questions:"),
-      tags$li("Why is my score so high?"),
+      faqQuestion("Why is my score so high?"),
       tags$p("We wanted our tool to be sensitive to the wide variety of circumstances encountered in the US right now;",
              "as a result, it's calibrated around a score of 50. A score of 50 is defined as an Exposure = 0.42% (the",
              "frequency by which the average American catches the flu in any given week), and whose susceptibility",
@@ -373,11 +379,11 @@ server <- function(input, output) {
              "Thus, for two users, one with a score of 50, and one with a score of 90, the user with a score of 90 is",
              "either 100x more likely to have been exposed to COVID-19, or would be 100x more likely to experience a",
              "serious consequence (hospitalization, ICU admission, or death)."),
-      tags$li("My family is sheltering in place with me. Should I count them as exposure risks?"),
+      faqQuestion("My family is sheltering in place with me. Should I count them as exposure risks?"),
       tags$p("As long as your family has been sheltering in place with you, you should be able to think of your family",
              "as a single \"user\" of the tool. However, bear in mind that their exposure risks become yours, and vice",
              "versa."),
-      tags$li("My county only has a few (tens, hundreds, thousands) of cases. Why is my exposure risk so high?"),
+      faqQuestion("My county only has a few (tens, hundreds, thousands) of cases. Why is my exposure risk so high?"),
       tags$p("Probably the most difficult/controversial/inaccurate part of our calculator is our estimation of the",
              "underreporting factor, the factor we use to estimate the true, larger, community prevalence of COVID-19",
              "in your community. In some places, our tool may be overestimating this factor, and in some places, it",
@@ -386,19 +392,14 @@ server <- function(input, output) {
              "feel like anyone that wants to be tested is being tested promptly, then I think there is reason to",
              "believe that the authorities are tracking most of the community cases of COVID-19 in your area.",
              "Unfortunately, that is not true of most of the US at present."),
-      tags$li("My specific medical condition isn't listed. What do I do?"),
+      faqQuestion("My specific medical condition isn't listed. What do I do?"),
       tags$p("Try using \"other conditions\" to get a catch-all estimate of your susceptibility."),
-      tags$li("My hospitalization/ICU/death risk seems out of whack."),
+      faqQuestion("My hospitalization/ICU/death risk seems out of whack."),
       tags$p("A lot is still unknown about the disease, and data sets are sparse, so our susceptibility scores are",
              "good for ballpark estimates only. We'll update our tool with better numbers as they become available."),
-      tags$li("I have suggestion X, or know of data set Y, or want feature Z..."),
+      faqQuestion("I have suggestion X, or know of data set Y, or want feature Z..."),
       tags$p("Let us know at", tags$a("covid.risk.score@gmail.com", href="mailto:covid.risk.score@gmail.com"), "!")
     )
-  })
-  
-  output$contact <- renderUI({
-    tags$p("Our contact info: ", 
-           tags$a("covid.risk.score@gmail.com", href = "mailto:covid.risk.score@gmail.com"))
   })
 }
 
