@@ -367,10 +367,9 @@ server <- function(input, output) {
       tags$h3("Frequently Asked Questions:"),
       tags$li("Why is my score so high?"),
       tags$p("We wanted our tool to be sensitive to the wide variety of circumstances encountered in the US right now;",
-             "as a result, it's calibrated around a score of 50.",
-             "A score of 50 is defined as an Exposure = 0.42% (the frequency by which the average American catches the",
-             "flu in any given week), and whose susceptibility score is 100%.",
-             "For every 10x change in (Exposure*Susceptibility), the score will change by 20.",
+             "as a result, it's calibrated around a score of 50. A score of 50 is defined as an Exposure = 0.42% (the",
+             "frequency by which the average American catches the flu in any given week), and whose susceptibility",
+             "score is 100%. For every 10x change in (Exposure*Susceptibility), the score will change by 20.",
              "Thus, for two users, one with a score of 50, and one with a score of 90, the user with a score of 90 is",
              "either 100x more likely to have been exposed to COVID-19, or would be 100x more likely to experience a",
              "serious consequence (hospitalization, ICU admission, or death)."),
@@ -388,8 +387,12 @@ server <- function(input, output) {
              "believe that the authorities are tracking most of the community cases of COVID-19 in your area.",
              "Unfortunately, that is not true of most of the US at present."),
       tags$li("My specific medical condition isn't listed. What do I do?"),
-      tags$p("Try using \"other conditions\")
-      
+      tags$p("Try using \"other conditions\" to get a catch-all estimate of your susceptibility."),
+      tags$li("My hospitalization/ICU/death risk seems out of whack."),
+      tags$p("A lot is still unknown about the disease, and data sets are sparse, so our susceptibility scores are",
+             "good for ballpark estimates only. We'll update our tool with better numbers as they become available."),
+      tags$li("I have suggestion X, or know of data set Y, or want feature Z..."),
+      tags$p("Let us know at", tags$a("covid.risk.score@gmail.com", href="mailto:covid.risk.score@gmail.com"), "!")
     )
   })
   
