@@ -91,7 +91,7 @@ ui <- fluidPage(theme=shinytheme("superhero"),
         checkboxInput('has_neuro', "Neurologic disorder"),
         checkboxInput('has_liver', "Chronic liver disease"),
         checkboxInput('has_other', "Other chronic disease"),
-        checkboxInput('is_smoker', "Current or former smoker"),
+        checkboxInput('is_smoker', "Current or former smoker")
       ),
       actionButton('go', "Calculate", class = "btn-primary"),
       width = 3
@@ -101,10 +101,12 @@ ui <- fluidPage(theme=shinytheme("superhero"),
       tabsetPanel(
         tabPanel("Score",
                  fluidRow(withSpinner(gaugeOutput("gauge", height = '600%'), type = 1)),
-                 fluidRow(column(9, offset = 1, htmlOutput("res")))),
+                 fluidRow(column(9, offset = 1, htmlOutput("res")))
+                 ),
         #tabPanel("Map"),
-        tabPanel("Methodology",
-                 htmlOutput("methods"))),
+        tabPanel("Methodology", htmlOutput("methods")),
+        tabPanel("Contact", htmlOutput("contact"))
+        ),
       width = 9
     )
   )
@@ -159,8 +161,14 @@ server <- function(input, output) {
     odds2risk<-function(odds) {
       return (odds / (1 + odds))
     }
-    validate(need(input$age >= 0, "Invalid age."))
-    age_index = max(which(age_list <= input$age))
+    age = as.numeric(input$age)
+    validate(need(age >= 0, "Invalid age."))
+    age_index = max(which(age_list <= age))
+    print("age index")
+    print(age_index)
+    print("age")
+    print(input$age)
+    print(age_list[age_index])
     hosp_prob = hosp_list[age_index]
     icu_prob = icu_list[age_index]
     death_prob = death_list[age_index]
@@ -309,7 +317,7 @@ server <- function(input, output) {
         'We found data from ', tags$b(temp['county_name']), ' for your zip code.',
         ' This county has ', tags$b(temp['county_casecount']%>%as.numeric()), ' cases out of a population of ', 
         tags$b(format(county_pop%>%as.numeric(), big.mark = ',')), 
-        ", and we estimated that your county's sepcific under-reporting factor is ", 
+        ", and we estimated that your county's specific under-reporting factor is ", 
         county_underreport_string, '. '))),
       sickness_html,
 
@@ -361,6 +369,10 @@ server <- function(input, output) {
       tags$p(""),
       tags$p("We'll be doing our best to update these assumptions as additional knowledge about the virus becomes available."),
     )
+  })
+  
+  output$contact <- renderUI({
+    tags$p("Our contact info: covid.risk.score@gmail.com")
   })
 }
 
