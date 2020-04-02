@@ -223,7 +223,7 @@ server <- function(input, output) {
       x = exposure * (hospitalization + icu + death)
       # a mapping function to better visualize probability
       normalized<-log10(x/prob_flu)*20+50 
-      # 30 means equal likelihood of flu
+      # 50 means equal likelihood of flu
       # 0 means 1/10 probability of flu
       # 90 means 100 times probability of flu
       return(normalized)
