@@ -73,7 +73,7 @@ ui <- fluidPage(theme=shinytheme("superhero"),
       conditionalPanel(
         condition = "input.has_preexisting == true",
         checkboxInput('has_diabetes', "Diabetes"),
-        checkboxInput('has_lung', "Chronic lung disease"),
+        checkboxInput('has_lung', "Chronic lung disease/moderate-to-severe asthma"),
         checkboxInput('has_cvd', "Cardiovascular disease"),
         checkboxInput('has_immune', "Immunocompromised condition"),
         checkboxInput('has_renal', "Chronic renal disease"),
@@ -92,11 +92,12 @@ ui <- fluidPage(theme=shinytheme("superhero"),
         tabPanel("Score",
                  fluidRow(withSpinner(gaugeOutput("gauge", height = '600%'), type = 1)),
                  fluidRow(column(9, offset = 1, htmlOutput("res")))
-                 ),
-        #tabPanel("Map"),
-        tabPanel("Methodology", htmlOutput("methods")),
-        tabPanel("Contact", htmlOutput("contact"))
         ),
+        #tabPanel("Map"),
+        tabPanel("Method", htmlOutput("methods")),
+        tabPanel("FAQ", htmlOutput("faq")),
+        tabPanel("Contact", htmlOutput("contact"))
+      ),
       width = 9
     )
   )
@@ -326,7 +327,7 @@ server <- function(input, output) {
   output$methods <-renderUI({
     tagList(
       tags$p(""),
-      tags$p('Our "Risk Score" visualization is the quantity Exposure * Susceptibility, logarithmically scaled.'),
+      tags$p('Our "Risk Score" visualization is the quantity {Exposure * Susceptibility}, logarithmically scaled.'),
       tags$p("Exposure represents how likely it is that you've come into contact with the virus. You can help decrease this factor by ",
         tags$a("social distancing, practicing good hygiene, and closely following the directives of your local public health officials.",
                href = "https://www.cdc.gov/coronavirus/2019-ncov/prevent-getting-sick/prevention.html"),
@@ -358,6 +359,37 @@ server <- function(input, output) {
       ),
       tags$p(""),
       tags$p("We'll be doing our best to update these assumptions as additional knowledge about the virus becomes available."),
+    )
+  })
+  
+  output$faq <- renderUI({
+    tagList(
+      tags$h3("Frequently Asked Questions:"),
+      tags$li("Why is my score so high?"),
+      tags$p("We wanted our tool to be sensitive to the wide variety of circumstances encountered in the US right now;",
+             "as a result, it's calibrated around a score of 50.",
+             "A score of 50 is defined as an Exposure = 0.42% (the frequency by which the average American catches the",
+             "flu in any given week), and whose susceptibility score is 100%.",
+             "For every 10x change in (Exposure*Susceptibility), the score will change by 20.",
+             "Thus, for two users, one with a score of 50, and one with a score of 90, the user with a score of 90 is",
+             "either 100x more likely to have been exposed to COVID-19, or would be 100x more likely to experience a",
+             "serious consequence (hospitalization, ICU admission, or death)."),
+      tags$li("My family is sheltering in place with me. Should I count them as exposure risks?"),
+      tags$p("As long as your family has been sheltering in place with you, you should be able to think of your family",
+             "as a single \"user\" of the tool. However, bear in mind that their exposure risks become yours, and vice",
+             "versa."),
+      tags$li("My county only has a few (tens, hundreds, thousands) of cases. Why is my exposure risk so high?"),
+      tags$p("Probably the most difficult/controversial/inaccurate part of our calculator is our estimation of the",
+             "underreporting factor, the factor we use to estimate the true, larger, community prevalence of COVID-19",
+             "in your community. In some places, our tool may be overestimating this factor, and in some places, it",
+             "may be underestimating. Even so, it's probably good enough to get you a ballpark estimate of your risk."),
+      tags$p("If your community has seen a huge increase in testing, has a \"test positive\" rate < 5%, and if you",
+             "feel like anyone that wants to be tested is being tested promptly, then I think there is reason to",
+             "believe that the authorities are tracking most of the community cases of COVID-19 in your area.",
+             "Unfortunately, that is not true of most of the US at present."),
+      tags$li("My specific medical condition isn't listed. What do I do?"),
+      tags$p("Try using \"other conditions\")
+      
     )
   })
   
