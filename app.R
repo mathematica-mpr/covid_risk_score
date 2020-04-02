@@ -40,17 +40,7 @@ css <- HTML(".html-widget.gauge svg {height: 66%; width: 66%; display: block; ma
 # Define the UI
 ui <- fluidPage(theme=shinytheme("superhero"),
   # google analytics tracking
-  tags$script(HTML(
-    "<!-- Global site tag (gtag.js) - Google Analytics -->
-      <script async src=\"https://www.googletagmanager.com/gtag/js?id=UA-162518390-1\"></script>
-      <script>
-      window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    
-    gtag('config', 'UA-162518390-1');
-    </script>"
-  )),
+  tags$head(includeHTML("google-analytics.html")),
   titlePanel("COVID-19 Risk Score Calculator"),
   tags$head(tags$style(css)),
   #INPUT
