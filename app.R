@@ -362,7 +362,8 @@ server <- function(input, output) {
   })
   
   output$contact <- renderUI({
-    tags$p("Our contact info: covid.risk.score@gmail.com")
+    tags$p("Our contact info: ", 
+           tags$a("covid.risk.score@gmail.com", href = "mailto:covid.risk.score@gmail.com"))
   })
 }
 
