@@ -105,7 +105,7 @@ ui <- fluidPage(theme=shinytheme("superhero"),
                  fluidRow(withSpinner(gaugeOutput("gauge", height = '600%'), type = 1)),
                  fluidRow(column(9, offset = 1, htmlOutput("res")))),
         #tabPanel("Map"),
-        tabPanel("Methodology",
+        tabPanel("For the Nerds",
                  htmlOutput("methods"))),
       width = 9
     )
@@ -228,7 +228,7 @@ server <- function(input, output) {
     g<-function(exposure, hospitalization, icu, death){
       x = exposure * (hospitalization + icu + death)
       # a mapping function to better visualize probability
-      normalized<-log10(x/prob_flu)*30+30 
+      normalized<-log10(x/prob_flu)*20+50 
       # 30 means equal likelihood of flu
       # 0 means 1/10 probability of flu
       # 90 means 100 times probability of flu
@@ -278,6 +278,27 @@ server <- function(input, output) {
       "Your estimated probability of COVID-19 exposure through community transmission is ", risk_string, '. ',
       "For comparison, ", prob_flu_string, ' of Americans catch the flu every week during flu season.')))
     
+    score<- temp2['score']%>%as.numeric()
+    score = max(score, 0)
+    score = min(score, 100)
+    score_string = tags$p(HTML(paste0(
+      "Your risk score is ",
+      tags$b(round(score)), 
+      case_when(
+        score<30 ~ paste0(
+          ", which is (relatively) safe. Even so, it's a good time to make sure that you're ",
+          tags$a("prepared! ", href = "https://www.cdc.gov/coronavirus/2019-ncov/daily-life-coping/get-your-household-ready-for-COVID-19.html")),
+        score>70 ~ paste0(
+          ", which is quite serious. Avoiding exposure, practicing good hygiene, and making sure you have ",
+          tags$a("a plan in place ", href = "https://www.cdc.gov/coronavirus/2019-ncov/prevent-getting-sick/prevention.html"), 
+          "are critically important for you."),
+        TRUE ~ paste0(
+          ". Please take the time to review ",
+          tags$a("this page", href = "https://www.cdc.gov/coronavirus/2019-ncov/prevent-getting-sick/prevention.html"),
+          " to make sure you're well prepared in the days to come.")
+      )
+    )))
+    
     if (input$is_sick == TRUE) {
       sickness_html = tags$p(HTML(paste0(
         "Since you're already sick, please immediately consult ", 
@@ -287,7 +308,10 @@ server <- function(input, output) {
     }
     
     tagList(
-      tags$p(""),
+      tags$p(case_when(
+        score<30 ~ "Awesome! ",
+        score>70 ~ "Yikes! ",
+        TRUE ~ "")),
       tags$p(HTML(paste0(
         'We found data from ', tags$b(temp['county_name']), ' for your zip code.',
         ' This county has ', tags$b(temp['county_casecount']%>%as.numeric()), ' cases out of a population of ', 
@@ -304,9 +328,7 @@ server <- function(input, output) {
         ", and your risk of dying is ",
         formatPercent(temp2["death_risk"]), "."
       ))),
-      tags$p(HTML(paste0(
-        "On a scale of 0  (low risk) to 100 (high risk), your risk score is ", 
-        tags$b(round(temp2['score']%>%as.numeric())), '.'))),
+      score_string,
     )
   })
   
