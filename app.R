@@ -26,9 +26,9 @@ neuro_or    = c(6.18, 2.30)
 liver_or    = c(2.44, 3.05)
 other_or    = c(4.21, 3.33)
 smoker_or   = c(2.67, 2.64)
-male_or     = c(1.8518, 1.85)
-# OR source: https://www.medrxiv.org/content/10.1101/2020.02.24.20027268v1
 all_conditions_death_or = 27.84
+# OR source: https://www.medrxiv.org/content/10.1101/2020.02.24.20027268v1
+male_or     = c(1.8518, 1.85)
 
 css <- HTML(".html-widget.gauge svg {height: 66%; width: 66%; display: block; margin-left: auto;margin-right: auto; margin-bottom:-10%;}
             .irs-bar {background: #DF691A;}
