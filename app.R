@@ -61,25 +61,25 @@ ui <- fluidPage(theme=shinytheme("superhero"),
       #textInput('fips', label =  '5-digit FIPS code of your county', fips),
       textInput('zip', label =  "What is your 5-digit zip code?"),
       textInput('age', label =  "What is your age?"),
-      radioButtons('gender', "Are you male?", c("Female" = "female", "Male" = "male")),
+      radioButtons('gender', "What is your gender?", c("Female" = "female", "Male" = "male")),
       sliderInput('nppl', 
                   'How many people do you see in person in a week?', 
                   min = 0, max = 100, value = nppl, step =1),
       #sliderInput('fac_underreport', "Choose what percentage of cases are tested?", min = 0.01, max = 1, value = 0.15, step = 0.01),
       checkboxInput('is_sick', 
                     HTML(paste0(
-                      "Do you have ", 
+                      "I have ", 
                       tags$a(
                         "flu-like symptoms",
-                        href = "https://www.cdc.gov/coronavirus/2019-ncov/symptoms-testing/symptoms.html"),
-                      "?"))),
+                        href = "https://www.cdc.gov/coronavirus/2019-ncov/symptoms-testing/symptoms.html"))
+                      )),
       checkboxInput('has_preexisting', 
                     HTML(paste0(
-                      "Do you have ", 
+                      "I have ", 
                       tags$a(
                         "underlying medical complications",
-                        href = "https://www.cdc.gov/coronavirus/2019-ncov/need-extra-precautions/people-at-higher-risk.html"),
-                      "?"))),
+                        href = "https://www.cdc.gov/coronavirus/2019-ncov/need-extra-precautions/people-at-higher-risk.html")
+                    ))),
       conditionalPanel(
         condition = "input.has_preexisting == true",
         checkboxInput('has_diabetes', "Diabetes"),
@@ -135,21 +135,19 @@ server <- function(input, output) {
     county_casecount<-temp['county_casecount']%>%as.numeric()
     county_pop<-temp['county_pop']%>%as.numeric()
     county_underreport<-temp['county_underreport']%>%as.numeric()
-    if (input$nppl>0){
-      total_covid_count = county_casecount/county_underreport
+    total_covid_count = county_casecount/county_underreport
+    if(input$is_sick){
+      # if you're already sick with flu-like symptoms, your likelihood of having covid is P(C19) / (P(C19) + P(flu))
+      total_covid_probability = total_covid_count / county_pop
+      exposure_risk = total_covid_probability / (total_covid_probability + prob_flu)
+    } else if (input$nppl>0) {
       # ASSUMPTION: diagnosed cases are not active
       active_casecount = total_covid_count - county_casecount
       # ASSUMPTION: active community case count cannot be less than 10% of reported cases
       if (active_casecount < 0.1 * county_casecount) {
         active_casecount = 0.1 * county_casecount
       }
-      if(input$is_sick){
-        # if you're already sick with flu-like symptoms, your likelihood of having covid is P(C19) / (P(C19) + P(flu))
-        total_covid_probability = total_covid_count / county_pop
-        exposure_risk = total_covid_probability / (total_covid_probability + prob_flu)
-      } else {
-        exposure_risk <- 1-(1-active_casecount/county_pop)^input$nppl
-      }
+      exposure_risk <- 1-(1-active_casecount/county_pop)^input$nppl
     } else{
       exposure_risk <- 0
     }
@@ -306,10 +304,7 @@ server <- function(input, output) {
     }
     
     tagList(
-      tags$p(case_when(
-        score<30 ~ "Awesome! ",
-        score>70 ~ "Yikes! ",
-        TRUE ~ "")),
+      tags$p(""),
       tags$p(HTML(paste0(
         'We found data from ', tags$b(temp['county_name']), ' for your zip code.',
         ' This county has ', tags$b(temp['county_casecount']%>%as.numeric()), ' cases out of a population of ', 
