@@ -71,7 +71,10 @@ augment_nyt_covid<-function(df){
 }
 
 df_ls<-augment_nyt_covid(df)
+us_death_today<-df_ls[[latest_day%>%as.character()]]%>%pull(deaths)%>%sum(na.rm = T)
+us_case_13d<-df_ls[[(latest_day-13)%>%as.character()]]%>%pull(cases)%>%sum(na.rm = T)
 
+###########county specific############3
 get_county_name<-function(key){
   #Looks up county name
   #input
@@ -147,19 +150,18 @@ calc_county_underreport<-function(fips){
   n_death_today<-get_county_deathcount(fips, latest_day)
   #number of infected cases 13 days ago
   n_case_13d<-get_county_casecount(fips, latest_day-13)
-  #calculate case fatality rate
-  cfr <- n_death_today/n_case_13d
-  #calculate underreporting rate
-  fac_underreport<-true_mortality_rate/cfr
-  #if cfr is zero, the underreporting factor is NA, then force it to be US average, 0.17.
-  return(case_when(is.infinite(fac_underreport) ~ 0.17,
-                   is.na(fac_underreport) ~ 0.17,
-                   fac_underreport<0.1 ~ 0.1,
+  #calculate underreporting factor as cfr/true mortality
+  fac_underreport <- n_death_today/n_case_13d/true_mortality_rate
+  #if cfr is zero, the underreporting factor is NA, then force it to be US average
+  us_average<-us_death_today/us_case_13d/true_mortality_rate
+  return(case_when(fac_underreport==0 ~ us_average,
+                   is.na(fac_underreport) ~ us_average,
+                   fac_underreport>10 ~ 10,
                    TRUE ~ fac_underreport))
 }
-assertthat::assert_that(calc_county_underreport("06001")<=1)
-assertthat::assert_that(calc_county_underreport("36067")<=1)
-assertthat::assert_that(calc_county_underreport("30031")<=1)
+assertthat::assert_that(calc_county_underreport("06001")>=1)
+assertthat::assert_that(calc_county_underreport("36067")>=1)
+assertthat::assert_that(calc_county_underreport("30031")>=1)
 
 get_fips_from_zip<-function(zip){
   fips<-crosswalk%>%

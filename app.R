@@ -6,14 +6,18 @@ source("src/helper_county.R")
 nppl <- 20
 prob_flu<- 35.5/327.2/26 #assume 26 weeks of flu season
 
-# susceptibility data for US, https://www.cdc.gov/mmwr/volumes/69/wr/mm6912e2.htm
-susceptibility_total_cases = 4226
-total_hospitalized = 508
-total_icu = 121
-age_list =   c(0,     20,    45,    55,    65,    75,    85)
-hosp_list =  c(2.05,  17.55, 24.75, 25.3,  36.05, 44.6,  50.8) / 100
-icu_list =   c(0,     3.1,   7.9,   7.95,  13.45, 20.75, 17.65) / 100
-death_list = c(0,     0.15,  0.65,  2.0,   3.8,   7.4,   18.85) / 100
+# # susceptibility data for US, https://www.cdc.gov/mmwr/volumes/69/wr/mm6912e2.htm
+# susceptibility_total_cases = 4226
+# total_hospitalized = 508
+# total_icu = 121
+# hosp_list =  c(2.05,  17.55, 24.75, 25.3,  36.05, 44.6,  50.8) / 100
+# icu_list =   c(0,     3.1,   7.9,   7.95,  13.45, 20.75, 17.65) / 100
+# infection hospitalization rate and fatality rate, https://www.thelancet.com/journals/laninf/article/PIIS1473-3099(20)30243-7/fulltext
+age_list   = c(0,       10,      20,      30,      40,      50,      60,     70,     80)
+hosp_list  = c(0,       0.0408,  1.04,    3.43,    4.25,    8.16,    11.8,   16.6,   18.4) / 100
+#case to infection conversion 1.38% cfr, 0.657% infection fatality rate
+icu_list   = c(0,       0,       2,       2,       3.7,     5.05,    6.4,    9.3,    8.4) *.657/1.38 /100
+death_list = c(0.00161, 0.00695, 0.0309,  0.0844,  0.161,   0.595,   1.93,   4.28,   7.8)  / 100
 
 # odds ratios, https://www.cdc.gov/mmwr/volumes/69/wr/mm6913e2.htm
 diabetes_or = c(5.00, 4.57)
@@ -30,13 +34,13 @@ all_conditions_death_or = 27.84
 # OR source: https://www.medrxiv.org/content/10.1101/2020.02.24.20027268v1
 male_or     = c(1.8518, 1.85)
 
+# CSS
 css <- HTML(".html-widget.gauge svg {height: 66%; width: 66%; display: block; margin-left: auto;margin-right: auto; margin-bottom:-10%;}
             .irs-bar {background: #DF691A;}
             .irs-single {background: #DF691A;}
             .irs-bar-edge {background: #DF691A;}
             .irs-from {background: #DF691A;}
             .irs-to {background: #DF691A;}")
-#yellow = #F0AD4E
 
 # Define the UI
 ui <- fluidPage(theme=shinytheme("superhero"),
@@ -130,7 +134,7 @@ server <- function(input, output, session) {
     county_casecount<-temp['county_casecount']%>%as.numeric()
     county_pop<-temp['county_pop']%>%as.numeric()
     county_underreport<-temp['county_underreport']%>%as.numeric()
-    total_covid_count = county_casecount/county_underreport
+    total_covid_count = county_casecount*county_underreport
     if(input$is_sick){
       # if you're already sick with flu-like symptoms, your likelihood of having covid is P(C19) / (P(C19) + P(flu))
       total_covid_probability = total_covid_count / county_pop
@@ -235,7 +239,7 @@ server <- function(input, output, session) {
     }
     
     prob_flu_string = formatPercent(prob_flu)
-    county_underreport_string = formatNumber(1/county_underreport, "x")
+    county_underreport_string = formatNumber(county_underreport, "x")
     risk_string = formatPercent(exposure_risk)
 
     sickness_html = tags$p(HTML(paste0(
@@ -278,8 +282,8 @@ server <- function(input, output, session) {
       tags$p(""),
       tags$p(HTML(paste0(
         'We found data from ', formatDynamicString(temp['county_name']), ' for your zip code.',
-        ' This county has ', formatDynamicString(temp['county_casecount']%>%as.numeric()), ' cases out of a population of ', 
-        formatDynamicString(format(county_pop%>%as.numeric(), big.mark = ',')), " as of ", formatDynamicString(latest_day), 
+        ' This county has ', formatDynamicString(format(county_casecount, big.mark=",")), ' cases out of a population of ', 
+        formatDynamicString(format(county_pop, big.mark = ',')), " as of ", formatDynamicString(latest_day), 
         ", and we estimated that your county's specific under-reporting factor is ", 
         county_underreport_string, '. '))),
       sickness_html,
