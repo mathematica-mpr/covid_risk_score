@@ -155,11 +155,6 @@ server <- function(input, output) {
     age = as.numeric(input$age)
     validate(need(age >= 0, "Invalid age."))
     age_index = max(which(age_list <= age))
-    print("age index")
-    print(age_index)
-    print("age")
-    print(input$age)
-    print(age_list[age_index])
     hosp_prob = hosp_list[age_index]
     icu_prob = icu_list[age_index]
     death_prob = death_list[age_index]
