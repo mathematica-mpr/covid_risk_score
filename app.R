@@ -296,7 +296,10 @@ server <- function(input, output) {
       sickness_html = tags$p(HTML(paste0(
         "Since you're already sick, please immediately consult ", 
         tags$a("the CDC's instructions",
-          href = "https://www.cdc.gov/coronavirus/2019-ncov/if-you-are-sick/steps-when-sick.html"),
+               href = "https://www.cdc.gov/coronavirus/2019-ncov/if-you-are-sick/steps-when-sick.html"),
+        ", or walk through their ",
+        tags$a("self-checker",
+               href = "https://www.cdc.gov/coronavirus/2019-ncov/symptoms-testing/index.html#cdc-chat-bot-open"),
         ". The probability that you could have COVID-19 is ", risk_string, '. ')))
     }
     
