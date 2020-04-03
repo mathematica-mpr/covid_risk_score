@@ -73,16 +73,18 @@ ui <- fluidPage(theme=shinytheme("superhero"),
                     ))),
       conditionalPanel(
         condition = "input.has_preexisting == true",
-        checkboxInput('has_diabetes', "Diabetes"),
-        checkboxInput('has_lung', "Chronic lung disease/moderate-to-severe asthma"),
-        checkboxInput('has_cvd', "Cardiovascular disease"),
-        checkboxInput('has_immune', "Immunocompromised condition"),
-        checkboxInput('has_renal', "Chronic renal disease"),
-        checkboxInput('is_pregnant', "Pregnancy"),
-        checkboxInput('has_neuro', "Neurologic disorder"),
-        checkboxInput('has_liver', "Chronic liver disease"),
-        checkboxInput('has_other', "Other chronic disease"),
-        checkboxInput('is_smoker', "Current or former smoker")
+        checkboxGroupInput("conditions", "Conditions",
+                           c("Diabetes" = "is_diabetes",
+                             "Chronic lung disease or asthma" = "is_lung",
+                             "Cardiovascular disease" = "is_cvd",
+                             "Immunocompromised condition" = "is_immune",
+                             "Chronic renal disease" = "is_renal",
+                             "Pregnancy" = "is_pregnant",
+                             "Neurologic disorder" = "is_neuro",
+                             "Chronic liver disease" = "is_liver",
+                             "Other chronic disease" = "is_other",
+                             "Current or former smoker" = "is_smoker"
+                             )),
       ),
       actionButton('go', "Calculate", class = "btn-primary"),
       width = 3
@@ -104,7 +106,7 @@ ui <- fluidPage(theme=shinytheme("superhero"),
 )
 
 # Define the server code
-server <- function(input, output) {
+server <- function(input, output, session) {
   temp<- eventReactive(input$go, {
     #read in FIPS or get it from ZIP
     fips<-get_fips_from_zip(input$zip)
@@ -162,45 +164,12 @@ server <- function(input, output) {
     icu_odds = risk2odds(icu_prob)
     death_odds = risk2odds(death_prob)
     
-    if (input$has_diabetes) {
-      hosp_odds = hosp_odds * diabetes_or[1]
-      icu_odds = icu_odds * diabetes_or[2]
-    }
-    if (input$has_lung) {
-      hosp_odds = hosp_odds * lung_or[1]
-      icu_odds = icu_odds * lung_or[2]
-    }
-    if (input$has_cvd) {
-      hosp_odds = hosp_odds * cvd_or[1]
-      icu_odds = icu_odds * cvd_or[2]
-    }
-    if (input$has_immune) {
-      hosp_odds = hosp_odds * immune_or[1]
-      icu_odds = icu_odds * immune_or[2]
-    }
-    if (input$has_renal) {
-      hosp_odds = hosp_odds * renal_or[1]
-      icu_odds = icu_odds * renal_or[2]
-    }
-    if (input$is_pregnant) {
-      hosp_odds = hosp_odds * pregnant_or[1]
-      icu_odds = icu_odds * pregnant_or[2]
-    }
-    if (input$has_neuro) {
-      hosp_odds = hosp_odds * neuro_or[1]
-      icu_odds = icu_odds * neuro_or[2]
-    }
-    if (input$has_liver) {
-      hosp_odds = hosp_odds * liver_or[1]
-      icu_odds = icu_odds * liver_or[2]
-    }
-    if (input$has_other) {
-      hosp_odds = hosp_odds * other_or[1]
-      icu_odds = icu_odds * other_or[2]
-    }
-    if (input$is_smoker) {
-      hosp_odds = hosp_odds * smoker_or[1]
-      icu_odds = icu_odds * smoker_or[2]
+    for (condition_id in input$conditions) {
+      # remove "is_" prefix
+      condition_root = substr(condition_id, 4, nchar(condition_id))
+      print(paste0(condition_root, "_or[1]"))
+      hosp_odds = hosp_odds * eval(parse(text=paste0(condition_root, "_or[1]")))
+      icu_odds = icu_odds * eval(parse(text=paste0(condition_root, "_or[2]")))
     }
     if (input$gender == "male") {
       hosp_odds = hosp_odds * male_or[1]
@@ -209,6 +178,8 @@ server <- function(input, output) {
     
     if (input$has_preexisting) {
       death_odds = death_odds * all_conditions_death_or
+    } else {
+      # clear the conditional panel's UI
     }
 
     hosp_risk = odds2risk(hosp_odds)
