@@ -167,7 +167,6 @@ server <- function(input, output, session) {
     for (condition_id in input$conditions) {
       # remove "is_" prefix
       condition_root = substr(condition_id, 4, nchar(condition_id))
-      print(paste0(condition_root, "_or[1]"))
       hosp_odds = hosp_odds * eval(parse(text=paste0(condition_root, "_or[1]")))
       icu_odds = icu_odds * eval(parse(text=paste0(condition_root, "_or[2]")))
     }
@@ -180,6 +179,7 @@ server <- function(input, output, session) {
       death_odds = death_odds * all_conditions_death_or
     } else {
       # clear the conditional panel's UI
+      updateCheckboxGroupInput(session, "conditions", selected = character(0))
     }
 
     hosp_risk = odds2risk(hosp_odds)
