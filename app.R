@@ -5,6 +5,7 @@ source("src/helper_county.R")
 # Global variables can go here
 nppl <- 20
 prob_flu<- 35.5/327.2/26 #assume 26 weeks of flu season
+fips<-""
 
 # # susceptibility data for US, https://www.cdc.gov/mmwr/volumes/69/wr/mm6912e2.htm
 # susceptibility_total_cases = 4226
@@ -61,6 +62,7 @@ ui <- fluidPage(theme=shinytheme("superhero"),
       helpText("Please answer a few questions to see your COVID-19 risk score.", class = "lead"),
       #textInput('fips', label =  '5-digit FIPS code of your county', fips),
       textInput('zip', label =  "What is your 5-digit zip code?"),
+      uiOutput("zipcontrol"),
       textInput('age', label =  "What is your age?"),
       radioButtons('gender', "What is your gender?", c("Female" = "female", "Male" = "male")),
       sliderInput('nppl', 
@@ -115,9 +117,18 @@ ui <- fluidPage(theme=shinytheme("superhero"),
 # Define the server code
 server <- function(input, output, session) {
   temp<- eventReactive(input$go, {
-    #read in FIPS or get it from ZIP
     fips<-get_fips_from_zip(input$zip)
-    validate(need(!is.na(fips), "Sorry, we don't have data for your region."))
+    if(length(fips)  >1){
+      output$zipcontrol <- renderUI({
+        fips<-get_fips_from_zip(input$zip)
+        fips_names<-lapply(fips, get_county_name)%>%unlist()
+        print(fips)
+        radioButtons("fips",label = "Choose a county and resubmit", choiceNames = fips_names, choiceValues  = fips, selected = NULL)
+        #textInput("fips", "If your zip code matches multiple counties, please put in 5-digit county FIPS code")
+      })
+      fips<-input$fips
+    }
+    validate(need(!is.na(fips), "Check input!"))
     #get county-level characteristics
     county_pop <- get_county_pop(fips)
     county_name <- get_county_name(fips)
