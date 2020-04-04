@@ -3,9 +3,11 @@ library(shinythemes)
 library(shinycssloaders)
 source("src/helper_county.R")
 # Global variables can go here
-nppl <- 20
+
 prob_flu<- 35.5/327.2/26 #assume 26 weeks of flu season
 fips<-""
+hand_or<-0.45 #https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2190272/
+ppe_or<-0.32 #https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2190272/
 
 # # susceptibility data for US, https://www.cdc.gov/mmwr/volumes/69/wr/mm6912e2.htm
 # susceptibility_total_cases = 4226
@@ -61,40 +63,76 @@ ui <- fluidPage(theme=shinytheme("superhero"),
       helpText("DISCLAIMER: this tool is NOT a qualified source of medical knowledge, NOR should it be used to inform policy decisions.", class = "text-danger"),
       helpText("Please answer a few questions to see your COVID-19 risk score.", class = "lead"),
       #textInput('fips', label =  '5-digit FIPS code of your county', fips),
-      textInput('zip', label =  "What is your 5-digit zip code?"),
-      uiOutput("zipcontrol"),
-      textInput('age', label =  "What is your age?"),
-      radioButtons('gender', "What is your gender?", c("Female" = "female", "Male" = "male")),
-      sliderInput('nppl', 
-                  'How many people do you see in person in a week?', 
-                  min = 0, max = 100, value = nppl, step =1),
-      #sliderInput('fac_underreport', "Choose what percentage of cases are tested?", min = 0.01, max = 1, value = 0.15, step = 0.01),
-      checkboxInput('is_sick', 
-                    HTML(paste0(
-                      "I have ", 
-                      tags$a(
-                        "flu-like symptoms",
-                        href = "https://www.cdc.gov/coronavirus/2019-ncov/symptoms-testing/symptoms.html"))
-                      )),
-      checkboxInput('has_preexisting', 
-                    HTML(paste0(
-                      "I have ", 
-                      tags$a(
-                        "underlying medical complications",
-                        href = "https://www.cdc.gov/coronavirus/2019-ncov/need-extra-precautions/people-at-higher-risk.html")
-                    ))),
+      #demographic
+      radioButtons('show_demo', "Demographic input", list("show", "hide"), inline=TRUE, selected = "show"),
+      #conditionalPanel(
+      #actionButton("toggle_demo", "Show demographic input"),
       conditionalPanel(
-        condition = "input.has_preexisting == true",
-        checkboxGroupInput("conditions", "Conditions",
-                           c("Diabetes" = "is_diabetes",
-                             "Chronic lung disease or asthma" = "is_lung",
-                             "Cardiovascular disease" = "is_cvd",
-                             "Immunocompromised condition" = "is_immune",
-                             "Chronic renal disease" = "is_renal",
-                             "Other chronic disease" = "is_other",
-                             "Current or former smoker" = "is_smoker"
-                             )),
+        #condition = "input.toggle_demo % 2 == 0",
+        condition = "input.show_demo == 'show'",
+        textInput('zip', label =  "What is your 5-digit zip code?"),
+        uiOutput("zipcontrol"),
+        textInput('age', label =  "What is your age?"),
+        radioButtons('gender', "What is your gender?", c("Female" = "female", "Male" = "male"), inline=TRUE),
       ),
+      #pre-existing conditions
+      radioButtons('show_cond', "Pre-existing condition input", list("show", "hide"), inline=TRUE, selected = "show"),
+      conditionalPanel(
+        condition = "input.show_cond == 'show'",
+        checkboxInput('is_sick', 
+                      HTML(paste0(
+                        "I have ", 
+                        tags$a(
+                          "flu-like symptoms",
+                          href = "https://www.cdc.gov/coronavirus/2019-ncov/symptoms-testing/symptoms.html"))
+                      )),
+        checkboxInput('has_preexisting', 
+                      HTML(paste0(
+                        "I have ", 
+                        tags$a(
+                          "underlying medical complications",
+                          href = "https://www.cdc.gov/coronavirus/2019-ncov/need-extra-precautions/people-at-higher-risk.html")
+                      ))),
+        conditionalPanel(
+          condition = "input.has_preexisting == true",
+          checkboxGroupInput("conditions", "Conditions",
+                             c("Diabetes" = "is_diabetes",
+                               "Hypertension" = "is_hyper",
+                               "Chronic lung disease or asthma" = "is_lung",
+                               "Cardiovascular disease" = "is_cvd",
+                               "Immunocompromised condition" = "is_immune",
+                               "Chronic renal disease" = "is_renal",
+                               "Other chronic disease" = "is_other",
+                               "Current or former smoker" = "is_smoker"
+                             )),
+        ),
+      ),
+      #behavioral input
+      radioButtons('show_behav', "Behavioral input", list("show", "hide"), inline=TRUE, selected = "show"),
+      conditionalPanel(
+        condition = "input.show_behav == 'show'",
+        sliderInput('nppl', 
+                  'How many people do you come into close contact with?', 
+                  min = 0, max = 100, value = 0, step =1),
+        checkboxInput('is_roommate', "I live with other people."),
+        conditionalPanel(
+          condition = "input.is_roommate == true",
+          sliderInput('nppl2', 
+                      'How many people do your other household members come into close contact with?', 
+                      min = 0, max = 100, value = 0, step =1)),
+          checkboxInput("hand", HTML(paste0(
+            "I perform hand hygiene according to ",
+            tags$a(
+              "CDC guidance",
+              href = "https://www.cdc.gov/handhygiene/providers/guideline.html")
+            ))),
+          checkboxInput("ppe", HTML(paste0(
+            "I wear personal pertection equipment according to ",
+            tags$a(
+              "CDC recommendation",
+              href = "https://www.cdc.gov/coronavirus/2019-ncov/hcp/respirator-use-faq.html")
+            )))
+        ),
       actionButton('go', "Calculate", class = "btn-primary"),
       width = 3
     ),
@@ -149,21 +187,25 @@ server <- function(input, output, session) {
     county_pop<-temp['county_pop']%>%as.numeric()
     county_underreport<-temp['county_underreport']%>%as.numeric()
     total_covid_count = county_casecount*county_underreport
+    
+    #risk calculator
     if(input$is_sick){
       # if you're already sick with flu-like symptoms, your likelihood of having covid is P(C19) / (P(C19) + P(flu))
       total_covid_probability = total_covid_count / county_pop
       exposure_risk = total_covid_probability / (total_covid_probability + prob_flu)
     } else if (input$nppl>0) {
       # ASSUMPTION: diagnosed cases are not active
-      active_casecount = total_covid_count - county_casecount
+      active_casecount = total_covid_count - county_casecount 
+    
       # ASSUMPTION: active community case count cannot be less than 10% of reported cases
-      if (active_casecount < 0.1 * county_casecount) {
+    if (active_casecount < 0.1 * county_casecount) {
         active_casecount = 0.1 * county_casecount
       }
-      exposure_risk <- 1-(1-active_casecount/county_pop)^input$nppl
+      exposure_risk <- 1-(1-active_casecount/county_pop)^(input$nppl+input$nppl2*0.1)
     } else{
       exposure_risk <- 0
     }
+    
     
     # susceptibility calculations
     risk2odds<-function(prob) {
@@ -172,6 +214,16 @@ server <- function(input, output, session) {
     odds2risk<-function(odds) {
       return (odds / (1 + odds))
     }
+    
+    # exposure modifier
+    if(input$hand){
+      exposure_risk<-odds2risk(risk2odds(exposure_risk)*hand_or)
+    }
+    
+    if(input$ppe){
+      exposure_risk<-odds2risk(risk2odds(exposure_risk)*ppe_or)
+    }
+    
     age = as.numeric(input$age)
     validate(need(age >= 0, "Invalid age."))
     age_index = max(which(age_list <= age))
