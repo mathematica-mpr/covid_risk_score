@@ -113,8 +113,7 @@ server <- function(input, output, session) {
         fips_names<-lapply(fips, get_county_name)%>%unlist()
         print(fips)
         radioButtons("fips",label = "Choose a county and resubmit", choiceNames = fips_names, choiceValues  = fips, selected = NULL)
-        #textInput("fips", "If your zip code matches multiple counties, please put in 5-digit county FIPS code")
-      })
+       })
       fips<-input$fips
     }
     validate(need(!is.na(fips), "Check input!"))
@@ -151,8 +150,9 @@ server <- function(input, output, session) {
       # ASSUMPTION: active community case count cannot be less than 10% of reported cases
     if (active_casecount < 0.1 * county_casecount) {
         active_casecount = 0.1 * county_casecount
-      }
-      exposure_risk <- 1-(1-active_casecount/county_pop)^(input$nppl+input$nppl2*0.1)
+    }
+      prev_active<-active_casecount/county_pop #prevalence of active cases
+      exposure_risk <- 1-(1-prev_active)^(input$nppl+input$nppl2*transmissibility_household)
     } else{
       exposure_risk <- 0
     }
@@ -209,12 +209,13 @@ server <- function(input, output, session) {
 
     g<-function(exposure, hospitalization, icu, death){
       x = exposure * (hospitalization + icu + death)
+      print(paste0("risk score is ", x))
       # a mapping function to better visualize probability
-      normalized<-log10(x/prob_flu)*20+50 
+      #normalized<-log10(x/prob_flu)*20+50 
       # 50 means equal likelihood of flu
       # 0 means 1/10 probability of flu
       # 90 means 100 times probability of flu
-      return(normalized)
+      return(x)#normalized)
     }
     score<-if_else(exposure_risk>0, g(exposure_risk, hosp_risk, icu_risk, death_risk), 1)
     unlist(list("exposure_risk" = exposure_risk,
@@ -264,7 +265,7 @@ server <- function(input, output, session) {
       "For comparison, ", prob_flu_string, ' of Americans catch the flu every week during flu season.')))
     
     score<- temp2['score']%>%as.numeric()
-    score = max(score, 0)
+    score = max(score, 1)
     score = min(score, 100)
     score_string = tags$p(HTML(paste0(
       "Your risk score is ",
