@@ -70,18 +70,10 @@ ui <- fluidPage(theme=shinytheme("superhero"),
             sliderInput('nppl2', 
                         'How many people do your other household members come into close contact with?', 
                         min = 0, max = 100, value = 0, step =1)),
-          checkboxInput("hand", HTML(paste0(
-            "I perform hand hygiene according to ",
-            tags$a(
-              "CDC guidance",
-              href = "https://www.cdc.gov/handhygiene/providers/guideline.html")
-          ))),
-          checkboxInput("ppe", HTML(paste0(
-            "I wear personal protection equipment consistent with ",
-            tags$a(
-              "CDC guidelines",
-              href = "https://www.cdc.gov/coronavirus/2019-ncov/hcp/respirator-use-faq.html")
-          )))
+          checkboxInput("hand", HTML(paste0("I perform hand hygiene according to ", 
+                                            tags$a("CDC guidance", href = urls$cdc_hand_hygiene)))),
+          checkboxInput("ppe", HTML(paste0("I wear personal protection equipment consistent with ",
+                                           tags$a("CDC guidelines", href = urls$cdc_ppe))))
         ) # bsCollapsePanel
       ), # bsCollapse
       actionButton('go', "Calculate", class = "btn-primary"),
@@ -326,6 +318,12 @@ server <- function(input, output, session) {
         formatPercent(temp2["death_risk"]), "."
       ))),
       score_string,
+      # Sharing
+      # Create url with the 'twitter-share-button' class
+      tags$a(href=urls$twitter_button, "Tweet", class="twitter-share-button"),
+      # Copy the script from https://dev.twitter.com/web/javascript/loading into your app
+      # You can source it from the URL below. It must go after you've created your link
+      includeScript(urls$twitter_widget)
     )
   })
   

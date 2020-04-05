@@ -53,3 +53,10 @@ male_or     = c(1.8518, 1.85, 1.69)
 #NYC county fips code
 NY_fips_ls<-c("36005", "36047", "36061", "36081", "36085")
 
+# urls class to store our urls
+urls  = list(
+  cdc_hand_hygiene = "https://www.cdc.gov/handhygiene/providers/guideline.html",
+  cdc_ppe = "https://www.cdc.gov/coronavirus/2019-ncov/hcp/respirator-use-faq.html",
+  twitter_button = "https://twitter.com/intent/tweet?text=Hello%20world&url=https://shiny.rstudio.com/gallery/widget-gallery.html/",
+  twitter_widget = "http://platform.twitter.com/widgets.js"
+)
