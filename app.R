@@ -1,6 +1,7 @@
 library(shiny)
 library(shinythemes)
 library(shinycssloaders)
+library(shinyBS)
 source("src/helper_county.R")
 # Global variables can go here
 
@@ -63,94 +64,91 @@ ui <- fluidPage(theme=shinytheme("superhero"),
       helpText("DISCLAIMER: this tool is NOT a qualified source of medical knowledge, NOR should it be used to inform policy decisions.", class = "text-danger"),
       helpText("Please answer a few questions to see your COVID-19 risk score.", class = "lead"),
       #textInput('fips', label =  '5-digit FIPS code of your county', fips),
-      #demographic
-      radioButtons('show_demo', "Demographic input", list("show", "hide"), inline=TRUE, selected = "show"),
-      #conditionalPanel(
-      #actionButton("toggle_demo", "Show demographic input"),
-      conditionalPanel(
-        #condition = "input.toggle_demo % 2 == 0",
-        condition = "input.show_demo == 'show'",
-        textInput('zip', label =  "What is your 5-digit zip code?"),
-        uiOutput("zipcontrol"),
-        textInput('age', label =  "What is your age?"),
-        radioButtons('gender', "What is your gender?", c("Female" = "female", "Male" = "male"), inline=TRUE),
-      ),
-      #pre-existing conditions
-      radioButtons('show_cond', "Pre-existing condition input", list("show", "hide"), inline=TRUE, selected = "show"),
-      conditionalPanel(
-        condition = "input.show_cond == 'show'",
-        checkboxInput('is_sick', 
-                      HTML(paste0(
-                        "I have ", 
-                        tags$a(
-                          "flu-like symptoms",
-                          href = "https://www.cdc.gov/coronavirus/2019-ncov/symptoms-testing/symptoms.html"))
-                      )),
-        checkboxInput('has_preexisting', 
-                      HTML(paste0(
-                        "I have ", 
-                        tags$a(
-                          "underlying medical complications",
-                          href = "https://www.cdc.gov/coronavirus/2019-ncov/need-extra-precautions/people-at-higher-risk.html")
-                      ))),
-        conditionalPanel(
-          condition = "input.has_preexisting == true",
-          checkboxGroupInput("conditions", "Conditions",
-                             c("Diabetes" = "is_diabetes",
-                               "Hypertension" = "is_hyper",
-                               "Chronic lung disease or asthma" = "is_lung",
-                               "Cardiovascular disease" = "is_cvd",
-                               "Immunocompromised condition" = "is_immune",
-                               "Chronic renal disease" = "is_renal",
-                               "Other chronic disease" = "is_other",
-                               "Current or former smoker" = "is_smoker"
-                             )),
-        ),
-      ),
-      #behavioral input
-      radioButtons('show_behav', "Behavioral input", list("show", "hide"), inline=TRUE, selected = "show"),
-      conditionalPanel(
-        condition = "input.show_behav == 'show'",
-        sliderInput('nppl', 
-                  'How many people do you come into close contact with?', 
-                  min = 0, max = 100, value = 0, step =1),
-        checkboxInput('is_roommate', "I live with other people."),
-        conditionalPanel(
-          condition = "input.is_roommate == true",
-          sliderInput('nppl2', 
-                      'How many people do your other household members come into close contact with?', 
-                      min = 0, max = 100, value = 0, step =1)),
+      # collapsible UI to streamline input. Everything is open by default.
+      bsCollapse(
+        id = "collapse_main",
+        multiple = TRUE,
+        open = "Demographic Information",
+        bsCollapsePanel(
+          title = "Demographic Information",
+          textInput('zip', label = "What is your 5-digit zip code?"),
+          uiOutput("zipcontrol"),
+          textInput('age', label = "What is your age?"),
+          radioButtons('gender', "What is your gender?", c("Female" = "female", "Male" = "male"), inline=TRUE)
+        ), # bsCollapsePanel
+        bsCollapsePanel(
+          title = "Pre-existing Conditions",
+          checkboxInput('is_sick', 
+                        HTML(paste0(
+                          "I have ", 
+                          tags$a(
+                            "flu-like symptoms",
+                            href = "https://www.cdc.gov/coronavirus/2019-ncov/symptoms-testing/symptoms.html"))
+                        )),
+          checkboxInput('has_preexisting', 
+                        HTML(paste0(
+                          "I have ", 
+                          tags$a(
+                            "underlying medical complications",
+                            href = "https://www.cdc.gov/coronavirus/2019-ncov/need-extra-precautions/people-at-higher-risk.html")
+                        ))),
+          conditionalPanel(
+            condition = "input.has_preexisting == true",
+            checkboxGroupInput("conditions", "Conditions",
+                               c("Diabetes" = "is_diabetes",
+                                 "Hypertension" = "is_hyper",
+                                 "Chronic lung disease or asthma" = "is_lung",
+                                 "Cardiovascular disease" = "is_cvd",
+                                 "Immunocompromised condition" = "is_immune",
+                                 "Chronic renal disease" = "is_renal",
+                                 "Other chronic disease" = "is_other",
+                                 "Current or former smoker" = "is_smoker"
+                               )),
+          )
+        ), # bsCollapsePanel
+        bsCollapsePanel(
+          title = "Behavioral Input",
+          sliderInput('nppl', 
+                      'How many people do you come into close contact with?', 
+                      min = 0, max = 100, value = 0, step =1),
+          checkboxInput('is_roommate', "I live with other people."),
+          conditionalPanel(
+            condition = "input.is_roommate == true",
+            sliderInput('nppl2', 
+                        'How many people do your other household members come into close contact with?', 
+                        min = 0, max = 100, value = 0, step =1)),
           checkboxInput("hand", HTML(paste0(
             "I perform hand hygiene according to ",
             tags$a(
               "CDC guidance",
               href = "https://www.cdc.gov/handhygiene/providers/guideline.html")
-            ))),
+          ))),
           checkboxInput("ppe", HTML(paste0(
             "I wear personal pertection equipment according to ",
             tags$a(
               "CDC recommendation",
               href = "https://www.cdc.gov/coronavirus/2019-ncov/hcp/respirator-use-faq.html")
-            )))
-        ),
+          )))
+        ) # bsCollapsePanel
+      ), # bsCollapse
       actionButton('go', "Calculate", class = "btn-primary"),
       width = 3
-    ),
-    #OUTPUT
+    ), # sidebarPanel
+    # OUTPUT
     mainPanel(
       tabsetPanel(
         tabPanel("Score",
                  fluidRow(withSpinner(gaugeOutput("gauge", height = '600%'), type = 1)),
                  fluidRow(column(9, offset = 1, htmlOutput("res")))
         ),
-        #tabPanel("Map"),
+        # tabPanel("Map"),
         tabPanel("Method", htmlOutput("methods")),
         tabPanel("FAQ", htmlOutput("faq"))
       ),
       width = 9
-    )
-  )
-)
+    ) # mainPanel
+  ) # sidebarLayout
+) # fluidPage
 
 # Define the server code
 server <- function(input, output, session) {
