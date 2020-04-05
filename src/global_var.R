@@ -1,5 +1,11 @@
 # Global variables can go here
-prob_flu<- 35.5/327.2/26 #assume 26 weeks of flu season
+#Flu data from CDC https://www.cdc.gov/flu/about/burden/index.html
+prob_flu<- 35520883/(329.45*10^6)/26 #assume 26 weeks of flu season
+hosp_flu<-490561/35520883
+icu_flu<-0.075*hosp_flu #Beumer, M. C., et al. "Influenza virus and factors that are associated with ICU admission, pulmonary co-infections and ICU mortality." Journal of critical care 50 (2019): 59-65.
+death_flu<-34157/35520883
+  
+
 fips<-""
 #odds ratio for hand washing
 hand_or<-0.45 #https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2190272/

@@ -209,13 +209,13 @@ server <- function(input, output, session) {
 
     g<-function(exposure, hospitalization, icu, death){
       x = exposure * (hospitalization + icu + death) 
-      
+      x_flu = prob_flu * (hosp_flu + icu_flu + death_flu)
       # a mapping function to better visualize probability
-      normalized<-log10(x/prob_flu)*50+100 
+      normalized<-log10(x/x_flu)*50/3+50
       print(paste0("risk score is ", normalized))
-      # 100 means equal likelihood of flu
-      # 50 means 1/10 probability of flu
-      # 0 means 1/100 times probability of flu
+      # 50 means equal disease burden as flu
+      # 1000 means 1000 times worse than flu
+      # 0 means 1/1000 times the disease burden of flu
       return(normalized)
     }
     score<-if_else(exposure_risk>0, g(exposure_risk, hosp_risk, icu_risk, death_risk), 1)
