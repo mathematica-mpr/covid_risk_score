@@ -152,7 +152,7 @@ server <- function(input, output, session) {
         active_casecount = 0.1 * county_casecount
     }
       prev_active<-active_casecount/county_pop #prevalence of active cases
-      exposure_risk <- 1-(1-prev_active)^(input$nppl+input$nppl2*transmissibility_household)
+      exposure_risk <- 1-(1-prev_active*transmissibility)^(input$nppl+input$nppl2*transmissibility_household)
     } else{
       exposure_risk <- 0
     }
@@ -208,14 +208,15 @@ server <- function(input, output, session) {
     death_risk = odds2risk(death_odds)
 
     g<-function(exposure, hospitalization, icu, death){
-      x = exposure * (hospitalization + icu + death)
-      print(paste0("risk score is ", x))
+      x = exposure * (hospitalization + icu + death) 
+      
       # a mapping function to better visualize probability
-      #normalized<-log10(x/prob_flu)*20+50 
-      # 50 means equal likelihood of flu
-      # 0 means 1/10 probability of flu
-      # 90 means 100 times probability of flu
-      return(x)#normalized)
+      normalized<-log10(x/prob_flu)*50+100 
+      print(paste0("risk score is ", normalized))
+      # 100 means equal likelihood of flu
+      # 50 means 1/10 probability of flu
+      # 0 means 1/100 times probability of flu
+      return(normalized)
     }
     score<-if_else(exposure_risk>0, g(exposure_risk, hosp_risk, icu_risk, death_risk), 1)
     unlist(list("exposure_risk" = exposure_risk,
