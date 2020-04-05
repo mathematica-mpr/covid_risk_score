@@ -77,9 +77,9 @@ ui <- fluidPage(theme=shinytheme("superhero"),
               href = "https://www.cdc.gov/handhygiene/providers/guideline.html")
           ))),
           checkboxInput("ppe", HTML(paste0(
-            "I wear personal pertection equipment according to ",
+            "I wear personal protection equipment consistent with ",
             tags$a(
-              "CDC recommendation",
+              "CDC guidelines",
               href = "https://www.cdc.gov/coronavirus/2019-ncov/hcp/respirator-use-faq.html")
           )))
         ) # bsCollapsePanel
