@@ -106,6 +106,7 @@ ui <- fluidPage(theme=shinytheme("superhero"),
 # Define the server code
 server <- function(input, output, session) {
   temp<- eventReactive(input$go, {
+    #deal with zipcode mapping to >1 counties
     fips<-get_fips_from_zip(input$zip)
     if(length(fips)  >1){
       output$zipcontrol <- renderUI({
@@ -117,11 +118,20 @@ server <- function(input, output, session) {
       fips<-input$fips
     }
     validate(need(!is.na(fips), "Check input!"))
-    #get county-level characteristics
-    county_pop <- get_county_pop(fips)
-    county_name <- get_county_name(fips)
-    county_casecount <- get_county_casecount(fips, latest_day)
-    county_underreport <- calc_county_underreport(fips)
+    #fix NYC, all NYC borough data uses NY county
+    if(fips%in%NY_fips_ls){
+      county_pop <- NY_fips_ls%>%map(~get_county_pop(.))%>%unlist()%>%sum()
+      county_name <- "New York City (5 Borough)"
+      county_casecount <- get_county_casecount("36061", latest_day)
+      county_underreport <- calc_county_underreport("36061")
+    }else{
+      #get county-level characteristics
+      county_pop <- get_county_pop(fips)
+      county_name <- get_county_name(fips)
+      county_casecount <- get_county_casecount(fips, latest_day)
+      county_underreport <- calc_county_underreport(fips)
+    }
+    
     
     unlist(list("fips" = fips,
                 "county_pop" = county_pop,

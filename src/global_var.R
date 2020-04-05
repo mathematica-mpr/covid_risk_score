@@ -49,3 +49,7 @@ smoker_or   = c(2.67, 2.64, 6.11) # death OR not available in CCDC
 #all_conditions_death_or = 27.84
 # OR source: https://www.medrxiv.org/content/10.1101/2020.02.24.20027268v1
 male_or     = c(1.8518, 1.85, 1.69)
+
+#NYC county fips code
+NY_fips_ls<-c("36005", "36047", "36061", "36081", "36085")
+
