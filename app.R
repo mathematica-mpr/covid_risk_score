@@ -22,14 +22,12 @@ ui <- fluidPage(
   #INPUT
   sidebarLayout(
     sidebarPanel(
-      helpText("DISCLAIMER: this tool is NOT a qualified source of medical knowledge, NOR should it be used to inform policy decisions.", class = "text-warning"),
-      helpText("Please answer a few questions to see your COVID-19 risk score.", class = "lead"),
+      #textInput('fips', label =  '5-digit FIPS code of your county', fips),
       # in helper_input.R
       collapseStory(),
-      actionButton('go', "Calculate", class = "btn btn-primary btn-block"),
       tags$div(style = "margin:6px;"),
       tags$div(class="sharethis-inline-share-buttons"),
-      width = 3
+      width = 4
     ), # sidebarPanel
     
     # OUTPUT
@@ -38,13 +36,13 @@ ui <- fluidPage(
         type = c("pills"),
         tabPanel("Score",
                  fluidRow(withSpinner(gaugeOutput("gauge", height = '600%'), type = 1)),
-                 fluidRow(column(9, offset = 1, htmlOutput("res")))),
+                 fluidRow(column(8, offset = 1, htmlOutput("res")))),
         # tabPanel("Map"),
         tabPanel("Method", htmlOutput("methods")),
         tabPanel("FAQ", htmlOutput("faq")),
         tabPanel("About us", htmlOutput("about"))
       ),
-      width = 9
+      width = 8
     ) # mainPanel
   ) # sidebarLayout
 ) # fluidPage
@@ -83,8 +81,27 @@ server <- function(input, output, session) {
                  casecount = casecount,
                  underreport_factor = underreport_factor))
   })
+
+  # Sidebar Collapse updates
+  updateInputCollapse1 <- eventReactive(input$next0, {
+    updateCollapse(session, id = "collapse_main", open = "1. About You", close = "Introduction")
+  })
+  updateInputCollapse2 <- eventReactive(input$next1, {
+    updateCollapse(session, id = "collapse_main", open = "2. Pre-existing Conditions", 
+                   close = "1. About You")
+  })
+  updateInputCollapse3 <- eventReactive(input$next2, {
+    updateCollapse(session, id = "collapse_main", open = "3. Your Behavior", 
+                   close = "2. Pre-existing Conditions")
+  })
+  updateInputCollapses <- function() {
+    updateInputCollapse1()
+    updateInputCollapse2()
+    updateInputCollapse3()
+  }
   
   updateRisk <- reactive({
+    updateInputCollapses()
     county_data<-getCountyData()
     if (!input$has_preexisting) {
       # clear the conditional panel's UI when unchecked
@@ -94,7 +111,7 @@ server <- function(input, output, session) {
     # in results.R
     return (calculateRisk(input, county_data))
   })
-  
+
   output$gauge <-renderGauge({
     risk<-updateRisk()
     gauge(case_when(risk$score<1 ~ 1,

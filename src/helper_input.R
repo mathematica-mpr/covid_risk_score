@@ -4,18 +4,32 @@ source("src/global_var.R")
 
 collapseStory <- function() {
 
-  #textInput('fips', label =  '5-digit FIPS code of your county', fips),
   # collapsible UI to streamline input. Everything is open by default.
   bsCollapse(
     id = "collapse_main",
     multiple = TRUE,
-    open = c("1. About You", "2. Pre-existing Conditions", "3. Your Behavior"),
+    open = c("Introduction"),
+    bsCollapsePanel(
+      title = "Introduction",
+      helpText("This tool attempts to sythesize reported COVID-19 geographic case data and rapidly 
+               evolving scientific research to help you ballpark how much risk this disease poses 
+               to you."),
+      helpText("We believe people make the right decisions when empowered with neither fear, nor 
+               complacency, but with accurate data."),
+      helpText("We ask that you please take our results with more than a few grains of salt: many 
+               very important aspects of this disease are either unknown or estimated with large 
+               uncertainty. With that said, our guiding philosophy is that a poor estimate is 
+               better than no estimate."),
+      helpText("DISCLAIMER: this tool is NOT a qualified source of medical knowledge, NOR should it be used to inform policy decisions.", class = "text-warning"),
+      actionButton('next0', "Next", class = "btn btn-primary btn-block")
+    ),
     bsCollapsePanel(
       title = "1. About You",
       textInput('zip', label = "What is your 5-digit zip code?"),
       uiOutput("zipcontrol"),
       textInput('age', label = "What is your age?"),
-      radioButtons('gender', "What is your gender?", c("Female" = "female", "Male" = "male"), inline=TRUE)
+      radioButtons('gender', "What is your gender?", c("Female" = "female", "Male" = "male"), inline=TRUE),
+      actionButton('next1', "Next", class = "btn btn-primary btn-block")
     ), # bsCollapsePanel
     bsCollapsePanel(
       title = "2. Pre-existing Conditions",
@@ -34,7 +48,8 @@ collapseStory <- function() {
                              "Other chronic disease" = "is_other",
                              "Current or former smoker" = "is_smoker"
                            )),
-      )
+      ),
+      actionButton('next2', "Next", class = "btn btn-primary btn-block")
     ), # bsCollapsePanel
     bsCollapsePanel(
       title = "3. Your Behavior",
@@ -50,7 +65,8 @@ collapseStory <- function() {
       checkboxInput("hand", div("I perform hand hygiene according to ", 
                                 tags$a("CDC guidance", href = urls$cdc_hand_hygiene))),
       checkboxInput("ppe", div("I wear personal protection equipment consistent with ",
-                               tags$a("CDC guidelines", href = urls$cdc_ppe)))
+                               tags$a("CDC guidelines", href = urls$cdc_ppe))),
+      actionButton('go', "Calculate", class = "btn btn-primary btn-block")
     ) # bsCollapsePanel
   ) # bsCollapse
 }
