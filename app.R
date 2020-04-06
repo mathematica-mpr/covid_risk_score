@@ -31,20 +31,9 @@ ui <- fluidPage(theme=shinytheme("superhero"),
         ), # bsCollapsePanel
         bsCollapsePanel(
           title = "Pre-existing Conditions",
-          checkboxInput('is_sick', 
-                        HTML(paste0(
-                          "I have ", 
-                          tags$a(
-                            "flu-like symptoms",
-                            href = "https://www.cdc.gov/coronavirus/2019-ncov/symptoms-testing/symptoms.html"))
-                        )),
-          checkboxInput('has_preexisting', 
-                        HTML(paste0(
-                          "I have ", 
-                          tags$a(
-                            "underlying medical complications",
-                            href = "https://www.cdc.gov/coronavirus/2019-ncov/need-extra-precautions/people-at-higher-risk.html")
-                        ))),
+          checkboxInput('is_sick', div("I have ", tags$a("flu-like symptoms", href = urls$cdc_symptoms))),
+          checkboxInput('has_preexisting', div("I have ", tags$a("underlying medical complications", 
+                                                                 href = urls$cdc_high_risk))),
           conditionalPanel(
             condition = "input.has_preexisting == true",
             checkboxGroupInput("conditions", "Conditions",
@@ -70,10 +59,10 @@ ui <- fluidPage(theme=shinytheme("superhero"),
             sliderInput('nppl2', 
                         'How many people do your other household members come into close contact with?', 
                         min = 0, max = 100, value = 0, step =1)),
-          checkboxInput("hand", HTML(paste0("I perform hand hygiene according to ", 
-                                            tags$a("CDC guidance", href = urls$cdc_hand_hygiene)))),
-          checkboxInput("ppe", HTML(paste0("I wear personal protection equipment consistent with ",
-                                           tags$a("CDC guidelines", href = urls$cdc_ppe))))
+          checkboxInput("hand", div("I perform hand hygiene according to ", 
+                                            tags$a("CDC guidance", href = urls$cdc_hand_hygiene))),
+          checkboxInput("ppe", div("I wear personal protection equipment consistent with ",
+                                           tags$a("CDC guidelines", href = urls$cdc_ppe)))
         ) # bsCollapsePanel
       ), # bsCollapse
       actionButton('go', "Calculate", class = "btn-primary"),
@@ -276,14 +265,14 @@ server <- function(input, output, session) {
       case_when(
         score<30 ~ paste0(
           ", which is (relatively) safe. Even so, it's a good time to make sure that you're ",
-          tags$a("prepared! ", href = "https://www.cdc.gov/coronavirus/2019-ncov/daily-life-coping/get-your-household-ready-for-COVID-19.html")),
+          tags$a("prepared! ", href = urls$cdc_get_ready)),
         score>70 ~ paste0(
           ", which is quite serious. Avoiding exposure, practicing good hygiene, and making sure you have ",
-          tags$a("a plan in place ", href = "https://www.cdc.gov/coronavirus/2019-ncov/prevent-getting-sick/prevention.html"), 
+          tags$a("a plan in place ", href = urls$cdc_prevention), 
           "are critically important for you."),
         TRUE ~ paste0(
           ". Please take the time to review ",
-          tags$a("this page", href = "https://www.cdc.gov/coronavirus/2019-ncov/prevent-getting-sick/prevention.html"),
+          tags$a("this page", href = urls$cdc_prevention),
           " to make sure you're well prepared in the days to come.")
       )
     )))
@@ -291,11 +280,9 @@ server <- function(input, output, session) {
     if (input$is_sick == TRUE) {
       sickness_html = tags$p(HTML(paste0(
         "Since you're already sick, please immediately consult ", 
-        tags$a("the CDC's instructions",
-               href = "https://www.cdc.gov/coronavirus/2019-ncov/if-you-are-sick/steps-when-sick.html"),
+        tags$a("the CDC's instructions", href = urls$cdc_if_sick),
         ", or walk through their ",
-        tags$a("self-checker",
-               href = "https://www.cdc.gov/coronavirus/2019-ncov/symptoms-testing/index.html#cdc-chat-bot-open"),
+        tags$a("self-checker", href = urls$cdc_chatbot),
         ". The probability that you could have COVID-19 is ", risk_string, '. ')))
     }
     
@@ -318,11 +305,8 @@ server <- function(input, output, session) {
         formatPercent(temp2["death_risk"]), "."
       ))),
       score_string,
-      # Sharing
-      # Create url with the 'twitter-share-button' class
-      tags$a(href=urls$twitter_button, "Tweet", class="twitter-share-button"),
-      # Copy the script from https://dev.twitter.com/web/javascript/loading into your app
-      # You can source it from the URL below. It must go after you've created your link
+      # Twitter Sharing
+      tags$a(href=urls$twitter_button, "Tweet", class="btn-primary"),
       includeScript(urls$twitter_widget)
     )
   })
@@ -333,7 +317,7 @@ server <- function(input, output, session) {
       tags$p('Our "Risk Score" visualization is the quantity {Exposure * Susceptibility}, logarithmically scaled.'),
       tags$p("Exposure represents how likely it is that you've come into contact with the virus. You can help decrease this factor by ",
         tags$a("social distancing, practicing good hygiene, and closely following the directives of your local public health officials.",
-               href = "https://www.cdc.gov/coronavirus/2019-ncov/prevent-getting-sick/prevention.html"),
+               href = urls$cdc_prevention),
         "Your personal susceptibility to COVID-19 is quantified by {P(hospitalization) + P(ICU) + P(death)}.",
         "Please remember that even if your personal susceptibility is low, you can still help by preventing spread to others."
       ),
@@ -341,24 +325,21 @@ server <- function(input, output, session) {
       tags$h3("Assumptions:"),
       tags$li(
         "To calculate exposure, we used ",
-        tags$a("the New York Times's published data on COVID-19 cases & deaths", 
-               href="https://www.nytimes.com/article/coronavirus-county-data-us.html"),
-        "to estimate the prevalence of infected people within your county.",
+        tags$a("the New York Times's published data on COVID-19 cases & deaths", href = urls$nytimes_data_article),
+        "to estimate the prevalence of infected people within your county."
       ),
       tags$li(
         "Due to rapid spread and insufficient testing during the COVID-19 pandemic, there are likely additional unreported cases beyond the officially reported cases.",
-        "We followed methodology reported by",
-        tags$a("Russell et al (2020)", href="https://cmmid.github.io/topics/covid19/severity/global_cfr_estimates.html"),
+        "We followed methodology reported by", tags$a("Russell et al (2020)", href = urls$russel_etal_2020),
         "to calculate the percentage of cases that are currently known, and presumably quarantined, versus the number of cases still distributed throughout the community."),
       tags$li("Other methods of becoming infected (e.g. touching an infected surface) are not accounted for by this calculator."),
       tags$li(
         "Estimations of US hospitalization, ICU and morbidity data by age were obtained from",
-        tags$a("the CDC Morbidity and Mortality Weekly Report (MMWR), March 26th.", href = "https://www.cdc.gov/mmwr/volumes/69/wr/mm6912e2.htm"),
+        tags$a("the CDC Morbidity and Mortality Weekly Report (MMWR), March 26th.", href = urls$cdc_mm6912e2),
       ),
       tags$li("Estimations of risk factors associated with underlying medical conditions were obtained from",
-        tags$a("the CDC MMWR, March 31st,", href = "https://www.cdc.gov/mmwr/volumes/69/wr/mm6912e2.htm"),
-        "and gender from this preprint by", 
-        tags$a("Caramelo et al (2020).", href = "https://www.medrxiv.org/content/10.1101/2020.02.24.20027268v1")
+        tags$a("the CDC MMWR, March 31st,", href = urls$cdc_mm6913e2),
+        "and gender from this preprint by", tags$a("Caramelo et al (2020).", href = urls$caramelo_etal_2020)
       ),
       tags$p(""),
       tags$p("We'll be doing our best to update these assumptions as additional knowledge about the virus becomes available."),
