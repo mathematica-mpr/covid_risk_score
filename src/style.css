@@ -6,6 +6,10 @@
   margin-right: auto; 
   margin-bottom:-10%;
   }
+  
+#go{
+  display:block;
+}
 
 .irs-bar {background: #DF691A;}
 .irs-single {background: #DF691A;}
@@ -19,8 +23,9 @@
 }
 
 .btn {
-    padding: 10px 16px;
-    font-size: 14px;
-    line-height: 1.33;
     border-radius: 6px;
+}
+
+.nav-pills>li.active>a, .nav-pills>li.active>a:hover, .nav-pills>li.active>a:focus{
+  border-radius: 6px;
 }

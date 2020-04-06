@@ -2,11 +2,14 @@ library(shiny)
 library(shinythemes)
 library(shinycssloaders)
 library(shinyBS)
+library(shinyjs)
 source("src/helper_county.R")
 source("src/global_var.R")
 
 # Define the UI
-ui <- fluidPage(theme=shinytheme("superhero"),
+ui <- fluidPage(
+  useShinyjs(),
+  theme=shinytheme("superhero"),
   titlePanel("COVID-19 Risk Score Calculator"),
   # google analytics tracking
   tags$head(includeHTML("src/google-analytics.html")),
@@ -68,17 +71,18 @@ ui <- fluidPage(theme=shinytheme("superhero"),
                                            tags$a("CDC guidelines", href = urls$cdc_ppe)))
         ) # bsCollapsePanel
       ), # bsCollapse
-      actionButton('go', "Calculate", class = "btn-primary"),
+      actionButton('go', "Calculate", class = "btn btn-primary btn-block"),
+      tags$div(style = "margin:6px;"),
+      tags$div(class="sharethis-inline-share-buttons"),
       width = 3
     ), # sidebarPanel
     # OUTPUT
     mainPanel(
       tabsetPanel(
+        type = c("pills"),
         tabPanel("Score",
                  fluidRow(withSpinner(gaugeOutput("gauge", height = '600%'), type = 1)),
-                 fluidRow(column(9, offset = 1, htmlOutput("res"))),
-                 tags$div(class="sharethis-inline-share-buttons")
-        ),
+                 fluidRow(column(9, offset = 1, htmlOutput("res")))),
         # tabPanel("Map"),
         tabPanel("Method", htmlOutput("methods")),
         tabPanel("FAQ", htmlOutput("faq"))
@@ -90,6 +94,9 @@ ui <- fluidPage(theme=shinytheme("superhero"),
 
 # Define the server code
 server <- function(input, output, session) {
+  #eventReactive(input$go, {
+    
+  #})
   temp<- eventReactive(input$go, {
     #deal with zipcode mapping to >1 counties
     fips<-get_fips_from_zip(input$zip)
@@ -326,6 +333,12 @@ server <- function(input, output, session) {
       
     )
   })
+  # output$sharethis<-renderUI({
+  #   # if (input$go == TRUE) {
+  #   #   print("trying buttons...")
+  #     tags$div(class="sharethis-inline-share-buttons")
+  #     # }
+  #   })
   
   output$methods <-renderUI({
     tagList(
@@ -363,7 +376,7 @@ server <- function(input, output, session) {
         tags$a("Caramelo et al (2020).", href = urls$caramelo_etal_2020)
       ),
       tags$p(""),
-      tags$p("We'll be doing our best to update these assumptions as additional knowledge about the virus becomes available."),
+      tags$p("We'll be doing our best to update these assumptions as additional knowledge about the virus becomes available.")
     )
   })
   
