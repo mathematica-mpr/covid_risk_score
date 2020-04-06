@@ -18,8 +18,8 @@ collapseStory <- function() {
                complacency, but with accurate data."),
       helpText("We ask that you please take our results with more than a few grains of salt: many 
                very important aspects of this disease are either unknown or estimated with large 
-               uncertainty. With that said, our guiding philosophy is that a poor estimate is 
-               better than no estimate."),
+               uncertainty. With that said, our guiding philosophy is that an imperfect estimate 
+               is better than no estimate."),
       helpText("DISCLAIMER: this tool is NOT a qualified source of medical knowledge, NOR should it be used to inform policy decisions.", class = "text-warning"),
       actionButton('next0', "Next", class = "btn btn-info btn-block")
     ),
