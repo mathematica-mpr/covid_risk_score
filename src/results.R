@@ -1,4 +1,4 @@
-library("shiny")
+library(shiny)
 source("src/global_var.R")
 
 calculateRisk <- function(input, county_data) {
