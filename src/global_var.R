@@ -77,5 +77,7 @@ urls  = list(
   verity_etal_2020 = "https://www.thelancet.com/journals/laninf/article/PIIS1473-3099(20)30243-7/fulltext",
   # social
   twitter_button = "https://twitter.com/intent/tweet?text=Find%20your%20COVID-19%20risk%20score!&url=https://19andme.shinyapps.io/covid_risk_score/",
-  twitter_widget = "http://platform.twitter.com/widgets.js"
+  twitter_widget = "http://platform.twitter.com/widgets.js",
+  facebook_button = "https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2F19andme.shinyapps.io%2Fcovid_risk_score%2F",
+  facebook_widget = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0"
 )

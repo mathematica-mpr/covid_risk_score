@@ -7,9 +7,12 @@ source("src/global_var.R")
 
 # Define the UI
 ui <- fluidPage(theme=shinytheme("superhero"),
-  # google analytics tracking
-  tags$head(includeHTML("google-analytics.html")),
   titlePanel("COVID-19 Risk Score Calculator"),
+  # google analytics tracking
+  tags$head(includeHTML("src/google-analytics.html")),
+  # sharethis
+  tags$head(includeHTML("src/sharethis.html")),
+  
   includeCSS("src/style.css"),
   #INPUT
   sidebarLayout(
@@ -21,16 +24,16 @@ ui <- fluidPage(theme=shinytheme("superhero"),
       bsCollapse(
         id = "collapse_main",
         multiple = TRUE,
-        open = "Demographic Information",
+        open = "1. Demographic Information",
         bsCollapsePanel(
-          title = "Demographic Information",
+          title = "1. Demographic Information",
           textInput('zip', label = "What is your 5-digit zip code?"),
           uiOutput("zipcontrol"),
           textInput('age', label = "What is your age?"),
           radioButtons('gender', "What is your gender?", c("Female" = "female", "Male" = "male"), inline=TRUE)
         ), # bsCollapsePanel
         bsCollapsePanel(
-          title = "Pre-existing Conditions",
+          title = "2. Pre-existing Conditions",
           checkboxInput('is_sick', div("I have ", tags$a("flu-like symptoms", href = urls$cdc_symptoms))),
           checkboxInput('has_preexisting', div("I have ", tags$a("underlying medical complications", 
                                                                  href = urls$cdc_high_risk))),
@@ -49,7 +52,7 @@ ui <- fluidPage(theme=shinytheme("superhero"),
           )
         ), # bsCollapsePanel
         bsCollapsePanel(
-          title = "Behavioral Input",
+          title = "3. Behavioral Input",
           sliderInput('nppl', 
                       'How many people do you come into close contact with?', 
                       min = 0, max = 100, value = 0, step =1),
@@ -73,7 +76,8 @@ ui <- fluidPage(theme=shinytheme("superhero"),
       tabsetPanel(
         tabPanel("Score",
                  fluidRow(withSpinner(gaugeOutput("gauge", height = '600%'), type = 1)),
-                 fluidRow(column(9, offset = 1, htmlOutput("res")))
+                 fluidRow(column(9, offset = 1, htmlOutput("res"))),
+                 tags$div(class="sharethis-inline-share-buttons")
         ),
         # tabPanel("Map"),
         tabPanel("Method", htmlOutput("methods")),
@@ -304,10 +308,22 @@ server <- function(input, output, session) {
         ", and your risk of dying is ",
         formatPercent(temp2["death_risk"]), "."
       ))),
-      score_string,
-      # Twitter Sharing
-      tags$a(href=urls$twitter_button, "Tweet", class="btn-primary"),
-      includeScript(urls$twitter_widget)
+      score_string
+      # fluidRow(column(width = 4,
+      #                 offset = 2,
+      #                 tags$a(href=urls$facebook_button,
+      #                        "Share on Facebook",
+      #                        class="btn btn-facebook btn-block"),
+      #                 includeScript(urls$facebook_widget)),
+      #          # column(width = 3,
+      #          #        offset = 1,
+      #          #        tags$a(href=urls$w_button, "Share on WhatsApp", class="btn btn-success btn-block")
+      #          #        ),
+      #          column(width = 4,
+      #                 offset = 2,
+      #                 tags$a(href=urls$twitter_button, "Share on Twitter", class="btn btn-info btn-block"),
+      #                 includeScript(urls$twitter_widget)))
+      
     )
   })
   
