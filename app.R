@@ -57,7 +57,7 @@ ui <- fluidPage(
         bsCollapsePanel(
           title = "3. Behavioral Input",
           sliderInput('nppl', 
-                      'How many people do you come into close contact with?', 
+                      'How many people do you come into close contact (> 10 min, < 6 feet) with?', 
                       min = 0, max = 100, value = 0, step =1),
           checkboxInput('is_roommate', "I live with other people."),
           conditionalPanel(
@@ -85,7 +85,8 @@ ui <- fluidPage(
                  fluidRow(column(9, offset = 1, htmlOutput("res")))),
         # tabPanel("Map"),
         tabPanel("Method", htmlOutput("methods")),
-        tabPanel("FAQ", htmlOutput("faq"))
+        tabPanel("FAQ", htmlOutput("faq")),
+        tabPanel("About us", htmlOutput("about"))
       ),
       width = 9
     ) # mainPanel
@@ -104,7 +105,6 @@ server <- function(input, output, session) {
       output$zipcontrol <- renderUI({
         fips<-get_fips_from_zip(input$zip)
         fips_names<-lapply(fips, get_county_name)%>%unlist()
-        print(fips)
         radioButtons("fips",label = "Choose a county and resubmit", choiceNames = fips_names, choiceValues  = fips, selected = NULL)
        })
       fips<-input$fips
@@ -214,7 +214,6 @@ server <- function(input, output, session) {
       x_flu = prob_flu * (hosp_flu + icu_flu + death_flu)
       # a mapping function to better visualize probability
       normalized<-log10(x/x_flu)*50/3+50
-      print(paste0("risk score is ", normalized))
       # 50 means equal disease burden as flu
       # 100 means 1000 times worse than flu
       # 0 means 1/1000 times the disease burden of flu
@@ -333,12 +332,6 @@ server <- function(input, output, session) {
       
     )
   })
-  # output$sharethis<-renderUI({
-  #   # if (input$go == TRUE) {
-  #   #   print("trying buttons...")
-  #     tags$div(class="sharethis-inline-share-buttons")
-  #     # }
-  #   })
   
   output$methods <-renderUI({
     tagList(
@@ -416,8 +409,16 @@ server <- function(input, output, session) {
       tags$p("Let us know at", tags$a("covid.risk.score@gmail.com", href="mailto:covid.risk.score@gmail.com"), "!")
     )
   })
+  
+  output$about <- renderUI({
+    tagList(
+      tags$h3("About us:"),
+      tags$p(tags$a("Cindy Hu ", href = "https://www.linkedin.com/in/xindi-cindy-hu-harvard/"), "is a data scientist trained in public health."),
+      tags$p(tags$a("George Luo", href = "https://www.linkedin.com/in/george-luo-38852450/"), "is a software engineer.")
+    )
+  })
 }
 
-
+  
 # Return a Shiny app object
 shinyApp(ui = ui, server = server)
