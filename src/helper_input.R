@@ -11,16 +11,16 @@ collapseStory <- function() {
     open = c("Introduction"),
     bsCollapsePanel(
       title = "Introduction",
-      helpText("This tool attempts to sythesize reported COVID-19 geographic case data and rapidly 
+      tags$p("This tool attempts to sythesize reported COVID-19 geographic case data and rapidly 
                evolving scientific research to help you ballpark how much risk this disease poses 
                to you."),
-      helpText("We believe people make the right decisions when empowered with neither fear, nor 
+      tags$p("We believe people make the right decisions when empowered with neither fear, nor 
                complacency, but with accurate data."),
-      helpText("We ask that you please take our results with more than a few grains of salt: many 
+      tags$p("We ask that you please take our results with more than a few grains of salt: many 
                very important aspects of this disease are either unknown or estimated with large 
                uncertainty. With that said, our guiding philosophy is that an imperfect estimate 
                is better than no estimate."),
-      helpText("DISCLAIMER: this tool is NOT a qualified source of medical knowledge, NOR should it be used to inform policy decisions.", class = "text-warning"),
+      tags$p(style="color:#DF691A", "DISCLAIMER: this tool is NOT a qualified source of medical knowledge, NOR should it be used to inform policy decisions.", class = "text-warning"),
       actionButton('next0', "Next", class = "btn btn-info btn-block")
     ),
     bsCollapsePanel(
