@@ -317,7 +317,7 @@ server <- function(input, output, session) {
       tags$p('Our "Risk Score" visualization is the quantity {Exposure * Susceptibility}, normalized by the average disease burden of flu, logarithmically scaled.'),
       tags$p("Exposure represents how likely it is that you've been infected with the virus. It's a function of the prevalence of active cases in your
              community and ",
-        tags$a("transmissibility estimates.", href = "https://www.cdc.gov/mmwr/volumes/69/wr/pdfs/mm6909e1-H.pdf"),
+        tags$a("transmissibility estimates.", href = urls$cdc_mm6909e1),
         "You can reduce your exposure by ",
         tags$a("social distancing, practicing good hygiene, and closely following the directives of your local public health officials.",
                href = urls$cdc_prevention),
@@ -330,7 +330,7 @@ server <- function(input, output, session) {
         "To calculate exposure, we used ",
         tags$a("the New York Times's published data on COVID-19 cases & deaths", href = urls$nytimes_data_article),
         "to estimate the prevalence of infected people within your county. 
-        For the five boroughs in New York City, we use the overll New York City COVID-19 data.",
+        For the five boroughs in New York City, we use the overall New York City COVID-19 data.",
       ),
       tags$li(
         "Due to rapid spread and insufficient testing during the COVID-19 pandemic, there are likely additional unreported cases beyond the officially reported cases.",
@@ -343,8 +343,7 @@ server <- function(input, output, session) {
         "We chose this study over US CDC reports because this study is larger and more thorough. We do not account for differences between Chinese population and US population."
       ),
       tags$li("Estimations of risk factors associated with underlying medical conditions were obtained from",
-        tags$a("China CDC weekly, 2020 Vol No.2", href = urls$ccdc_vol2_2020),
-        "and gender from this preprint by", 
+        tags$a("China CDC weekly, 2020 Vol No.2", href = urls$ccdc_vol2_2020), "and gender from this preprint by", 
         tags$a("Caramelo et al (2020).", href = urls$caramelo_etal_2020)
       ),
       tags$p(""),
