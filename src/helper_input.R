@@ -11,9 +11,8 @@ collapseStory <- function() {
     open = c("Introduction"),
     bsCollapsePanel(
       title = "Introduction",
-      tags$p("This tool attempts to sythesize reported COVID-19 geographic case data and rapidly 
-               evolving scientific research to help you ballpark how much risk this disease poses 
-               to you."),
+      tags$p("This tool sythesizes reported COVID-19 geographic case data and rapidly evolving
+               scientific research to help you ballpark how much risk this disease poses to you."),
       tags$p("We believe people make the right decisions when empowered with neither fear, nor 
                complacency, but with accurate data."),
       tags$p("We ask that you please take our results with more than a few grains of salt: many 
