@@ -95,10 +95,7 @@ ui <- fluidPage(
 
 # Define the server code
 server <- function(input, output, session) {
-  #eventReactive(input$go, {
-    
-  #})
-  temp<- eventReactive(input$go, {
+  getCountyData<- eventReactive(input$go, {
     #deal with zipcode mapping to >1 counties
     fips<-get_fips_from_zip(input$zip)
     if(length(fips)  >1){
@@ -133,11 +130,11 @@ server <- function(input, output, session) {
     ))
   })
   
-  temp2<-reactive({
-    temp<-temp()
-    county_casecount<-temp['county_casecount']%>%as.numeric()
-    county_pop<-temp['county_pop']%>%as.numeric()
-    county_underreport<-temp['county_underreport']%>%as.numeric()
+  calculateRisk <- reactive({
+    county_data<-getCountyData()
+    county_casecount<-county_data['county_casecount']%>%as.numeric()
+    county_pop<-county_data['county_pop']%>%as.numeric()
+    county_underreport<-county_data['county_underreport']%>%as.numeric()
     total_covid_count = county_casecount*county_underreport
     
     #risk calculator
@@ -228,8 +225,8 @@ server <- function(input, output, session) {
   })
   
   output$gauge <-renderGauge({
-    temp2<-temp2()
-    score<-temp2['score']%>%as.numeric()
+    risk<-calculateRisk()
+    score<-risk['score']%>%as.numeric()
     gauge(case_when(score<1 ~ 1,
                 score>100 ~ 100,
                 TRUE ~round(score)), 
@@ -241,12 +238,12 @@ server <- function(input, output, session) {
   })
   
   output$res <-renderUI({
-    temp <-temp()
-    temp2 <- temp2()
-    county_casecount<-temp['county_casecount']%>%as.numeric()
-    county_pop<-temp['county_pop']%>%as.numeric()
-    county_underreport<-temp['county_underreport']%>%as.numeric()
-    exposure_risk<-temp2['exposure_risk']%>%as.numeric()
+    county_data <- getCountyData()
+    risk <- calculateRisk()
+    county_casecount<-county_data['county_casecount']%>%as.numeric()
+    county_pop<-county_data['county_pop']%>%as.numeric()
+    county_underreport<-county_data['county_underreport']%>%as.numeric()
+    exposure_risk<-risk['exposure_risk']%>%as.numeric()
     
     formatDynamicString <- function(string) {
       return (tags$b(tags$span(style="color:#F0AD4E",string)))
@@ -266,7 +263,7 @@ server <- function(input, output, session) {
       "Your estimated probability of catching COVID-19 through community transmission is ", risk_string, '. ',
       "For comparison, ", prob_flu_string, ' of Americans catch the flu every week during flu season.')))
     
-    score<- temp2['score']%>%as.numeric()
+    score<- risk['score']%>%as.numeric()
     score = max(score, 1)
     score = min(score, 100)
     score_string = tags$p(HTML(paste0(
@@ -299,7 +296,7 @@ server <- function(input, output, session) {
     tagList(
       tags$p(""),
       tags$p(HTML(paste0(
-        'We found data from ', formatDynamicString(temp['county_name']), ' for your zip code.',
+        'We found data from ', formatDynamicString(county_data['county_name']), ' for your zip code.',
         ' This county has ', formatDynamicString(format(county_casecount, big.mark=",")), ' cases out of a population of ', 
         formatDynamicString(format(county_pop, big.mark = ',')), " as of ", formatDynamicString(latest_day), 
         ", and we estimated that your county's specific under-reporting factor is ", 
@@ -308,11 +305,11 @@ server <- function(input, output, session) {
 
       tags$p(HTML(paste0(
         "If you were to get sick from COVID-19, your risk of hospitalization is ", 
-        formatPercent(temp2["hosp_risk"]),
+        formatPercent(risk["hosp_risk"]),
         ", your risk of requiring an ICU is ",
-        formatPercent(temp2["icu_risk"]),
+        formatPercent(risk["icu_risk"]),
         ", and your risk of dying is ",
-        formatPercent(temp2["death_risk"]), "."
+        formatPercent(risk["death_risk"]), "."
       ))),
       score_string
       # fluidRow(column(width = 4,
