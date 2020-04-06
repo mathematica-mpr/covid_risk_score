@@ -102,7 +102,7 @@ server <- function(input, output, session) {
     #fix NYC, all NYC borough data uses NY county
     if(fips%in%NY_fips_ls){
       county_pop <- NY_fips_ls%>%map(~get_county_pop(.))%>%unlist()%>%sum()
-      county_name <- "New York City (5 Borough)"
+      county_name <- "New York City (5 Boroughs)"
       county_casecount <- get_county_casecount("36061", latest_day)
       county_underreport <- calc_county_underreport("36061")
     }else{
@@ -143,7 +143,7 @@ server <- function(input, output, session) {
         active_casecount = 0.1 * county_casecount
     }
       prev_active<-active_casecount/county_pop #prevalence of active cases
-      exposure_risk <- 1-(1-prev_active*transmissibility)^(input$nppl+input$nppl2*transmissibility_household)
+      exposure_risk <- 1-(1-prev_active*transmissibility_household)^(input$nppl+input$nppl2*transmissibility_household)
     } else{
       exposure_risk <- 0
     }
@@ -205,7 +205,7 @@ server <- function(input, output, session) {
       normalized<-log10(x/x_flu)*50/3+50
       print(paste0("risk score is ", normalized))
       # 50 means equal disease burden as flu
-      # 1000 means 1000 times worse than flu
+      # 100 means 1000 times worse than flu
       # 0 means 1/1000 times the disease burden of flu
       return(normalized)
     }
@@ -253,7 +253,7 @@ server <- function(input, output, session) {
     risk_string = formatPercent(exposure_risk)
 
     sickness_html = tags$p(HTML(paste0(
-      "Your estimated probability of COVID-19 exposure through community transmission is ", risk_string, '. ',
+      "Your estimated probability of catching COVID-19 through community transmission is ", risk_string, '. ',
       "For comparison, ", prob_flu_string, ' of Americans catch the flu every week during flu season.')))
     
     score<- temp2['score']%>%as.numeric()
@@ -314,8 +314,11 @@ server <- function(input, output, session) {
   output$methods <-renderUI({
     tagList(
       tags$p(""),
-      tags$p('Our "Risk Score" visualization is the quantity {Exposure * Susceptibility}, logarithmically scaled.'),
-      tags$p("Exposure represents how likely it is that you've come into contact with the virus. You can help decrease this factor by ",
+      tags$p('Our "Risk Score" visualization is the quantity {Exposure * Susceptibility}, normalized by the average disease burden of flu, logarithmically scaled.'),
+      tags$p("Exposure represents how likely it is that you've been infected with the virus. It's a function of the prevalence of active cases in your
+             community and ",
+        tags$a("transmissibility estimates.", href = "https://www.cdc.gov/mmwr/volumes/69/wr/pdfs/mm6909e1-H.pdf"),
+        "You can reduce your exposure by ",
         tags$a("social distancing, practicing good hygiene, and closely following the directives of your local public health officials.",
                href = urls$cdc_prevention),
         "Your personal susceptibility to COVID-19 is quantified by {P(hospitalization) + P(ICU) + P(death)}.",
@@ -326,7 +329,8 @@ server <- function(input, output, session) {
       tags$li(
         "To calculate exposure, we used ",
         tags$a("the New York Times's published data on COVID-19 cases & deaths", href = urls$nytimes_data_article),
-        "to estimate the prevalence of infected people within your county."
+        "to estimate the prevalence of infected people within your county. 
+        For the five boroughs in New York City, we use the overll New York City COVID-19 data.",
       ),
       tags$li(
         "Due to rapid spread and insufficient testing during the COVID-19 pandemic, there are likely additional unreported cases beyond the officially reported cases.",
@@ -334,12 +338,14 @@ server <- function(input, output, session) {
         "to calculate the percentage of cases that are currently known, and presumably quarantined, versus the number of cases still distributed throughout the community."),
       tags$li("Other methods of becoming infected (e.g. touching an infected surface) are not accounted for by this calculator."),
       tags$li(
-        "Estimations of US hospitalization, ICU and morbidity data by age were obtained from",
-        tags$a("the CDC Morbidity and Mortality Weekly Report (MMWR), March 26th.", href = urls$cdc_mm6912e2),
+        "Estimations of the probability of hospitalization, ICU and death among all infected cases, stratified by age groups, were obtained from a Lancet article authored by ",
+        tags$a("Verity et al (2020).", href = urls$verity_etal_2020),
+        "We chose this study over US CDC reports because this study is larger and more thorough. We do not account for differences between Chinese population and US population."
       ),
       tags$li("Estimations of risk factors associated with underlying medical conditions were obtained from",
-        tags$a("the CDC MMWR, March 31st,", href = urls$cdc_mm6913e2),
-        "and gender from this preprint by", tags$a("Caramelo et al (2020).", href = urls$caramelo_etal_2020)
+        tags$a("China CDC weekly, 2020 Vol No.2", href = urls$ccdc_vol2_2020),
+        "and gender from this preprint by", 
+        tags$a("Caramelo et al (2020).", href = urls$caramelo_etal_2020)
       ),
       tags$p(""),
       tags$p("We'll be doing our best to update these assumptions as additional knowledge about the virus becomes available."),
@@ -354,12 +360,12 @@ server <- function(input, output, session) {
       tags$h3("Frequently Asked Questions:"),
       faqQuestion("Why is my score so high?"),
       tags$p("We wanted our tool to be sensitive to the wide variety of circumstances encountered in the US right now;",
-             "as a result, it's calibrated around a score of 50. A score of 50 is defined as an Exposure = 0.42% (the",
-             "frequency by which the average American catches the flu in any given week), and whose susceptibility",
-             "score is 100%. For every 10x change in (Exposure*Susceptibility), the score will change by 20.",
-             "Thus, for two users, one with a score of 50, and one with a score of 90, the user with a score of 90 is",
-             "either 100x more likely to have been exposed to COVID-19, or would be 100x more likely to experience a",
-             "serious consequence (hospitalization, ICU admission, or death)."),
+             "as a result, it's calibrated around a score of 50. A score of 50 is defined as an equal disease burden as ",
+             "the flu, estimated based on total number of flu cases, hospitalizations, ICU admission, and deaths in the ",
+             "2018-2019 flu season. For every 10x change in (Exposure*Susceptibility), the score will change by 50/3.",
+             "Thus, for two users, one with a score of 20, and one with a score of 70, the user with a score of 70 is",
+             "1000x more likely to have been exposed to COVID-19 and experience a serious consequence (hospitalization, ",
+             "ICU admission, or death)."),
       faqQuestion("My family is sheltering in place with me. Should I count them as exposure risks?"),
       tags$p("As long as your family has been sheltering in place with you, you should be able to think of your family",
              "as a single \"user\" of the tool. However, bear in mind that their exposure risks become yours, and vice",
