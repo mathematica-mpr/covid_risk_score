@@ -1,3 +1,5 @@
+# Environment variable file
+.env
 # History files
 .Rhistory
 .Rapp.history

@@ -9,6 +9,9 @@ library(tidyverse)
 library(tidycensus)
 library(assertr)
 library(flexdashboard)
+library(httr)
+
+httr::set_config(config(ssl_verifypeer = 0L))
 
 #Population data from census
 #census_api_key("341b9e8939115fe9fcd94897d70d826fe1b945be")
@@ -21,17 +24,15 @@ fips_codes<-fips_codes%>%
   mutate(fips = paste0(state_code, county_code))
 
 #Read in NYT covid-19 county-level data
-# path is relative to app.R
-dir <- "data/covid-19-data/"
-setwd(dir)
-system('git pull')
 #NYT county-level data
-df<-read_csv("us-counties.csv")%>%
+nyt_url <- "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv"
+GET(nyt_url, write_disk("data/us-counties.csv", overwrite=TRUE))
+
+df <- read_csv("data/us-counties.csv") %>%
   mutate(fips = case_when(county == "New York City" & state == "New York" ~ "36061",
                           county == "Kansas City" & state == "Missouri" ~ "29095",
                           TRUE ~ fips))%>%
   select(-c(state,county))
-setwd("../..")
 latest_day = df$date%>%max()
 
 #get FIPS code given zip code, using crosswalk from census
