@@ -1,0 +1,15 @@
+version: '3'
+services:
+  rstudio:
+    environment:
+    #  - ADD=SHINY
+      - PASSWORD=${PASSWORD}
+    build: .
+    volumes:
+      - .:/home/rstudio
+      - ~/.aws:/home/rstudio/.aws
+
+    ports:
+     - '8787:8787' # Rstudio
+     - '8080:8080'
+     #- '3838:3838' # Shiny
