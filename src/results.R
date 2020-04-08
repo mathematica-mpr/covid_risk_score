@@ -12,7 +12,7 @@ calculateRisk <- function(input, county_data) {
     # if you're already sick with flu-like symptoms, your likelihood of having covid is P(C19) / (P(C19) + P(flu))
     total_covid_probability = total_covid_count / population
     exposure_risk = total_covid_probability / (total_covid_probability + prob_flu)
-  } else if (input$nppl>0) {
+  } else {
     # ASSUMPTION: diagnosed cases are not active
     active_casecount = total_covid_count - casecount 
     
@@ -22,9 +22,7 @@ calculateRisk <- function(input, county_data) {
     }
     prev_active<-active_casecount/population #prevalence of active cases
     exposure_risk <- 1-(1-prev_active*transmissibility_household)^(input$nppl+input$nppl2*transmissibility_household)
-  } else{
-    exposure_risk <- 0
-  }
+  } 
   
   # susceptibility calculations
   risk2odds<-function(prob) {
