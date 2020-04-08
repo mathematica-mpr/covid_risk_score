@@ -1,6 +1,5 @@
 library(shiny)
 library(shinycssloaders)
-library(shinyjs)
 library(shinythemes)
 source("src/helper_county.R")
 source("src/helper_input.R")
@@ -10,7 +9,6 @@ source("src/results.R")
 
 # Define the UI
 ui <- fluidPage(
-  useShinyjs(),
   theme=shinytheme("superhero"),
   titlePanel("COVID-19 Risk Score Calculator"),
   # google analytics tracking

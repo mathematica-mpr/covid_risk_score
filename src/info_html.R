@@ -23,8 +23,7 @@ renderMethodsHtml <- function() {
         "To calculate exposure, we used ",
         tags$a("the New York Times's published data on COVID-19 cases & deaths", href = urls$nytimes_data_article),
         "to estimate the prevalence of infected people within your county. 
-        For the five boroughs in New York City, we use the overall New York City COVID-19 data.",
-      ),
+        For the five boroughs in New York City, we use the overall New York City COVID-19 data."),
       tags$li(
         "Due to rapid spread and insufficient testing during the COVID-19 pandemic, there are likely additional unreported cases beyond the officially reported cases.",
         "We followed methodology reported by", tags$a("Russell et al (2020)", href = urls$russel_etal_2020),
@@ -38,7 +37,7 @@ renderMethodsHtml <- function() {
       tags$li("Estimations of risk factors associated with underlying medical conditions were obtained from",
               tags$a("China CDC weekly, 2020 Vol No.2", href = urls$ccdc_vol2_2020), "and gender from this preprint by", 
               tags$a("Caramelo et al (2020).", href = urls$caramelo_etal_2020)
-      ),
+      )
     ),
     tags$p(""),
     tags$p("We'll be doing our best to update these assumptions as additional knowledge about the virus becomes available.")

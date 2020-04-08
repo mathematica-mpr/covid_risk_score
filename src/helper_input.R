@@ -46,7 +46,7 @@ collapseStory <- function() {
                              "Chronic renal disease" = "is_renal",
                              "Other chronic disease" = "is_other",
                              "Current or former smoker" = "is_smoker"
-                           )),
+                           ))
       ),
       actionButton('next2', "Next", class = "btn btn-info btn-block")
     ), # bsCollapsePanel
