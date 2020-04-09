@@ -114,7 +114,7 @@ get_county_casecount<-function(key, date){
   if(length(res)==1){
     return(res)
   }else{
-    return(max(res))
+    return(max(res, na.rm = TRUE))
   }
   
 }
@@ -133,7 +133,7 @@ get_county_deathcount<-function(key, date){
   if(length(res)==1){
     return(res)
   }else{
-    return(max(res))
+    return(max(res, na.rm = TRUE))
   }
 }
 assertthat::assert_that(get_county_deathcount("06001", as.Date("2020-03-27"))>1)
