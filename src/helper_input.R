@@ -52,6 +52,7 @@ collapseStory <- function() {
     ), # bsCollapsePanel
     bsCollapsePanel(
       title = "3. Your Behavior",
+      # Fei: may be useful to specify it out this is none household members bc i see ppl and ppl2 are treated as independent subgroups in the risk calculator
       sliderInput('nppl', 
                   'How many people do you come into close contact (> 10 min, < 6 feet) with?', 
                   min = 0, max = 100, value = 0, step =1),

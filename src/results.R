@@ -14,13 +14,14 @@ calculateRisk <- function(input, county_data) {
     exposure_risk = total_covid_probability / (total_covid_probability + prob_flu)
   } else if (input$nppl>0) {
     # ASSUMPTION: diagnosed cases are not active
-    active_casecount = total_covid_count - casecount 
+    active_casecount = total_covid_count - casecount # Fei: does this assume underreport_factor > 1 here? Also, i need a bit more discussion to follow this line of code here.
     
     # ASSUMPTION: active community case count cannot be less than 10% of reported cases
     if (active_casecount < 0.1 * casecount) {
       active_casecount = 0.1 * casecount
     }
     prev_active<-active_casecount/population #prevalence of active cases
+    # Fei: why using prev_active*transmissibility_household as the transmision probability here? how to distinguish the scenarios of nppl and nppl2?
     exposure_risk <- 1-(1-prev_active*transmissibility_household)^(input$nppl+input$nppl2*transmissibility_household)
   } else{
     exposure_risk <- 0
@@ -36,7 +37,10 @@ calculateRisk <- function(input, county_data) {
   
   # exposure modifier
   if(input$hand){
-    exposure_risk<-odds2risk(risk2odds(exposure_risk)*hand_or)
+    #' Fei: need a bit more explanation on this. As mathematician,
+    #' I am not used to operations on ORs but more familiar with probabilities, 
+    #' but this is a standard approach in Epi study.
+    exposure_risk<-odds2risk(risk2odds(exposure_risk)*hand_or)   
   }
   
   if(input$ppe){
@@ -70,6 +74,8 @@ calculateRisk <- function(input, county_data) {
   icu_risk = odds2risk(icu_odds)
   death_risk = odds2risk(death_odds)
   
+  #' Fei: may be useful to call out hospitalization, icu, death are all probabilities.
+  #' It took me a little bit to figure it out after tracking codes in various places. 
   g<-function(exposure, hospitalization, icu, death){
     x = exposure * (hospitalization + icu + death) 
     x_flu = prob_flu * (hosp_flu + icu_flu + death_flu)
@@ -80,6 +86,7 @@ calculateRisk <- function(input, county_data) {
     # 0 means 1/1000 times the disease burden of flu
     return(normalized)
   }
+ 
   score<-if_else(exposure_risk>0, g(exposure_risk, hosp_risk, icu_risk, death_risk), 1)
   return (list(county_data = county_data,
                exposure_risk = exposure_risk,
