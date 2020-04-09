@@ -12,7 +12,7 @@ calculateRisk <- function(input, county_data) {
     # if you're already sick with flu-like symptoms, your likelihood of having covid is P(C19) / (P(C19) + P(flu))
     total_covid_probability = total_covid_count / population
     exposure_risk = total_covid_probability / (total_covid_probability + prob_flu)
-  } else if (input$nppl>0) {
+  } else {
     # ASSUMPTION: diagnosed cases are not active
     active_casecount = total_covid_count - casecount 
     
@@ -22,9 +22,7 @@ calculateRisk <- function(input, county_data) {
     }
     prev_active<-active_casecount/population #prevalence of active cases
     exposure_risk <- 1-(1-prev_active*transmissibility_household)^(input$nppl+input$nppl2*transmissibility_household)
-  } else{
-    exposure_risk <- 0
-  }
+  } 
   
   # susceptibility calculations
   risk2odds<-function(prob) {
@@ -89,31 +87,42 @@ calculateRisk <- function(input, county_data) {
                score = score))
 }
 
-renderResultsHtml <- function(risk, is_sick) {
-  county_data = risk$county_data
+formatDynamicString <- function(string) {
+  return (tags$b(tags$span(style="color:#F0AD4E",string)))
+}
+formatNumber<-function(number, unit) {
+  return (formatDynamicString(HTML(paste0(formatC(signif(number,digits=2), digits=2,format="fg"), unit))))
+}
+formatPercent<-function(probability) {
+  return (formatNumber(100 * probability, "%"))
+}
 
-  formatDynamicString <- function(string) {
-    return (tags$b(tags$span(style="color:#F0AD4E",string)))
-  }
-  formatNumber<-function(number, unit) {
-    return (formatDynamicString(HTML(paste0(formatC(signif(number,digits=2), digits=2,format="fg"), unit))))
-  }
-  formatPercent<-function(probability) {
-    return (formatNumber(100 * probability, "%"))
-  }
-  
-  prob_flu_string = formatPercent(prob_flu)
+renderOutputIntroHtml <- function() {
+  tagList(
+    tags$h3("Your Risk Score is")
+  )
+}
+
+renderLocationHtml <- function(risk) {
+  county_data = risk$county_data
   underreport_factor_string = formatNumber(county_data$underreport_factor, "x")
-  risk_string = formatPercent(risk$exposure_risk)
-  
-  sickness_html = tags$p(HTML(paste0(
-    "Your estimated probability of catching COVID-19 through community transmission is ", risk_string, '. ',
-    "For comparison, ", prob_flu_string, ' of Americans catch the flu every week during flu season.')))
-  
+  div(
+      title = "Location",
+      tags$p(div('We found data from ', formatDynamicString(county_data$name), ' for your zip code.',
+                 ' This county has ', formatDynamicString(format(county_data$casecount, big.mark=",")), ' cases out of a population of ', 
+                 formatDynamicString(format(county_data$population, big.mark = ',')), " as of ", formatDynamicString(latest_day), 
+                 ", and we estimated that your county under-reports by a factor of ", 
+                 underreport_factor_string, '. '
+      ))
+    )
+}
+
+renderScoreHtml <- function(risk) {
   score<- risk$score
   score = max(score, 1)
   score = min(score, 100)
-  score_string = tags$p(HTML(paste0(
+  
+  tags$p(HTML(paste0(
     "Your risk score is ",
     formatDynamicString(round(score)), 
     case_when(
@@ -130,6 +139,15 @@ renderResultsHtml <- function(risk, is_sick) {
         " to make sure you're well prepared in the days to come.")
     )
   )))
+}
+
+renderExposureHtml <- function(risk, is_sick) {
+  prob_flu_string = formatPercent(prob_flu)
+  risk_string = formatPercent(risk$exposure_risk)
+  
+  sickness_html = tags$p(HTML(paste0(
+    "Your estimated probability of catching COVID-19 through community transmission is ", risk_string, '. ',
+    "For comparison, ", prob_flu_string, ' of Americans catch the flu every week during flu season.')))
   
   if (is_sick == TRUE) {
     sickness_html = tags$p(HTML(paste0(
@@ -139,27 +157,29 @@ renderResultsHtml <- function(risk, is_sick) {
       tags$a("self-checker", href = urls$cdc_chatbot),
       ". The probability that you could have COVID-19 is ", risk_string, '. ')))
   }
+  return (sickness_html)
+}
+
+renderSusceptibilityHtml <- function(risk) {
+  tags$p(HTML(paste0(
+    "If you were to get sick from COVID-19, your risk of hospitalization is ", 
+    formatPercent(risk$hosp_risk),
+    ", your risk of requiring an ICU is ",
+    formatPercent(risk$icu_risk),
+    ", and your risk of dying is ",
+    formatPercent(risk$death_risk), "."
+  )))
+}
+
+renderResultsHtml <- function(risk, is_sick) {
   
   # return
   tagList(
     tags$p(""),
-    tags$p(HTML(paste0(
-      'We found data from ', formatDynamicString(county_data$name), ' for your zip code.',
-      ' This county has ', formatDynamicString(format(county_data$casecount, big.mark=",")), ' cases out of a population of ', 
-      formatDynamicString(format(county_data$population, big.mark = ',')), " as of ", formatDynamicString(latest_day), 
-      ", and we estimated that your county under-reports by a factor of ", 
-      underreport_factor_string, '. '))),
-    sickness_html,
-    
-    tags$p(HTML(paste0(
-      "If you were to get sick from COVID-19, your risk of hospitalization is ", 
-      formatPercent(risk$hosp_risk),
-      ", your risk of requiring an ICU is ",
-      formatPercent(risk$icu_risk),
-      ", and your risk of dying is ",
-      formatPercent(risk$death_risk), "."
-    ))),
-    score_string
+    renderLocationHtml(risk),
+    renderExposureHtml(risk, is_sick),
+    renderSusceptibilityHtml(risk),
+    renderScoreHtml(risk)
     # fluidRow(column(width = 4,
     #                 offset = 2,
     #                 tags$a(href=urls$facebook_button,

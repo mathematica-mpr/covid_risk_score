@@ -1,3 +1,5 @@
+# Environment variable file
+.env
 # History files
 .Rhistory
 .Rapp.history
@@ -44,3 +46,5 @@ vignettes/*.pdf
 # 
 .DS_Store
 rsconnect/
+.rstudio
+data/us-counties.csv

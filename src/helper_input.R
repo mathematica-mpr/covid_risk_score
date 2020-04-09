@@ -53,8 +53,8 @@ collapseStory <- function() {
     bsCollapsePanel(
       title = "3. Your Behavior",
       sliderInput('nppl', 
-                  'How many people do you come into close contact (> 10 min, < 6 feet) with?', 
-                  min = 0, max = 100, value = 0, step =1),
+                  'How many people (include your household members) do you come into close contact (> 10 min, < 6 feet) with in a week?', 
+                  min = 0, max = 100, value = 1, step =1),
       checkboxInput('is_roommate', "I live with other people."),
       conditionalPanel(
         condition = "input.is_roommate == true",
