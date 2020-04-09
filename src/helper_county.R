@@ -11,9 +11,6 @@ library(assertr)
 library(flexdashboard)
 
 #Population data from census
-#census_api_key("341b9e8939115fe9fcd94897d70d826fe1b945be")
-#census_pop<-get_estimates(geography = "county", product = "population")%>%
-#  filter(variable == "POP")
 census_pop<-read_csv("data/county_pop.csv")
 #FIPS data from census
 data("fips_codes")
