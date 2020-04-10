@@ -51,7 +51,8 @@ calculateRisk <- function(input, county_data) {
   icu_odds = risk2odds(icu_prob)
   death_odds = risk2odds(death_prob)
   
-  for (condition_id in input$conditions) {
+  #If user input more than two comorbidities, only the first two are considered.
+  for (condition_id in input$conditions[1:min(length(input$conditions), 2)]) {
     # remove "is_" prefix
     condition_root = substr(condition_id, 4, nchar(condition_id))
     hosp_odds = hosp_odds * eval(parse(text=paste0(condition_root, "_or[1]")))
