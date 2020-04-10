@@ -33,8 +33,10 @@ ui <- fluidPage(
       tabsetPanel(
         type = c("pills"),
         tabPanel("Score",
-                 fluidRow(withSpinner(gaugeOutput("gauge", height = '600%'), type = 1)),
-                 fluidRow(column(8, offset = 1, htmlOutput("res")))),
+                 fluidRow(column(width = 8, htmlOutput("output_intro"))),
+                 fluidRow(column(width = 8, withSpinner(gaugeOutput("gauge", height = '600%'), type = 1))),
+                 fluidRow(column(width = 8,htmlOutput("res")))
+                 ),
         # tabPanel("Map"),
         tabPanel("Method", htmlOutput("methods")),
         tabPanel("FAQ", htmlOutput("faq")),
@@ -110,6 +112,13 @@ server <- function(input, output, session) {
     return (calculateRisk(input, county_data))
   })
 
+  output$output_intro <-renderUI({
+    # This is a hack to hold off on output until risk is calculated.
+    risk<-updateRisk()
+    # in src/results.R
+    renderOutputIntroHtml()
+  })
+  
   output$gauge <-renderGauge({
     risk<-updateRisk()
     gauge(case_when(risk$score<1 ~ 1,
