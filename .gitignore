@@ -44,3 +44,6 @@ vignettes/*.pdf
 # 
 .DS_Store
 rsconnect/
+.env
+data/us-counties.csv
+.rstudio/
