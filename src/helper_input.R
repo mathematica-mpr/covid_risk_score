@@ -38,14 +38,14 @@ collapseStory <- function() {
       conditionalPanel(
         condition = "input.has_preexisting == true",
         checkboxGroupInput("conditions", "Conditions",
-                           c("Diabetes" = "is_diabetes",
-                             "Hypertension" = "is_hyper",
-                             "Chronic lung disease or asthma" = "is_lung",
+                           c("Chronic renal disease" = "is_renal",
                              "Cardiovascular disease" = "is_cvd",
+                             "Diabetes" = "is_diabetes",
+                             "Hypertension" = "is_hyper",
+                             "Current or former smoker" = "is_smoker",
                              "Immunocompromised condition" = "is_immune",
-                             "Chronic renal disease" = "is_renal",
-                             "Other chronic disease" = "is_other",
-                             "Current or former smoker" = "is_smoker"
+                             "Chronic lung disease or asthma" = "is_lung",
+                             "Other chronic disease" = "is_other"
                            ))
       ),
       actionButton('next2', "Next", class = "btn btn-info btn-block")
