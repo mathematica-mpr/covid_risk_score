@@ -42,7 +42,6 @@ calculateRisk <- function(input, county_data) {
   }
   
   age = as.numeric(input$age)
-  validate(need(age >= 0, "Invalid age."))
   age_index = max(which(age_list <= age))
   hosp_prob = hosp_list[age_index]
   icu_prob = icu_list[age_index]

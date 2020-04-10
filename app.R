@@ -49,19 +49,55 @@ ui <- fluidPage(
 
 # Define the server code
 server <- function(input, output, session) {
-  getCountyData<- eventReactive(input$go, {
-    #deal with zipcode mapping to >1 counties
+
+  validate_fips<-function(){
+    #make sure zipcode is a five-digit number
+    print(input$zip%>%as.numeric())
+    validate(need(!is.na(input$zip%>%as.numeric()), "zip code must only contain numbers."))
+    validate(need(input$zip%>%as.numeric()<=99999, "zip code must be 5 digits."))
+    #deal with foreign zipcode
     fips<-get_fips_from_zip(input$zip)
+    validate(need(!is.na(fips), "Sorry we don't have data for your zip code, please double check it is a 5-digit US zip code."))
+    #deal with zipcode mapping to >1 counties
     if (length(fips)  >1){
+      print("more than 1")
       output$zipcontrol <- renderUI({
         fips<-get_fips_from_zip(input$zip)
         fips_names<-lapply(fips, get_county_name)%>%unlist()
         radioButtons("fips",label = "Choose a county and resubmit", choiceNames = fips_names, choiceValues  = fips, selected = NULL)
-       })
+      })
       fips<-input$fips
-      updateCollapse(session, id = "collapse_main", open = "1. About You", close = "3. Your Behavior")
+      updateRadioButtons(session, "fips", selected = fips)
     }
-    validate(need(!is.na(fips), "Please select the correct county and resubmit."))
+    validate(need(!is.na(fips), "Your zip code matches multiple counties. Please select the correct county and continue."))
+  }
+  
+  validate_age<-function(){
+    age<-input$age%>%as.numeric()
+    validate(need(!is.na(age), "Age must be a number."))
+    validate(need(age >= 0, "Age can't be negative."))
+    validate(need(age < 123, "According to the Guinness World Records, age must be smaller than 123."))
+  }
+  
+  validate_nppl<-function(){
+    #if user checks "I live with others", then input$nppl has to be greater than 0
+    if(input$is_roommate){
+      validate(need(input$nppl>=1, "Since you live with other people, you must have come into close contact with one or more people."))
+    }
+  }
+  
+  getCountyData<- eventReactive(input$go, {
+    #validate number of people for close contact
+    validate_nppl()
+    output$output_intro <-renderUI({
+      # in src/results.R
+      renderOutputIntroHtml()
+    })
+    fips<-get_fips_from_zip(input$zip)
+    # if zip code matches multiple counties, read the input$fips
+    if(length(fips)>1){
+      fips <-input$fips
+    }
     #fix NYC, all NYC borough data uses NY county
     if (fips%in%NY_fips_ls){
       population <- NY_fips_ls%>%map(~get_county_pop(.))%>%unlist()%>%sum()
@@ -88,6 +124,8 @@ server <- function(input, output, session) {
     updateCollapse(session, id = "collapse_main", open = "1. About You", close = "Introduction")
   })
   updateInputCollapse2 <- eventReactive(input$next1, {
+    validate_fips()
+    validate_age()
     updateCollapse(session, id = "collapse_main", open = "2. Pre-existing Conditions", 
                    close = "1. About You")
   })
@@ -113,12 +151,6 @@ server <- function(input, output, session) {
     return (calculateRisk(input, county_data))
   })
 
-  output$output_intro <-renderUI({
-    # This is a hack to hold off on output until risk is calculated.
-    risk<-updateRisk()
-    # in src/results.R
-    renderOutputIntroHtml()
-  })
   
   output$gauge <-renderGauge({
     risk<-updateRisk()
