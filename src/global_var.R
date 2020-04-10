@@ -35,17 +35,19 @@ death_list = c(0.00161, 0.00695, 0.0309,  0.0844,  0.161,   0.595,   1.93,   4.2
 #Coronavirus Diseases (COVID-19) — China, 2020
 #The Novel Coronavirus Pneumonia Emergency Response Epidemiology Team
 # first is hospitalization odds ratio, second is ICU odds ratio, third is death odds ratio
+renal_or    = c(10.17, 5.82, 6.11) # death OR not available in CCDC
+cvd_or      = c(6.60, 4.88, 7.43)
 diabetes_or = c(5.00, 4.57, 4.70)
 hyper_or    = c(5.00, 4.57, 4.70) # use the same as diabetes
-lung_or     = c(2.53, 2.83, 3.59)
-cvd_or      = c(6.60, 4.88, 7.43)
+smoker_or   = c(2.67, 2.64, 6.11) # death OR not available in CCDC
 immune_or   = c(2.58, 2.86, 6.11) # death OR not available in CCDC
-renal_or    = c(10.17, 5.82, 6.11) # death OR not available in CCDC
+lung_or     = c(2.53, 2.83, 3.59)
+other_or    = c(4.21, 3.33, 6.11) # death OR not available in CCDC
+
+
 #pregnant_or = c(1.23, 0.42, 1)
 #neuro_or    = c(6.18, 2.30, 6.11) # death OR not available in CCDC
 #liver_or    = c(2.44, 3.05, 6.11) # death OR not available in CCDC
-other_or    = c(4.21, 3.33, 6.11) # death OR not available in CCDC
-smoker_or   = c(2.67, 2.64, 6.11) # death OR not available in CCDC
 #all_conditions_death_or = 27.84
 # OR source: https://www.medrxiv.org/content/10.1101/2020.02.24.20027268v1
 male_or     = c(1.8518, 1.85, 1.69)

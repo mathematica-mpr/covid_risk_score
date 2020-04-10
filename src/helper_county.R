@@ -1,9 +1,3 @@
-#load dependencies
-# if(!require(pacman)){
-#   install.packages('pacman')
-# }
-# library(pacman)
-#install.packages(c("shiny", "tidyverse", "tidycensus", "assertr", "flexdashboard"))
 library(shiny)
 library(tidyverse)
 library(tidycensus)
@@ -173,5 +167,3 @@ get_fips_from_zip<-function(zip){
   #   return(fips[1])
   # }
 }
-
-

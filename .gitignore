@@ -49,3 +49,4 @@ rsconnect/
 .env
 data/us-counties.csv
 .rstudio/
+.bash_history

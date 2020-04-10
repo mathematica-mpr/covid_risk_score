@@ -59,8 +59,9 @@ server <- function(input, output, session) {
         radioButtons("fips",label = "Choose a county and resubmit", choiceNames = fips_names, choiceValues  = fips, selected = NULL)
        })
       fips<-input$fips
+      updateCollapse(session, id = "collapse_main", open = "1. About You", close = "3. Your Behavior")
     }
-    validate(need(!is.na(fips), "Check input!"))
+    validate(need(!is.na(fips), "Please select the correct county and resubmit."))
     #fix NYC, all NYC borough data uses NY county
     if (fips%in%NY_fips_ls){
       population <- NY_fips_ls%>%map(~get_county_pop(.))%>%unlist()%>%sum()
