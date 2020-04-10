@@ -12,9 +12,9 @@ calculateRisk <- function(input, county_data) {
     # if you're already sick with flu-like symptoms, your likelihood of having covid is P(C19) / (P(C19) + P(flu))
     total_covid_probability = total_covid_count / population
     exposure_risk = total_covid_probability / (total_covid_probability + prob_flu)
-  } else if (input$nppl>0) {
+  } else {
     # ASSUMPTION: diagnosed cases are not active
-    active_casecount = total_covid_count - casecount 
+    active_casecount = total_covid_count - casecount
     
     # ASSUMPTION: active community case count cannot be less than 10% of reported cases
     if (active_casecount < 0.1 * casecount) {
@@ -22,9 +22,7 @@ calculateRisk <- function(input, county_data) {
     }
     prev_active<-active_casecount/population #prevalence of active cases
     exposure_risk <- 1-(1-prev_active*transmissibility_household)^(input$nppl+input$nppl2*transmissibility_household)
-  } else{
-    exposure_risk <- 0
-  }
+  } 
   
   # susceptibility calculations
   risk2odds<-function(prob) {
@@ -61,7 +59,7 @@ calculateRisk <- function(input, county_data) {
     death_odds = death_odds * eval(parse(text=paste0(condition_root, "_or[3]")))
   }
   if (input$gender == "male") {
-    hosp_odds = hosp_odds * male_or[1]
+    hosp_odds = hosp_odds * male_or[1] # should be hosp_odds(female) * male_or[1]
     icu_odds = icu_odds * male_or[2]
     death_odds = death_odds * male_or[3]
   }
@@ -71,6 +69,9 @@ calculateRisk <- function(input, county_data) {
   death_risk = odds2risk(death_odds)
   
   g<-function(exposure, hospitalization, icu, death){
+    # hospitalization, icu, death are probability
+    # exposure: the probability of exposure
+    
     x = exposure * (hospitalization + icu + death) 
     x_flu = prob_flu * (hosp_flu + icu_flu + death_flu)
     # a mapping function to better visualize probability
