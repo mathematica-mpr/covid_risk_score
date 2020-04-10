@@ -14,9 +14,6 @@ library(httr)
 httr::set_config(config(ssl_verifypeer = 0L))
 
 #Population data from census
-#census_api_key("341b9e8939115fe9fcd94897d70d826fe1b945be")
-#census_pop<-get_estimates(geography = "county", product = "population")%>%
-#  filter(variable == "POP")
 census_pop<-read_csv("data/county_pop.csv")
 #FIPS data from census
 data("fips_codes")
@@ -118,7 +115,7 @@ get_county_casecount<-function(key, date){
   if(length(res)==1){
     return(res)
   }else{
-    return(max(res))
+    return(max(res, na.rm = TRUE))
   }
   
 }
@@ -137,7 +134,7 @@ get_county_deathcount<-function(key, date){
   if(length(res)==1){
     return(res)
   }else{
-    return(max(res))
+    return(max(res, na.rm = TRUE))
   }
 }
 assertthat::assert_that(get_county_deathcount("06001", as.Date("2020-03-27"))>1)

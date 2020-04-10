@@ -114,7 +114,7 @@ renderLocationHtml <- function(risk) {
       tags$p(div('We found data from ', formatDynamicString(county_data$name), ' for your zip code.',
                  ' This county has ', formatDynamicString(format(county_data$casecount, big.mark=",")), ' cases out of a population of ', 
                  formatDynamicString(format(county_data$population, big.mark = ',')), " as of ", formatDynamicString(latest_day), 
-                 ", and we estimated that your county's specific under-reporting factor is ", 
+                 ", and we estimated that your county under-reports by a factor of ", 
                  underreport_factor_string, '. '
       ))
     )
