@@ -19,7 +19,7 @@ An interactive dashboard for users to calculate their individualized risk score 
 * **George Luo** - *front-end lead*
 
 ## Reviewers and Support
-* **Margaret Luo** - * Docker guru*
+* **Margaret Luo** - *Docker guru*
 * **George Gallo** - *AWS architect*
 * **Kelsey Skvoretz** - *QA reviewer*
 * **Fei Xing** - *QA reviewer*
@@ -28,7 +28,7 @@ An interactive dashboard for users to calculate their individualized risk score 
 We appreciate additional support towards this project from Alex Bohl, Dave Peters, and Matt Gillingham.
 
 ## Contact info
-For more information, please contact Cindy Hu at [CHu@mathematica-mpr.com] (mailto:CHu@mathematica-mpr.com) and George Luo at [covid.risk.score@gmail.com](mailto:covid.risk.score@gmail.com).
+For more information, please contact Cindy Hu at CHu@mathematica-mpr.com and George Luo at covid.risk.score@gmail.com.
 
 # DockerShinyApp
 
