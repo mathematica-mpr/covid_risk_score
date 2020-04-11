@@ -1,5 +1,34 @@
-# covid_risk_score
-An interactive dashboard for users to calculate their individualized risk score of contracting COVID-19
+# 19andMe
+An interactive dashboard for users to calculate their individualized risk score of contracting COVID-19 and related adverse health outcomes.
+
+## Contents
+* app.R
+    * Launch the [19andMe app] (https://19andme.shinyapps.io/covid_risk_score/)
+* data/
+    * Store the input data
+* doc/
+    * Calculate input from the literature
+* src/
+    * R Scripts for different modules of the app
+    * Google Analytics plug-in
+    * ShareThis plug-in
+    * CSS
+
+## Authors
+* **Cindy Hu** - *back-end lead*
+* **George Luo** - *front-end lead*
+
+## Reviewers and Support
+* **Margaret Luo** - * Docker guru*
+* **George Gallo** - *AWS architect*
+* **Kelsey Skvoretz** - *QA reviewer*
+* **Fei Xing** - *QA reviewer*
+
+## Acknowledgements
+We appreciate additional support towards this project from Alex Bohl, Dave Peters, and Matt Gillingham.
+
+## Contact info
+For more information, please contact Cindy Hu at [CHu@mathematica-mpr.com] (mailto:CHu@mathematica-mpr.com) and George Luo at [covid.risk.score@gmail.com](mailto:covid.risk.score@gmail.com).
 
 # DockerShinyApp
 
