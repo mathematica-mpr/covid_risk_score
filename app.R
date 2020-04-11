@@ -24,6 +24,7 @@ ui <- fluidPage(
       # in helper_input.R
       collapseStory(),
       tags$div(style = "margin:6px;"),
+      tags$p("Share this tool if you find it useful. Don't worry, your data won't be shared.", class = "text-muted"),
       tags$div(class="sharethis-inline-share-buttons"),
       width = 4
     ), # sidebarPanel
@@ -52,7 +53,6 @@ server <- function(input, output, session) {
 
   validate_fips<-function(){
     #make sure zipcode is a five-digit number
-    print(input$zip%>%as.numeric())
     validate(need(!is.na(input$zip%>%as.numeric()), "zip code must only contain numbers."))
     validate(need(input$zip%>%as.numeric()<=99999, "zip code must be 5 digits."))
     #deal with foreign zipcode
@@ -60,7 +60,6 @@ server <- function(input, output, session) {
     validate(need(!is.na(fips), "Sorry we don't have data for your zip code, please double check it is a 5-digit US zip code."))
     #deal with zipcode mapping to >1 counties
     if (length(fips)  >1){
-      print("more than 1")
       output$zipcontrol <- renderUI({
         fips<-get_fips_from_zip(input$zip)
         fips_names<-lapply(fips, get_county_name)%>%unlist()
@@ -167,7 +166,7 @@ server <- function(input, output, session) {
   output$res <-renderUI({
     risk <- updateRisk()
     # in src/results.R
-    renderResultsHtml(risk, input$is_sick)
+    renderResultsHtml(risk, input$is_sick, input$hand, input$ppe)
   })
   
   output$methods <-renderUI({

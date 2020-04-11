@@ -71,6 +71,7 @@ urls  = list(
   cdc_ppe = "https://www.cdc.gov/coronavirus/2019-ncov/hcp/respirator-use-faq.html",
   cdc_prevention = "https://www.cdc.gov/coronavirus/2019-ncov/prevent-getting-sick/prevention.html",
   cdc_symptoms = "https://www.cdc.gov/coronavirus/2019-ncov/symptoms-testing/symptoms.html",
+  cdc_flu = "https://www.cdc.gov/flu/about/burden/index.html",
   # NYT
   nytimes_data_article = "https://www.nytimes.com/article/coronavirus-county-data-us.html",
   # papers

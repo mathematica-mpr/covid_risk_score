@@ -15,10 +15,11 @@ collapseStory <- function() {
                scientific research to help you ballpark how much risk this disease poses to you."),
       tags$p("We believe people make the right decisions when empowered with neither fear, nor 
                complacency, but with accurate data."),
-      tags$p("We ask that you please take our results with more than a few grains of salt: many 
+      tags$p("Please note: many 
                very important aspects of this disease are either unknown or estimated with large 
                uncertainty. With that said, our guiding philosophy is that an imperfect estimate 
                is better than no estimate."),
+      tags$p("This tool works the best on Google Chrome and on mobile.", class = "text-warning"),
       tags$p(style="color:#DF691A", "DISCLAIMER: this tool is NOT a qualified source of medical knowledge, NOR should it be used to inform policy decisions.", class = "text-warning"),
       actionButton('next0', "Next", class = "btn btn-info btn-block")
     ),
@@ -27,7 +28,7 @@ collapseStory <- function() {
       textInput('zip', label = "What is your 5-digit zip code?"),
       uiOutput("zipcontrol"),
       textInput('age', label = "What is your age?"),
-      radioButtons('gender', "What is your gender?", c("Female" = "female", "Male" = "male"), inline=TRUE),
+      radioButtons('gender', "Are you female or male?", c("Female" = "female", "Male" = "male"), inline=TRUE),
       actionButton('next1', "Next", class = "btn btn-info btn-block")
     ), # bsCollapsePanel
     bsCollapsePanel(
@@ -53,13 +54,13 @@ collapseStory <- function() {
     bsCollapsePanel(
       title = "3. Your Behavior",
       sliderInput('nppl', 
-                  'How many people (include your household members) do you come into close contact (> 10 min, < 6 feet) with in a week?', 
+                  'Direct exposure: how many people (include your household members) do you come into close contact (> 10 min, < 6 feet) with in a week?', 
                   min = 0, max = 100, value = 1, step =1),
       checkboxInput('is_roommate', "I live with other people."),
       conditionalPanel(
         condition = "input.is_roommate == true",
         sliderInput('nppl2', 
-                    'How many people do your other household members come into close contact with?', 
+                    'Indirect exposure: how many people in total do your other household members come into close contact with in a week?', 
                     min = 0, max = 100, value = 0, step =1)),
       checkboxInput("hand", div("I perform hand hygiene according to ", 
                                 tags$a("CDC guidance", href = urls$cdc_hand_hygiene))),

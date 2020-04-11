@@ -6,7 +6,10 @@ renderMethodsHtml <- function() {
   # return
   tagList(
     tags$p(""),
-    tags$p('Our "Risk Score" visualization is the quantity {Exposure * Susceptibility}, normalized by the average disease burden of flu, logarithmically scaled.'),
+    tags$p('Our "Risk Score" visualization is the quantity {Exposure * Susceptibility}, normalized by the average disease burden of flu for the average American, logarithmically scaled.'),
+    tags$p('In 2018-2019 flu season, US had 35 million cases, 0.5 million hospitalization, and almost 35,000 deaths (',
+           tags$a('Source: CDC', href = urls$cdc_flu),
+           ').'),
     tags$p("Exposure represents how likely it is that you've been infected with the virus. It's a function of the prevalence of active cases in your
              community and ",
            tags$a("transmissibility estimates.", href = urls$cdc_mm6909e1),
@@ -81,7 +84,8 @@ renderFaqHtml <- function() {
     tags$p("A lot is still unknown about the disease, and data sets are sparse, so our susceptibility scores are",
            "good for ballpark estimates only. We'll update our tool with better numbers as they become available."),
     faqQuestion("I have suggestion X, or know of data set Y, or want feature Z..."),
-    tags$p("Let us know at", tags$a("covid.risk.score@gmail.com", href="mailto:covid.risk.score@gmail.com"), "!")
+    tags$p("Let us know at", tags$a("covid.risk.score@gmail.com", href="mailto:covid.risk.score@gmail.com"), 
+    "or visit us on ", tags$a("GitHub", href="https://github.com/mathematica-mpr/covid_risk_score"))
   )
 }
 

@@ -1,6 +1,16 @@
 library(shiny)
 source("src/global_var.R")
 
+
+risk2odds<-function(prob) {
+  return (prob / (1 - prob))
+}
+
+odds2risk<-function(odds) {
+  return (odds / (1 + odds))
+}
+
+
 calculateRisk <- function(input, county_data) {
   casecount<-county_data$casecount
   population<-county_data$population
@@ -24,14 +34,6 @@ calculateRisk <- function(input, county_data) {
     exposure_risk <- 1-(1-prev_active*transmissibility_household)^(input$nppl+input$nppl2*transmissibility_household)
   } 
   
-  # susceptibility calculations
-  risk2odds<-function(prob) {
-    return (prob / (1 - prob))
-  }
-  odds2risk<-function(odds) {
-    return (odds / (1 + odds))
-  }
-  
   # exposure modifier
   if(input$hand){
     exposure_risk<-odds2risk(risk2odds(exposure_risk)*hand_or)
@@ -41,6 +43,7 @@ calculateRisk <- function(input, county_data) {
     exposure_risk<-odds2risk(risk2odds(exposure_risk)*ppe_or)
   }
   
+  #susceptibility calculation
   age = as.numeric(input$age)
   age_index = max(which(age_list <= age))
   hosp_prob = hosp_list[age_index]
@@ -174,7 +177,63 @@ renderSusceptibilityHtml <- function(risk) {
   )))
 }
 
-renderResultsHtml <- function(risk, is_sick) {
+renderProtectionHtml <- function(risk, hand, ppe){
+  
+  risk_hand_0<-risk$exposure_risk
+  risk_hand_1<-if_else(hand == TRUE,
+                       # default is hand washing, H1 is no hand washing, divide OR
+                       odds2risk(risk2odds(risk_hand_0)/hand_or),
+                       # default is no hand washing, H1 is with hand washing, multiply OR
+                       odds2risk(risk2odds(risk_hand_0)*hand_or))
+  risk_hand_delta<-if_else(hand == TRUE,
+                           # default is hand washing, H1 is no hand washing, H0/H1
+                           abs(risk_hand_0/risk_hand_1-1),
+                           # default is no hand washing, H1 is hand washing, H1/H0
+                           abs(risk_hand_1/risk_hand_0-1))
+  prob_hand_string<- formatPercent(risk_hand_delta)
+
+  risk_ppe_0<-risk$exposure_risk
+  risk_ppe_1<-if_else(ppe == TRUE,
+                       # default is wearing PPE, H1 is no PPE, divide OR
+                       odds2risk(risk2odds(risk_ppe_0)/ppe_or),
+                       # default is no PPE, H1 is with PPE, multiply OR
+                       odds2risk(risk2odds(risk_ppe_0)*ppe_or))
+  risk_ppe_delta<-if_else(ppe == TRUE,
+                          # default is hand washing, H1 is no hand washing, H0/H1
+                          abs(risk_ppe_0/risk_ppe_1-1),
+                          # default is no hand washing, H1 is hand washing, H1/H0
+                          abs(risk_ppe_1/risk_ppe_0-1))
+  prob_ppe_string<- formatPercent(risk_ppe_delta)
+  
+  
+  if (hand == TRUE){
+    hand_html = HTML(paste0(
+      "Good to know you wash your hands per ", 
+      tags$a("CDC guidance", href = urls$cdc_hand_hygiene),
+      ". This has contributed to a ", prob_hand_string, "reduction of your risk to be exposed to COVID-19. "))
+  } else{
+    hand_html = HTML(paste0(
+      "If you washed your hands per ", 
+      tags$a("CDC guidance", href = urls$cdc_hand_hygiene),
+      ", your risk of being exposed to COVID-19 would drop by ", prob_hand_string, " . "))
+  }
+  
+  if (ppe == TRUE){
+    ppe_html = HTML(paste0(
+      "Good to know you wear personal protection equipment per ", 
+      tags$a("CDC guidelines", href = urls$cdc_ppe),
+      ". This has contributed to a ", prob_ppe_string, "reduction of your risk to be exposed to COVID-19. "))
+  } else{
+    ppe_html = HTML(paste0(
+      "If you wear personal protection equipment per ", 
+      tags$a("CDC guidelines", href = urls$cdc_ppe),
+      ", your risk of being exposed to COVID-19 would drop by ", prob_ppe_string, " . "))
+  }
+  
+  return(tags$p(hand_html, ppe_html))
+}
+
+renderResultsHtml <- function(risk, is_sick, hand, ppe) {
   
   # return
   tagList(
@@ -182,6 +241,7 @@ renderResultsHtml <- function(risk, is_sick) {
     renderLocationHtml(risk),
     renderExposureHtml(risk, is_sick),
     renderSusceptibilityHtml(risk),
+    renderProtectionHtml(risk, hand, ppe),
     renderScoreHtml(risk)
     # fluidRow(column(width = 4,
     #                 offset = 2,
