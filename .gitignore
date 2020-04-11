@@ -50,3 +50,4 @@ rsconnect/
 data/us-counties.csv
 .rstudio/
 .bash_history
+doc/HUD_API_KEY.txt
