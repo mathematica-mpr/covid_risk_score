@@ -1,6 +1,7 @@
 ## v0.3.0
 ---------------------------------
 * QA review with Fei and Kelsey
+* QA review by Matt Salganik
 
 ## v0.2.0
 ----------------------------------
