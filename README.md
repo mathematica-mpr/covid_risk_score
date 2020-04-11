@@ -3,7 +3,7 @@ An interactive dashboard for users to calculate their individualized risk score 
 
 ## Contents
 * app.R
-    * Launch the [19andMe app] (https://19andme.shinyapps.io/covid_risk_score/)
+    * Launch the 19andMe app (https://19andme.shinyapps.io/covid_risk_score/)
 * data/
     * Store the input data
 * doc/
