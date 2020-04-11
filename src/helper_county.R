@@ -26,12 +26,6 @@ df <- read_csv("data/us-counties.csv") %>%
   select(-c(state,county))
 latest_day = df$date%>%max()
 
-#get FIPS code given zip code, using crosswalk from census
-crosswalk<-"https://www2.census.gov/geo/docs/maps-data/data/rel/zcta_county_rel_10.txt"%>%
-  read.table(header=T, sep=",")%>%
-  #select(ZCTA5, GEOID)%>%
-  mutate_all(.funs = stringr::str_pad, width = 5, pad = "0")
-
 
 #utiity function
 named_group_split <- function(.tbl, ...) {
@@ -156,14 +150,10 @@ assertthat::assert_that(calc_county_underreport("36067")>=1)
 assertthat::assert_that(calc_county_underreport("30031")>=1)
 
 get_fips_from_zip<-function(zip){
-  fips<-crosswalk%>%
-    filter(ZCTA5 == zip)%>%
-    pull(GEOID)
+  HUD_API_KEY <- Sys.getenv("HUD_API_KEY")
+  query<-paste0("https://www.huduser.gov/hudapi/public/usps?type=2&query=", zip)
+  resp<-GET(url = query, add_headers(Authorization = paste("Bearer", HUD_API_KEY)))
+  result <- httr::content(resp, as = "parsed")
+  fips<-sapply(result$data$results, '[[', 'geoid')
   return(fips)
-  # if(length(fips)==1){
-  #   #zipcode maps to one county
-  #   return(fips)
-  # } else{
-  #   return(fips[1])
-  # }
 }
