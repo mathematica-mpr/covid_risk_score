@@ -106,11 +106,9 @@ server <- function(input, output, session) {
     if(length(fips)>1){
       fips <-input$fips
     } else if (is_empty(fips)){
-      print("entered")
       fips <-input$fips0
     }
     
-    print(fips)
     #fix NYC, all NYC borough data uses NY county
     if (fips%in%NY_fips_ls){
       population <- NY_fips_ls%>%map(~get_county_pop(.))%>%unlist()%>%sum()
