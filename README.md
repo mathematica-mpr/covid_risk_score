@@ -53,12 +53,14 @@ PASSWORD=mystrongpassword
 ```
 There is an example [sample.env](sample.env) you can also use.  Copy it and rename it to `.env`. 
 
-2. Start the environment
+2. Generate username and API key for USPS ZIP CODE CROSSWALK [here](https://www.huduser.gov/portal/dataset/api.html). We will use this to look up the FIPS county code for the zip code submitted by the user. Add API key to doc/HUD_API_KEY.txt
+
+3. Start the environment
 `docker-compose up`
 
-3. Visit `http://localhost:8787` and start hacking.
+4. Visit `http://localhost:8787` and start hacking.
 
-4. Keep shiny app code in `app.R`.  Launch it for development with `shiny::runApp('app.R')`.
+5. Keep shiny app code in `app.R`.  Launch it for development with `shiny::runApp('app.R')`.
 
 ## Deployment
 TBD
