@@ -23,6 +23,7 @@ An interactive dashboard for users to calculate their individualized risk score 
 * **George Gallo** - *AWS architect*
 * **Kelsey Skvoretz** - *QA reviewer*
 * **Fei Xing** - *QA reviewer*
+* **Matt Salganik** - *Expert reviewer*
 
 ## Acknowledgements
 We appreciate additional support towards this project from Alex Bohl, Dave Peters, and Matt Gillingham.
