@@ -55,11 +55,17 @@ server <- function(input, output, session) {
     #make sure zipcode is a five-digit number
     validate(need(!is.na(input$zip%>%as.numeric()), "zip code must only contain numbers."))
     validate(need(input$zip%>%as.numeric()<=99999, "zip code must be 5 digits."))
-    #deal with foreign zipcode
+    
     fips<-get_fips_from_zip(input$zip)
-    validate(need(!is.na(fips), "Sorry we don't have data for your zip code, please double check it is a 5-digit US zip code."))
-    #deal with zipcode mapping to >1 counties
-    if (length(fips)  >1){
+     #deal with foreign zipcode
+    if (length(fips) ==0){
+      output$zipcontrol <- renderUI({
+        textInput("fips0",label = "Please supply the FIPS code of your county")
+      })
+      fips<-input$fips0
+      updateTextInput(session, "fips0", value = fips)
+    } else if(length(fips)  >1){
+        #deal with zipcode mapping to >1 counties 
       output$zipcontrol <- renderUI({
         fips<-get_fips_from_zip(input$zip)
         fips_names<-lapply(fips, get_county_name)%>%unlist()
@@ -68,7 +74,9 @@ server <- function(input, output, session) {
       fips<-input$fips
       updateRadioButtons(session, "fips", selected = fips)
     }
-    validate(need(!is.na(fips), "Your zip code matches multiple counties. Please select the correct county and continue."))
+    validate(need(!is.na(fips), "If your zip code matches multiple counties, please select the correct county and continue. If you don't see any choices, please input your county 5-digit FIPS code to proceed."))
+    
+    
   }
   
   validate_age<-function(){
@@ -93,10 +101,14 @@ server <- function(input, output, session) {
       renderOutputIntroHtml()
     })
     fips<-get_fips_from_zip(input$zip)
+    
     # if zip code matches multiple counties, read the input$fips
     if(length(fips)>1){
       fips <-input$fips
+    } else if (is_empty(fips)){
+      fips <-input$fips0
     }
+    
     #fix NYC, all NYC borough data uses NY county
     if (fips%in%NY_fips_ls){
       population <- NY_fips_ls%>%map(~get_county_pop(.))%>%unlist()%>%sum()
