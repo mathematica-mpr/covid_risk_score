@@ -13,8 +13,6 @@ ui <- fluidPage(
   titlePanel("COVID-19 Risk Score Calculator"),
   # google analytics tracking
   tags$head(includeHTML("src/google-analytics.html")),
-  # sharethis
-  tags$head(includeHTML("src/sharethis.html")),
   
   includeCSS("src/style.css"),
   #INPUT
@@ -23,9 +21,6 @@ ui <- fluidPage(
       #textInput('fips', label =  '5-digit FIPS code of your county', fips),
       # in helper_input.R
       collapseStory(),
-      tags$div(style = "margin:6px;"),
-      tags$p("Share this tool if you find it useful. Don't worry, your data won't be shared.", class = "text-muted"),
-      tags$div(class="sharethis-inline-share-buttons"),
       width = 4
     ), # sidebarPanel
     

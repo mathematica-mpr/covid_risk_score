@@ -11,7 +11,6 @@ An interactive dashboard for users to calculate their individualized risk score 
 * src/
     * R Scripts for different modules of the app
     * Google Analytics plug-in
-    * ShareThis plug-in
     * CSS
 
 ## Authors
