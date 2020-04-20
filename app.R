@@ -37,8 +37,7 @@ ui <- fluidPage(
                  ),
         # tabPanel("Map"),
         tabPanel("Method", htmlOutput("methods")),
-        tabPanel("FAQ", htmlOutput("faq")),
-        tabPanel("About us", htmlOutput("about"))
+        tabPanel("FAQ", htmlOutput("faq"))
       ),
       width = 8
     ) # mainPanel
@@ -197,10 +196,6 @@ server <- function(input, output, session) {
     renderFaqHtml()
   })
   
-  output$about <- renderUI({
-    # in src/info_html.R
-    renderAboutHtml()
-  })
 }
 
 # Return a Shiny app object

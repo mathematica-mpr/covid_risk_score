@@ -110,11 +110,3 @@ renderFaqHtml <- function() {
     "or visit us on ", tags$a("GitHub", href="https://github.com/mathematica-mpr/covid_risk_score"))
   )
 }
-
-renderAboutHtml <- function() {
-  tagList(
-    tags$h3("About us:"),
-    tags$p(tags$a("Cindy Hu ", href = "https://www.linkedin.com/in/xindi-cindy-hu-harvard/"), "is a data scientist trained in public health."),
-    tags$p(tags$a("George Luo", href = "https://www.linkedin.com/in/george-luo-38852450/"), "is a software engineer.")
-  )
-}
