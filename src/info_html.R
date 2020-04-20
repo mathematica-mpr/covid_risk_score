@@ -4,15 +4,8 @@ source("src/global_var.R")
 # disclaimer popup
 disclaimerpopupHTML <- function(){
   tagList(
-    tags$p("This tool synthesizes reported COVID-19 geographic case data and rapidly evolving
-               scientific research to help you ballpark how much risk this disease poses to you."),
-    tags$p("We believe people make the right decisions when empowered with neither fear, nor 
-               complacency, but with accurate data."),
-    tags$p("Please note: many 
-               very important aspects of this disease are either unknown or estimated with large 
-               uncertainty. With that said, our guiding philosophy is that an imperfect estimate 
-               is better than no estimate."),
     tags$p("This tool works best on Google Chrome and mobile.", class = "text-warning"),
+    tags$p("Your use of this tool is subject to these ", tags$a("Terms of Use", href="")),
     tags$p(style="color:#DF691A", "THE INFORMATION PROVIDED BY THIS TOOL IS NOT MEDICAL ADVICE AND CANNOT BE 
              USED TO DIAGNOSE OR TREAT ANY MEDICAL CONDITION.  See FAQ for more information.", class = "text-warning")
   )
