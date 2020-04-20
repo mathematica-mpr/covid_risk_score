@@ -85,7 +85,19 @@ renderFaqHtml <- function() {
            "good for ballpark estimates only. We'll update our tool with better numbers as they become available."),
     faqQuestion("I have suggestion X, or know of data set Y, or want feature Z..."),
     tags$p("Let us know at", tags$a("covid.risk.score@gmail.com", href="mailto:covid.risk.score@gmail.com"), 
-    "or visit us on ", tags$a("GitHub", href="https://github.com/mathematica-mpr/covid_risk_score"))
+    "or visit us on ", tags$a("GitHub", href="https://github.com/mathematica-mpr/covid_risk_score")),
+    faqQuestion("I understand that the information provided by the tool is not medical advice and cannot be 
+                used to diagnose or treat any medical condition, so how should I best use the information provided 
+                by the tool?"),
+    tags$p("This tool provides you with an estimation of your personal susceptibility or risk of contracting 
+           COVID 19 based on the information you input into the tool.  We believe that having this information 
+           can help you make better decisions when going about your daily activities.  Whatever your personal 
+           risk of contracting COVID 19 may be, you should always follow the ", 
+           tags$a("CDC’s guidelines", href="https://www.cdc.gov/coronavirus/2019-ncov/communication/guidance-list.html?Sort=Date%3A%3Adesc"), 
+           " and any other guidelines provided by your state or local public health officials.  It is also very important to remember that even 
+           if your risk is low, following the ",  
+            tags$a("CDC’s guidelines", href="https://www.cdc.gov/coronavirus/2019-ncov/communication/guidance-list.html?Sort=Date%3A%3Adesc"), 
+           " will help prevent spreading COVID 19 to others.")
   )
 }
 
