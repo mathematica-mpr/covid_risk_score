@@ -11,7 +11,7 @@ source("src/results.R")
 ui <- fluidPage(
   theme=shinytheme("superhero"),
   titlePanel(title=div("COVID-19 Risk Score Calculator", 
-                       img(src="logo.png", 
+                       img(src="MathematicaLogo_White.png", 
                            style = "float:right;"))),
   # google analytics tracking
   tags$head(includeHTML("src/google-analytics.html")),
