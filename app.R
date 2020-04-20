@@ -11,7 +11,7 @@ source("src/results.R")
 ui <- fluidPage(
   theme=shinytheme("superhero"),
   titlePanel(title=div("COVID-19 Risk Score Calculator", 
-                       img(src="src/logo.png", 
+                       img(src="logo.png", 
                            style = "float:right;"))),
   # google analytics tracking
   tags$head(includeHTML("src/google-analytics.html")),
@@ -48,11 +48,11 @@ ui <- fluidPage(
 # Define the server code
 server <- function(input, output, session) {
 
-  
   # the modal dialog where the user can enter the query details.
   query_modal <- modalDialog(
     title = "Important Message",
-    "This is an important message!")
+    disclaimerpopupHTML()
+    )
   
   # Show the model on start up ...
   showModal(query_modal)
