@@ -48,6 +48,15 @@ ui <- fluidPage(
 # Define the server code
 server <- function(input, output, session) {
 
+  
+  # the modal dialog where the user can enter the query details.
+  query_modal <- modalDialog(
+    title = "Important Message",
+    "This is an important message!")
+  
+  # Show the model on start up ...
+  showModal(query_modal)
+  
   validate_fips<-function(){
     #make sure zipcode is a five-digit number
     validate(need(!is.na(input$zip%>%as.numeric()), "zip code must only contain numbers."))
