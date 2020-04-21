@@ -3,7 +3,7 @@ An interactive dashboard for users to calculate their individualized risk score 
 
 ## Contents
 * app.R
-    * Launch the 19andMe app (https://19andme.shinyapps.io/covid_risk_score/)
+    * Launch the 19andMe app (https://19andme.covid19.mathematica.org)
 * data/
     * Store the input data
 * doc/
@@ -12,7 +12,8 @@ An interactive dashboard for users to calculate their individualized risk score 
     * R Scripts for different modules of the app
     * Google Analytics plug-in
     * CSS
-
+* www/
+    * Mathematica logo
 ## Authors
 * **Cindy Hu** - *back-end lead*
 * **George Luo** - *front-end lead*
