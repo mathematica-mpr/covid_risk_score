@@ -10,9 +10,8 @@ source("src/results.R")
 # Define the UI
 ui <- fluidPage(
   theme=shinytheme("superhero"),
-  titlePanel(title=div("COVID-19 Risk Score Calculator", 
-                       img(src="MathematicaLogo_White_smaller.png", 
-                           style = "float:right;"))),
+  titlePanel(fluidRow(column(width = 9, "19 and Me: COVID-19 Risk Score Calculator"),
+                      column(width = 3, img(src = 'MathematicaLogo_White_smaller.png',class = "pull-right")))),
   # google analytics tracking
   tags$head(includeHTML("src/google-analytics.html")),
   
@@ -20,7 +19,6 @@ ui <- fluidPage(
   #INPUT
   sidebarLayout(
     sidebarPanel(
-      #textInput('fips', label =  '5-digit FIPS code of your county', fips),
       # in helper_input.R
       collapseStory(),
       width = 4
