@@ -1,6 +1,16 @@
 library(shiny)
 source("src/global_var.R")
 
+# disclaimer popup
+disclaimerpopupHTML <- function(){
+  tagList(
+    tags$p("This tool works best on Google Chrome and mobile.", class = "text-warning"),
+    tags$p("Your use of this tool is subject to these ", tags$a("Terms of Use", href="")),
+    tags$p(style="color:#DF691A", "THE INFORMATION PROVIDED BY THIS TOOL IS NOT MEDICAL ADVICE AND CANNOT BE 
+             USED TO DIAGNOSE OR TREAT ANY MEDICAL CONDITION.  See FAQ for more information.", class = "text-warning")
+  )
+}
+
 # render the Methodology
 renderMethodsHtml <- function() {
   # return
@@ -57,6 +67,18 @@ renderFaqHtml <- function() {
   # return
   tagList(
     tags$h3("Frequently Asked Questions:"),
+    faqQuestion("I understand that the information provided by the tool is not medical advice and cannot be 
+                used to diagnose or treat any medical condition, so how should I best use the information provided 
+                by the tool?"),
+    tags$p("This tool provides you with an estimation of your personal susceptibility or risk of contracting 
+           COVID 19 based on the information you input into the tool.  We believe that having this information 
+           can help you make better decisions when going about your daily activities.  Whatever your personal 
+           risk of contracting COVID 19 may be, you should always follow the ", 
+           tags$a("CDC’s guidelines", href="https://www.cdc.gov/coronavirus/2019-ncov/communication/guidance-list.html?Sort=Date%3A%3Adesc"), 
+           " and any other guidelines provided by your state or local public health officials.  It is also very important to remember that even 
+           if your risk is low, following the ",  
+           tags$a("CDC’s guidelines", href="https://www.cdc.gov/coronavirus/2019-ncov/communication/guidance-list.html?Sort=Date%3A%3Adesc"), 
+           " will help prevent spreading COVID 19 to others."),
     faqQuestion("Why is my score so high?"),
     tags$p("We wanted our tool to be sensitive to the wide variety of circumstances encountered in the US right now;",
            "as a result, it's calibrated around a score of 50. A score of 50 is defined as an equal disease burden as ",
@@ -86,13 +108,5 @@ renderFaqHtml <- function() {
     faqQuestion("I have suggestion X, or know of data set Y, or want feature Z..."),
     tags$p("Let us know at", tags$a("covid.risk.score@gmail.com", href="mailto:covid.risk.score@gmail.com"), 
     "or visit us on ", tags$a("GitHub", href="https://github.com/mathematica-mpr/covid_risk_score"))
-  )
-}
-
-renderAboutHtml <- function() {
-  tagList(
-    tags$h3("About us:"),
-    tags$p(tags$a("Cindy Hu ", href = "https://www.linkedin.com/in/xindi-cindy-hu-harvard/"), "is a data scientist trained in public health."),
-    tags$p(tags$a("George Luo", href = "https://www.linkedin.com/in/george-luo-38852450/"), "is a software engineer.")
   )
 }
