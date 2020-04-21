@@ -20,7 +20,9 @@ collapseStory <- function() {
                uncertainty. With that said, our guiding philosophy is that an imperfect estimate 
                is better than no estimate."),
       tags$p("This tool works best on Google Chrome and mobile.", class = "text-warning"),
-      tags$p(style="color:#DF691A", "DISCLAIMER: This tool is NOT a qualified source of medical knowledge, NOR should it be used to inform policy decisions.", class = "text-warning"),
+      tags$p("Your use of this tool is subject to these ", tags$a("Terms of Use", href="")),
+      tags$p(style="color:#DF691A", "THE INFORMATION PROVIDED BY THIS TOOL IS NOT MEDICAL ADVICE AND CANNOT BE 
+             USED TO DIAGNOSE OR TREAT ANY MEDICAL CONDITION.  See FAQ for more information.", class = "text-warning"),
       actionButton('next0', "Next", class = "btn btn-info btn-block")
     ),
     bsCollapsePanel(

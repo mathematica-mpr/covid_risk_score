@@ -10,11 +10,11 @@ source("src/results.R")
 # Define the UI
 ui <- fluidPage(
   theme=shinytheme("superhero"),
-  titlePanel("COVID-19 Risk Score Calculator"),
+  titlePanel(title=div("COVID-19 Risk Score Calculator", 
+                       img(src="MathematicaLogo_White_smaller.png", 
+                           style = "float:right;"))),
   # google analytics tracking
   tags$head(includeHTML("src/google-analytics.html")),
-  # sharethis
-  tags$head(includeHTML("src/sharethis.html")),
   
   includeCSS("src/style.css"),
   #INPUT
@@ -23,9 +23,6 @@ ui <- fluidPage(
       #textInput('fips', label =  '5-digit FIPS code of your county', fips),
       # in helper_input.R
       collapseStory(),
-      tags$div(style = "margin:6px;"),
-      tags$p("Share this tool if you find it useful. Don't worry, your data won't be shared.", class = "text-muted"),
-      tags$div(class="sharethis-inline-share-buttons"),
       width = 4
     ), # sidebarPanel
     
@@ -40,8 +37,7 @@ ui <- fluidPage(
                  ),
         # tabPanel("Map"),
         tabPanel("Method", htmlOutput("methods")),
-        tabPanel("FAQ", htmlOutput("faq")),
-        tabPanel("About us", htmlOutput("about"))
+        tabPanel("FAQ", htmlOutput("faq"))
       ),
       width = 8
     ) # mainPanel
@@ -51,6 +47,14 @@ ui <- fluidPage(
 # Define the server code
 server <- function(input, output, session) {
 
+  disclaimer_message <- modalDialog(
+    title = "Disclaimer",
+    disclaimerpopupHTML()
+    )
+  
+  # Show the model on start up ...
+  showModal(disclaimer_message)
+  
   validate_fips<-function(){
     #make sure zipcode is a five-digit number
     validate(need(!is.na(input$zip%>%as.numeric()), "zip code must only contain numbers."))
@@ -191,10 +195,6 @@ server <- function(input, output, session) {
     renderFaqHtml()
   })
   
-  output$about <- renderUI({
-    # in src/info_html.R
-    renderAboutHtml()
-  })
 }
 
 # Return a Shiny app object
