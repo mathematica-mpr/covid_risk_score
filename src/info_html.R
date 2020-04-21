@@ -5,7 +5,8 @@ source("src/global_var.R")
 disclaimerpopupHTML <- function(){
   tagList(
     tags$p("This tool works best on Google Chrome and mobile.", class = "text-warning"),
-    tags$p("Your use of this tool is subject to these ", tags$a("Terms of Use", href="")),
+    tags$p("We do not collect or store you data."),
+    tags$p("Your use of this tool is subject to these ", tags$a("Terms of Use.", href="")),
     tags$p(style="color:#DF691A", "THE INFORMATION PROVIDED BY THIS TOOL IS NOT MEDICAL ADVICE AND CANNOT BE 
              USED TO DIAGNOSE OR TREAT ANY MEDICAL CONDITION.  See FAQ for more information.", class = "text-warning")
   )
@@ -79,6 +80,8 @@ renderFaqHtml <- function() {
            if your risk is low, following the ",  
            tags$a("CDC’s guidelines", href="https://www.cdc.gov/coronavirus/2019-ncov/communication/guidance-list.html?Sort=Date%3A%3Adesc"), 
            " will help prevent spreading COVID 19 to others."),
+    faqQuestion("Are my data captured by the app?"),
+    tags$p("No, we do not collect or store any data you put in. We want this app to be a tool that can serve you."),
     faqQuestion("Why is my score so high?"),
     tags$p("We wanted our tool to be sensitive to the wide variety of circumstances encountered in the US right now;",
            "as a result, it's calibrated around a score of 50. A score of 50 is defined as an equal disease burden as ",
