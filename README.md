@@ -3,7 +3,7 @@ An interactive dashboard for users to calculate their individualized risk score 
 
 ## Contents
 * app.R
-    * Launch the 19andMe app (https://19andme.shinyapps.io/covid_risk_score/)
+    * Launch the 19andMe app (https://19andme.covid19.mathematica.org)
 * data/
     * Store the input data
 * doc/
@@ -12,7 +12,8 @@ An interactive dashboard for users to calculate their individualized risk score 
     * R Scripts for different modules of the app
     * Google Analytics plug-in
     * CSS
-
+* www/
+    * Mathematica logo
 ## Authors
 * **Cindy Hu** - *back-end lead*
 * **George Luo** - *front-end lead*
@@ -53,12 +54,14 @@ PASSWORD=mystrongpassword
 ```
 There is an example [sample.env](sample.env) you can also use.  Copy it and rename it to `.env`. 
 
-2. Start the environment
+2. Generate username and API key for USPS ZIP CODE CROSSWALK [here](https://www.huduser.gov/portal/dataset/api.html). We will use this to look up the FIPS county code for the zip code submitted by the user. Add API key to doc/HUD_API_KEY.txt
+
+3. Start the environment
 `docker-compose up`
 
-3. Visit `http://localhost:8787` and start hacking.
+4. Visit `http://localhost:8787` and start hacking.
 
-4. Keep shiny app code in `app.R`.  Launch it for development with `shiny::runApp('app.R')`.
+5. Keep shiny app code in `app.R`.  Launch it for development with `shiny::runApp('app.R')`.
 
 ## Deployment
 TBD
