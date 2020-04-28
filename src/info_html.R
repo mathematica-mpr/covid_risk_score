@@ -5,8 +5,8 @@ source("src/global_var.R")
 disclaimerpopupHTML <- function(){
   tagList(
     tags$p("This tool works best on Google Chrome and mobile.", class = "text-warning"),
-    tags$p("We do not collect or store you data."),
-    tags$p("Your use of this tool is subject to these ", tags$a("Terms of Use.", href="")),
+    tags$p("We do not retain any information that you provide in connection with your use of the tool."),
+    tags$p("Your use of this tool is subject to these ", tags$a("Terms of Use.", href="https://19andme-pub-0812304701987.s3.amazonaws.com/COVID-19+Risk+Calculator+Terms+of+Use+-+042220.pdf")),
     tags$p(style="color:#DF691A", "THE INFORMATION PROVIDED BY THIS TOOL IS NOT MEDICAL ADVICE AND CANNOT BE 
              USED TO DIAGNOSE OR TREAT ANY MEDICAL CONDITION.  See FAQ for more information.", class = "text-warning")
   )
