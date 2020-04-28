@@ -20,7 +20,7 @@ An interactive dashboard for users to calculate their individualized risk score 
 
 ## Reviewers and Support
 * **Margaret Luo** - *Docker guru*
-* **George Gallo** - *AWS architect*
+* **Arpan Bhattacharya, George Gallo** - *AWS architects*
 * **Kelsey Skvoretz** - *QA reviewer*
 * **Fei Xing** - *QA reviewer*
 * **Matt Salganik** - *Expert reviewer*
@@ -64,4 +64,4 @@ There is an example [sample.env](sample.env) you can also use.  Copy it and rena
 5. Keep shiny app code in `app.R`.  Launch it for development with `shiny::runApp('app.R')`.
 
 ## Deployment
-TBD
+Utilize the attached Dockerfile for a simple but efficient deployment setup.
