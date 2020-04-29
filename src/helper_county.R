@@ -145,9 +145,7 @@ calc_county_underreport<-function(fips){
                    fac_underreport>10 ~ 10,
                    TRUE ~ fac_underreport))
 }
-assertthat::assert_that(calc_county_underreport("06001")>=1)
-assertthat::assert_that(calc_county_underreport("36067")>=1)
-assertthat::assert_that(calc_county_underreport("30031")>=1)
+
 
 get_fips_from_zip<-function(zip){
   #HUD_API_KEY <- Sys.getenv("HUD_API_KEY")
