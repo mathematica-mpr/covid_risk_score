@@ -74,7 +74,7 @@ get_county_name<-function(key){
     paste(., collapse = ', ')
   return(res)
 }
-assertthat::assert_that(get_county_name("06001")=="Alameda County, CA")
+#assertthat::assert_that(get_county_name("06001")=="Alameda County, CA")
 
 get_county_pop<-function(key){
   #looks up county population
@@ -87,7 +87,7 @@ get_county_pop<-function(key){
     pull(POPESTIMATE2019)
   return(res)
 }
-assertthat::assert_that(get_county_pop("06001")>1.66*10^6)
+#assertthat::assert_that(get_county_pop("06001")>1.66*10^6)
 
 get_county_casecount<-function(key, date){
   #looks up county case count on a given date
@@ -107,7 +107,7 @@ get_county_casecount<-function(key, date){
   }
   
 }
-assertthat::assert_that(get_county_casecount("06001", as.Date("2020-03-27"))>220)
+#assertthat::assert_that(get_county_casecount("06001", as.Date("2020-03-27"))>220)
 
 get_county_deathcount<-function(key, date){
   #looks up county death count on a given date
@@ -125,9 +125,9 @@ get_county_deathcount<-function(key, date){
     return(max(res, na.rm = TRUE))
   }
 }
-assertthat::assert_that(get_county_deathcount("06001", as.Date("2020-03-27"))>1)
-assertthat::assert_that(get_county_deathcount("06001", as.Date("2020-03-27"))<
-                          get_county_casecount("06001", as.Date("2020-03-27")-13))
+# assertthat::assert_that(get_county_deathcount("06001", as.Date("2020-03-27"))>1)
+# assertthat::assert_that(get_county_deathcount("06001", as.Date("2020-03-27"))<
+#                           get_county_casecount("06001", as.Date("2020-03-27")-13))
 
 calc_county_underreport<-function(fips){
   #calculate the underreporting factor using case fatality rate, following methods in (TW Russell, 2020)
@@ -143,6 +143,7 @@ calc_county_underreport<-function(fips){
   return(case_when(fac_underreport==0 ~ us_average,
                    is.na(fac_underreport) ~ us_average,
                    fac_underreport>10 ~ 10,
+                   fac_underreport<1 ~ 1,
                    TRUE ~ fac_underreport))
 }
 
