@@ -17,9 +17,8 @@ fips_codes<-fips_codes%>%
 #Read in NYT covid-19 county-level data
 #NYT county-level data
 nyt_url <- "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv"
-GET(nyt_url, write_disk("data/us-counties.csv", overwrite=TRUE))
-
-df <- read_csv("data/us-counties.csv") %>%
+#GET(nyt_url, write_disk("data/us-counties.csv", overwrite=TRUE))
+df <- read_csv(nyt_url) %>%
   mutate(fips = case_when(county == "New York City" & state == "New York" ~ "36061",
                           county == "Kansas City" & state == "Missouri" ~ "29095",
                           TRUE ~ fips))%>%
