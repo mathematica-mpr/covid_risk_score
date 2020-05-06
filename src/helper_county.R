@@ -18,7 +18,10 @@ fips_codes<-fips_codes%>%
 #NYT county-level data
 nyt_url <- "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv"
 #GET(nyt_url, write_disk("data/us-counties.csv", overwrite=TRUE))
-df <- read_csv(nyt_url) %>%
+response<-GET(nyt_url)
+df <- response$content%>%
+  rawToChar()%>%
+  read_csv()%>%
   mutate(fips = case_when(county == "New York City" & state == "New York" ~ "36061",
                           county == "Kansas City" & state == "Missouri" ~ "29095",
                           TRUE ~ fips))%>%
@@ -144,9 +147,9 @@ calc_county_underreport<-function(fips){
                    fac_underreport>10 ~ 10,
                    TRUE ~ fac_underreport))
 }
-assertthat::assert_that(calc_county_underreport("06001")>=1)
-assertthat::assert_that(calc_county_underreport("36067")>=1)
-assertthat::assert_that(calc_county_underreport("30031")>=1)
+#assertthat::assert_that(calc_county_underreport("06001")>=1)
+#assertthat::assert_that(calc_county_underreport("36067")>=1)
+#assertthat::assert_that(calc_county_underreport("30031")>=1)
 
 get_fips_from_zip<-function(zip){
   #HUD_API_KEY <- Sys.getenv("HUD_API_KEY")
