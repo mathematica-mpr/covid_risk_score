@@ -105,7 +105,7 @@ formatPercent<-function(probability) {
 
 renderOutputIntroHtml <- function() {
   tagList(
-    tags$h3("Your Risk Score is")
+    tags$h3("The risk score for people with similar characteristics and behaviors as you is")
   )
 }
 
@@ -115,10 +115,11 @@ renderLocationHtml <- function(risk) {
   div(
       title = "Location",
       tags$p(div('We found data from ', formatDynamicString(county_data$name), ' for your zip code.',
-                 ' This county has ', formatDynamicString(format(county_data$casecount, big.mark=",")), ' cases out of a population of ', 
+                 ' This county has ', formatDynamicString(format(county_data$casecount, big.mark=",")), ' confirmed cases out of a population of ', 
                  formatDynamicString(format(county_data$population, big.mark = ',')), " as of ", formatDynamicString(latest_day), 
                  ", and we estimated that your county under-reports by a factor of ", 
-                 underreport_factor_string, '. '
+                 underreport_factor_string, '. This means there may be ', formatDynamicString(format(round(county_data$casecount*county_data$underreport_factor), big.mark =",")),
+                 ' actual (confirmed and unconfirmed) cases because many are untested or unreported.'
       ))
     )
 }
@@ -129,7 +130,7 @@ renderScoreHtml <- function(risk) {
   score = min(score, 100)
   
   tags$p(HTML(paste0(
-    "Your risk score is ",
+    "The risk score for people with similar characteristics and behaviors as you is ",
     formatDynamicString(round(score)), 
     case_when(
       score<30 ~ paste0(
@@ -152,7 +153,8 @@ renderExposureHtml <- function(risk, is_sick) {
   risk_string = formatPercent(risk$exposure_risk)
   
   sickness_html = tags$p(HTML(paste0(
-    "Your estimated probability of catching COVID-19 through community transmission is ", risk_string, '. ',
+    "Among people who are the same age, sex, and health status as you, and have behaviors and levels of interaction with others that are similar to yours, the estimated probability of catching COVID-19 through community transmission is ", 
+    risk_string, '. ',
     "For comparison, ", prob_flu_string, ' of Americans catch the flu every week during flu season.')))
   
   if (is_sick == TRUE) {
@@ -168,11 +170,11 @@ renderExposureHtml <- function(risk, is_sick) {
 
 renderSusceptibilityHtml <- function(risk) {
   tags$p(HTML(paste0(
-    "If you were to get sick from COVID-19, your risk of hospitalization is ", 
+    "Among people who are the same age, sex, and health status as you and get sick from COVID-19, the risk of hospitalization is ", 
     formatPercent(risk$hosp_risk),
-    ", your risk of requiring an ICU is ",
+    ", the risk of requiring an ICU is ",
     formatPercent(risk$icu_risk),
-    ", and your risk of dying is ",
+    ", and the risk of dying is ",
     formatPercent(risk$death_risk), "."
   )))
 }
@@ -210,24 +212,24 @@ renderProtectionHtml <- function(risk, hand, ppe){
     hand_html = HTML(paste0(
       "Good to know you wash your hands per ", 
       tags$a("CDC guidance", href = urls$cdc_hand_hygiene),
-      ". This has contributed to a ", prob_hand_string, "reduction of your risk to be exposed to COVID-19. "))
+      ". In general, this lowers people's risk of being exposed to COVID-19 by ", prob_hand_string, " . "))
   } else{
     hand_html = HTML(paste0(
-      "If you washed your hands per ", 
+      "We recommend you wash your hands per ", 
       tags$a("CDC guidance", href = urls$cdc_hand_hygiene),
-      ", your risk of being exposed to COVID-19 would drop by ", prob_hand_string, " . "))
+      ". In general, this would lower people's risk of being exposed to COVID-19 by ", prob_hand_string, " . "))
   }
   
   if (ppe == TRUE){
     ppe_html = HTML(paste0(
       "Good to know you wear personal protection equipment per ", 
       tags$a("CDC guidelines", href = urls$cdc_ppe),
-      ". This has contributed to a ", prob_ppe_string, "reduction of your risk to be exposed to COVID-19. "))
+      ". In general, this lowers people's risk of being exposed to COVID-19 by ", prob_ppe_string, " . "))
   } else{
     ppe_html = HTML(paste0(
-      "If you wear personal protection equipment per ", 
+      "We recommend you wear personal protection equipment per ", 
       tags$a("CDC guidelines", href = urls$cdc_ppe),
-      ", your risk of being exposed to COVID-19 would drop by ", prob_ppe_string, " . "))
+      ". In general, this would lower people's risk of being exposed to COVID-19 by ", prob_ppe_string, " . "))
   }
   
   return(tags$p(hand_html, ppe_html))
