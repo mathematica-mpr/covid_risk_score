@@ -76,7 +76,7 @@ urls  = list(
   nytimes_data_article = "https://www.nytimes.com/article/coronavirus-county-data-us.html",
   # papers
   caramelo_etal_2020 = "https://www.medrxiv.org/content/10.1101/2020.02.24.20027268v1",
-  russel_etal_2020 = "https://cmmid.github.io/topics/covid19/severity/global_cfr_estimates.html",
+  russel_etal_2020 = "https://cmmid.github.io/topics/covid19/global_cfr_estimates.html",
   verity_etal_2020 = "https://www.thelancet.com/journals/laninf/article/PIIS1473-3099(20)30243-7/fulltext",
   # social
   twitter_button = "https://twitter.com/intent/tweet?text=Find%20your%20COVID-19%20risk%20score!&url=https://19andme.shinyapps.io/covid_risk_score/",
