@@ -53,6 +53,7 @@ calculateRisk <- function(input, county_data) {
   icu_odds = risk2odds(icu_prob)
   death_odds = risk2odds(death_prob)
   
+  print(input$conditions)
   #If user input more than two comorbidities, only the first two are considered.
   for (condition_id in input$conditions[1:min(length(input$conditions), 2)]) {
     # remove "is_" prefix

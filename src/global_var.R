@@ -31,9 +31,13 @@ death_list = c(0.00161, 0.00695, 0.0309,  0.0844,  0.161,   0.595,   1.93,   4.2
 
 # odds ratios, https://www.cdc.gov/mmwr/volumes/69/wr/mm6913e2.htm
 # CCDC weekly, 2020 Vol No.2
-#The Epidemiological Characteristics of an Outbreak of 2019 Novel
-#Coronavirus Diseases (COVID-19) — China, 2020
-#The Novel Coronavirus Pneumonia Emergency Response Epidemiology Team
+# The Epidemiological Characteristics of an Outbreak of 2019 Novel Coronavirus Diseases (COVID-19) in China, 2020
+# The Novel Coronavirus Pneumonia Emergency Response Epidemiology Team
+# https://www.unboundmedicine.com/medline/citation/32064853/[The_epidemiological_characteristics_of_an_outbreak_of_2019_novel_coronavirus_diseases__COVID_19__in_China]_"
+# obesity odds ratio source: 
+#     hosp https://academic.oup.com/cid/advance-article/doi/10.1093/cid/ciaa415/5818333
+#     ICU https://onlinelibrary.wiley.com/doi/abs/10.1002/oby.22831?af=R
+#     death https://www.medrxiv.org/content/10.1101/2020.05.06.20092999v1.full.pdf
 # first is hospitalization odds ratio, second is ICU odds ratio, third is death odds ratio
 renal_or    = c(10.17, 5.82, 6.11) # death OR not available in CCDC
 cvd_or      = c(6.60, 4.88, 7.43)
@@ -42,6 +46,7 @@ hyper_or    = c(5.00, 4.57, 4.70) # use the same as diabetes
 smoker_or   = c(2.67, 2.64, 6.11) # death OR not available in CCDC
 immune_or   = c(2.58, 2.86, 6.11) # death OR not available in CCDC
 lung_or     = c(2.53, 2.83, 3.59)
+obese_or    = c(2.0, 4.17, 1.7)
 other_or    = c(4.21, 3.33, 6.11) # death OR not available in CCDC
 
 
