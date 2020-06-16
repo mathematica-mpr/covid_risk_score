@@ -1,8 +1,3 @@
-library(tidyverse)
-
-source(file.path("src","global_var.R"))
-source(file.path("src","results.R"))
-
 solve_for_p_female <- function(OR, p_overall){
   if (p_overall==0){return(0)}
   # solve for female suspetibility rate using male/female OR and overall suseptibility 
