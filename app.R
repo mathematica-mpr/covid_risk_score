@@ -5,8 +5,8 @@ source("src/helper_county.R")
 source("src/helper_input.R")
 source("src/info_html.R")
 source("src/global_var.R")
-source("src/calculate_female_rate.R")
 source("src/results.R")
+source("src/calculate_female_rate.R")
 
 # Define the UI
 ui <- fluidPage(
