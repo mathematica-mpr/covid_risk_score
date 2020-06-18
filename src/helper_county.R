@@ -111,7 +111,7 @@ get_county_casecount<-function(key, date){
 }
 #assertthat::assert_that(get_county_casecount("06001", as.Date("2020-03-27"))>220)
 
-get_county_moving_casecount <- function(key, end, beg = 0, dat = latest_day, county_casecount_fun = get_county_casecount) {
+get_county_moving_casecount <- function(key, beg, end, dat = latest_day, county_casecount_fun = get_county_casecount) {
   #finds total cases within a range
   #input
   ##key: string, five digit
