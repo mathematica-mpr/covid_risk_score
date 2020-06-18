@@ -115,6 +115,7 @@ server <- function(input, output, session) {
     if (fips%in%NY_fips_ls){
       population <- NY_fips_ls%>%map(~get_county_pop(.))%>%unlist()%>%sum()
       name <- "New York City (5 Boroughs)"
+      casecount <- get_county_casecount("36061", latest_day)
       casecount_day1_14 <- get_county_moving_casecount("36061", 0, 14)
       casecount_day14_28 <- get_county_moving_casecount("36061", 14, 28)
       underreport_factor <- calc_county_underreport("36061")
@@ -122,6 +123,7 @@ server <- function(input, output, session) {
       #get county-level characteristics
       population <- get_county_pop(fips)
       name <- get_county_name(fips)
+      casecount <- get_county_casecount(fips, latest_day)
       casecount_day1_14 <- get_county_moving_casecount(fips, 0, 14)
       casecount_day14_28 <- get_county_moving_casecount(fips, 14, 28)
       underreport_factor <- calc_county_underreport(fips)
@@ -130,6 +132,7 @@ server <- function(input, output, session) {
     return (list(fips = fips,
                  population = population,
                  name = name,
+                 casecount = casecount,
                  casecount_day1_14 = casecount_day1_14,
                  casecount_day14_28 = casecount_day14_28,
                  underreport_factor = underreport_factor))
