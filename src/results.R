@@ -12,23 +12,24 @@ odds2risk<-function(odds) {
 
 
 calculateRisk <- function(input, county_data) {
-  casecount<-county_data$casecount
+  casecount_day1_14 <- county_data$casecount_day1_14
+  casecount_day14_28<-county_data$casecount_day14_28
   population<-county_data$population
   underreport_factor<-county_data$underreport_factor
-  total_covid_count = casecount * underreport_factor
-  
+  total_covid_count_day1_14 = casecount_day1_14 * underreport_factor
+  total_covid_count = total_covid_count_day1_14 + casecount_day14_28
   #risk calculator
   if(input$is_sick){
     # if you're already sick with flu-like symptoms, your likelihood of having covid is P(C19) / (P(C19) + P(flu))
     total_covid_probability = total_covid_count / population
     exposure_risk = total_covid_probability / (total_covid_probability + prob_flu)
   } else {
-    # ASSUMPTION: diagnosed cases are not active
-    active_casecount = total_covid_count - casecount
+    # ASSUMPTION: diagnosed cases are not active and undiagnosed cases get better in 2 weeks
+    active_casecount = total_covid_count_day1_14 - casecount_day1_14
     
     # ASSUMPTION: active community case count cannot be less than 10% of reported cases
-    if (active_casecount < 0.1 * casecount) {
-      active_casecount = 0.1 * casecount
+    if (active_casecount < 0.1 * casecount_day1_14) {
+      active_casecount = 0.1 * casecount_day1_14
     }
     prev_active<-active_casecount/population #prevalence of active cases
     exposure_risk <- 1-(1-prev_active*transmissibility_household)^(input$nppl+input$nppl2*transmissibility_household)
