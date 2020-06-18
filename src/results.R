@@ -114,15 +114,18 @@ renderLocationHtml <- function(risk) {
   county_data = risk$county_data
   underreport_factor_string = formatNumber(county_data$underreport_factor, "x")
   div(
-      title = "Location",
-      tags$p(div('We found data from ', formatDynamicString(county_data$name), ' for your zip code.',
-                 ' This county has ', formatDynamicString(format(county_data$casecount, big.mark=",")), ' confirmed cases out of a population of ', 
-                 formatDynamicString(format(county_data$population, big.mark = ',')), " as of ", formatDynamicString(latest_day), 
-                 ", and we estimated that your county under-reports by a factor of ", 
-                 underreport_factor_string, '. This means there may be ', formatDynamicString(format(round(county_data$casecount*county_data$underreport_factor), big.mark =",")),
-                 ' actual (confirmed and unconfirmed) cases because many are untested or unreported.'
-      ))
-    )
+    title = "Location",
+    tags$p(div('We found data from ', formatDynamicString(county_data$name), ' for your zip code.',
+               ' This county has ', formatDynamicString(format(county_data$casecount, big.mark=",")), ' confirmed cases out of a population of ', 
+               formatDynamicString(format(county_data$population, big.mark = ',')), " as of ", formatDynamicString(latest_day), 
+               ". We estimated that your county under-reports by a factor of ", 
+               underreport_factor_string, ' and that there are ', 
+               formatDynamicString(format(round(county_data$casecount_day1_14 + county_data$casecount_day14_28), big.mark =",")), ' of the confirmed cases 
+               are still active. This means there may be ', 
+               formatDynamicString(format(round(county_data$casecount_day1_14*county_data$underreport_factor + county_data$casecount_day14_28), big.mark =",")),
+               ' actual (confirmed and unconfirmed) cases because many are untested or unreported.'
+    ))
+  )
 }
 
 renderScoreHtml <- function(risk) {
