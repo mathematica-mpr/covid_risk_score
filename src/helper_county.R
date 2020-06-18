@@ -111,6 +111,20 @@ get_county_casecount<-function(key, date){
 }
 #assertthat::assert_that(get_county_casecount("06001", as.Date("2020-03-27"))>220)
 
+get_county_moving_casecount <- function(key, end, beg = 0, dat = latest_day, county_casecount_fun = get_county_casecount) {
+  #finds total cases within a range
+  #input
+  ##key: string, five digit
+  ##end: number of days after date for end
+  ##beg: number of days after date for start
+  ##date: Date, "YYYY-MM-DD"
+  ##county_casecount_fun: function to find case count on a given day
+  #output
+  ##casecount: numeric, county case count between 2 given days
+  moving_casecount <- county_casecount_fun(key, dat-beg) - county_casecount_fun(key, dat-end)
+  return(moving_casecount)
+}
+
 get_county_deathcount<-function(key, date){
   #looks up county death count on a given date
   #input
