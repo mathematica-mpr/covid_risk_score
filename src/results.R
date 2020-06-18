@@ -12,12 +12,12 @@ odds2risk<-function(odds) {
 
 
 calculateRisk <- function(input, county_data) {
-  casecount_day1_14 <- county_data$casecount_day1_14
-  casecount_day14_28<-county_data$casecount_day14_28
+  casecount_newer <- county_data$casecount_newer
+  casecount_older<-county_data$casecount_older
   population<-county_data$population
   underreport_factor<-county_data$underreport_factor
-  total_covid_count_day1_14 = casecount_day1_14 * underreport_factor
-  total_covid_count = total_covid_count_day1_14 + casecount_day14_28
+  total_covid_count_newer = casecount_newer * underreport_factor
+  total_covid_count = total_covid_count_newer + casecount_older
   #risk calculator
   if(input$is_sick){
     # if you're already sick with flu-like symptoms, your likelihood of having covid is P(C19) / (P(C19) + P(flu))
@@ -25,11 +25,11 @@ calculateRisk <- function(input, county_data) {
     exposure_risk = total_covid_probability / (total_covid_probability + prob_flu)
   } else {
     # ASSUMPTION: diagnosed cases are not active and undiagnosed cases get better in 2 weeks
-    active_casecount = total_covid_count_day1_14 - casecount_day1_14
+    active_casecount = total_covid_count_newer - casecount_newer
     
     # ASSUMPTION: active community case count cannot be less than 10% of reported cases
-    if (active_casecount < 0.1 * casecount_day1_14) {
-      active_casecount = 0.1 * casecount_day1_14
+    if (active_casecount < 0.1 * casecount_newer) {
+      active_casecount = 0.1 * casecount_newer
     }
     prev_active<-active_casecount/population #prevalence of active cases
     exposure_risk <- 1-(1-prev_active*transmissibility_household)^(input$nppl+input$nppl2*transmissibility_household)
@@ -120,9 +120,9 @@ renderLocationHtml <- function(risk) {
                formatDynamicString(format(county_data$population, big.mark = ',')), " as of ", formatDynamicString(latest_day), 
                ". We estimated that your county under-reports by a factor of ", 
                underreport_factor_string, ' and that there are ', 
-               formatDynamicString(format(round(county_data$casecount_day1_14 + county_data$casecount_day14_28), big.mark =",")), ' of the confirmed cases 
+               formatDynamicString(format(round(county_data$casecount_newer + county_data$casecount_older), big.mark =",")), ' of the confirmed cases 
                are still active. This means there may be ', 
-               formatDynamicString(format(round(county_data$casecount_day1_14*county_data$underreport_factor + county_data$casecount_day14_28), big.mark =",")),
+               formatDynamicString(format(round(county_data$casecount_newer*county_data$underreport_factor + county_data$casecount_older), big.mark =",")),
                ' actual (confirmed and unconfirmed) cases because many are untested or unreported.'
     ))
   )
