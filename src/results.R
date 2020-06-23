@@ -116,7 +116,7 @@ renderLocationHtml <- function(risk) {
   div(
     title = "Location",
     tags$p(div('We found data from ', formatDynamicString(county_data$name), ' for your zip code. As of ', 
-               formatDynamicString(latest_day), ' This county has ', formatDynamicString(format(county_data$casecount, big.mark=",")), 
+               formatDynamicString(latest_day), ', this county has ', formatDynamicString(format(county_data$casecount, big.mark=",")), 
                ' total confirmed COVID-19. We estimated that  out of the total confirmed cases',
                formatDynamicString(format(round(county_data$casecount_newer + county_data$casecount_older), big.mark =",")), 
                'of people are still sick. Many people who contract COVID-19 are not tested, and therefore not reported. 
