@@ -60,13 +60,12 @@ calculateRisk <- function(input, county_data) {
       # remove "is_" prefix
       condition_root = substr(condition_id, 4, nchar(condition_id))
       
-      print(condition_root)
       # hosp OR are mutually adjusted except for immuno and other - for these 2 only adjust if they are only condition
       if ( (!condition_root %in% c("immune","other")) | length(input$conditions)==1 ){
         hosp_odds = hosp_odds * eval(parse(text=paste0(condition_root, "_or[1]")))
       }
       # ICU OR are not mutually adjusted, so use first 2 only
-      if (i>=2){
+      if (i<=2){
         icu_odds = icu_odds * eval(parse(text=paste0(condition_root, "_or[2]")))
       }
       # hosp OR are mutually adjusted except for immuno and other - for these 2 only adjust if they are only condition
