@@ -10,6 +10,11 @@ odds2risk<-function(odds) {
   return (odds / (1 + odds))
 }
 
+logodds2risk <- -function(logodds){
+  return(exp(logodds)/(1 + exp(logodds)))
+  }
+
+
 
 calculateRisk <- function(input, county_data) {
   casecount<-county_data$casecount
@@ -19,9 +24,16 @@ calculateRisk <- function(input, county_data) {
   
   #risk calculator
   if(input$is_sick){
-    # if you're already sick with flu-like symptoms, your likelihood of having covid is P(C19) / (P(C19) + P(flu))
-    total_covid_probability = total_covid_count / population
-    exposure_risk = total_covid_probability / (total_covid_probability + prob_flu)
+    # if you're already sick with symptoms, your log_odds of having COVID is:
+    # prediction_model = (-1.32) - (0.01*age) + (0.44*sex) + (1.75*loss_smell_taste) + (0.31*cough) + (0.49*fatigue) + (0.39*skip_meal)
+    community_exposure_risk = total_covid_count / population
+    
+    age <- as.numeric(input$age)
+    sex <- ifelse(input$gender == "male", 1, 0)
+    sympt_covid_logodds <- (-1.32) - (0.01*age) + (0.44*sex) + (1.75*input$loss_smell_taste) + (0.31*input$cough) + (0.49*input$fatigue) + (0.39*input$skip_meal)
+    sympt_odds <- risk2odds(logodds2risk(sympt_covid_logodds))
+    exposure_risk <- odds2risk(risk2odds(community_exposure_risk)*sympt_odds)
+    
   } else {
     # ASSUMPTION: diagnosed cases are not active
     active_casecount = total_covid_count - casecount
