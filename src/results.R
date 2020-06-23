@@ -115,15 +115,15 @@ renderLocationHtml <- function(risk) {
   underreport_factor_string = formatNumber(county_data$underreport_factor, "x")
   div(
     title = "Location",
-    tags$p(div('We found data from ', formatDynamicString(county_data$name), ' for your zip code.',
-               ' This county has ', formatDynamicString(format(county_data$casecount, big.mark=",")), ' confirmed cases out of a population of ', 
-               formatDynamicString(format(county_data$population, big.mark = ',')), " as of ", formatDynamicString(latest_day), 
-               ". We estimated that your county under-reports by a factor of ", 
-               underreport_factor_string, ' and that there are ', 
-               formatDynamicString(format(round(county_data$casecount_newer + county_data$casecount_older), big.mark =",")), ' of the confirmed cases 
-               are still active. This means there may be ', 
+    tags$p(div('We found data from ', formatDynamicString(county_data$name), ' for your zip code. As of ', 
+               formatDynamicString(latest_day), ' This county has ', formatDynamicString(format(county_data$casecount, big.mark=",")), 
+               ' total confirmed COVID-19. We estimated that  out of the total confirmed cases',
+               formatDynamicString(format(round(county_data$casecount_newer + county_data$casecount_older), big.mark =",")), 
+               'of people are still sick. Many people who contract COVID-19 are not tested, and therefore not reported. 
+               We estimate that your county has an under-reporting factor of ', underreport_factor_string, 
+               '. Accounting for the under-reporting factor and average lenght of sickness, we estimate there are ',
                formatDynamicString(format(round(county_data$casecount_newer*county_data$underreport_factor + county_data$casecount_older), big.mark =",")),
-               ' actual (confirmed and unconfirmed) cases because many are untested or unreported.'
+               ' sick people distributed through the county who are not officially reported.'
     ))
   )
 }
