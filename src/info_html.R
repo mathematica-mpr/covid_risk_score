@@ -41,7 +41,7 @@ renderMethodsHtml <- function() {
       tags$li(
         "Due to rapid spread and insufficient testing during the COVID-19 pandemic, there are likely additional unreported cases beyond the 
         officially reported cases. We combined the methodology reported by ",  tags$a("Russell et al (2020)", href = urls$russel_etal_2020), 
-        " and the average length of sickenss reported by ", tags$a("Wolfel, et al (2020)", href = urls$wolfer_etall_2020), " and the ",
+        " and the average length of sickenss reported by ", tags$a("Wolfel et al (2020)", href = urls$wolfer_etall_2020), " and the ",
         tags$a("COVID Symptom Study", href = urls$covid_symptom_study), 
         "to calculate the percentage of cases that are currently known and presumably quarantined, versus the number of active cases in the community."),
       tags$li("Other methods of becoming infected (e.g. touching an infected surface) are not accounted for by this calculator."),
