@@ -157,7 +157,7 @@ renderExposureHtml <- function(risk, is_sick) {
   risk_string = formatPercent(risk$exposure_risk)
   
   sickness_html = tags$p(HTML(paste0(
-    "Among people who are the same age, sex, and health status as you, and have behaviors and levels of interaction with others that are similar to yours, the estimated probability of catching COVID-19 through community transmission is ", 
+    "Among people who are the same age, sex, and health status as you, and have behaviors and levels of interaction with others that are similar to yours, the estimated probability of catching COVID-19 through community transmission in a week is ", 
     risk_string, '. ',
     "For comparison, ", prob_flu_string, ' of Americans catch the flu every week during flu season.')))
   
