@@ -171,7 +171,7 @@ renderExposureHtml <- function(risk, is_sick) {
   
   if (is_sick == TRUE) {
     sickness_html = tags$p(HTML(paste0(
-      "Since you're already sick, please immediately consult ", 
+      "Since you are experiencing symptoms correlated to COVID-19, please immediately consult ", 
       tags$a("the CDC's instructions", href = urls$cdc_if_sick),
       ", or walk through their ",
       tags$a("self-checker", href = urls$cdc_chatbot),
