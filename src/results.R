@@ -30,7 +30,8 @@ calculateRisk <- function(input, county_data) {
     
     age <- as.numeric(input$age)
     sex <- ifelse(input$gender == "male", 1, 0)
-    sympt_covid_logodds <- (-1.32) - (0.01*age) + (0.44*sex) + (1.75*input$loss_smell_taste) + (0.31*input$cough) + (0.49*input$fatigue) + (0.39*input$skip_meal)
+    sympt_covid_logodds <- (-1.32) - (0.01*age) + (0.44*sex) + (1.75*input$is_loss_smell_taste) + (0.31*input$is_cough) + (0.49*input$is_fatigue) + 
+      (0.39*input$is_skip_meal)
     sympt_odds <- risk2odds(logodds2risk(sympt_covid_logodds))
     exposure_risk <- odds2risk(risk2odds(community_exposure_risk)*sympt_odds)
     
