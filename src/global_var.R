@@ -48,10 +48,10 @@ renal_or    = c(2.6, 5.82, 1.72) # death OR not available in CCDC
 cvd_or      = c(1.4, 4.88, 1.27)
 diabetes_or = c(3.1, 4.57, 1.79)
 hyper_or    = c(1.1, 4.57, 1) # use the same as diabetes
-smoker_or   = c(2.67, 2.64, 1.12) # death OR not available in CCDC
-immune_or   = c(1, 2.86, 1.69) # death OR not available in CCDC
+smoker_or   = c(2.3, 2.64, 1.12) # death OR not available in CCDC
+immune_or   = c(2.58, 2.86, 1.69) # death OR not available in CCDC
 lung_or     = c(1, 2.83, 1.78)
-other_or    = c(1, 3.33, 6.11) # death OR not available in CCDC
+other_or    = c(4.21, 3.33, 6.11) # death OR not available in CCDC
 
 
 #pregnant_or = c(1.23, 0.42, 1)
