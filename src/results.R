@@ -68,7 +68,7 @@ calculateRisk <- function(input, county_data) {
       if (i<=2){
         icu_odds = icu_odds * eval(parse(text=paste0(condition_root, "_or[2]")))
       }
-      # hosp OR are mutually adjusted except for immuno and other - for these 2 only adjust if they are only condition
+      # Death OR are mutually adjusted except for other - for this one only adjust if it is only condition
       if ( (!condition_root %in% c("other")) | length(input$conditions)==1 ){
         death_odds = death_odds * eval(parse(text=paste0(condition_root, "_or[3]")))
       }
