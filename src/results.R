@@ -15,11 +15,12 @@ logodds2risk <- function(logodds){
   }
 
 calculateRisk <- function(input, county_data) {
-  casecount<-county_data$casecount
+  casecount_newer <- county_data$casecount_newer
+  casecount_older<-county_data$casecount_older
   population<-county_data$population
   underreport_factor<-county_data$underreport_factor
-  total_covid_count = casecount * underreport_factor
-  
+  total_covid_count_newer = casecount_newer * underreport_factor
+  total_covid_count = total_covid_count_newer + casecount_older
   #risk calculator
   if(input$is_sick){
     # if you're already sick with symptoms, your log_odds of having COVID is:
@@ -33,12 +34,12 @@ calculateRisk <- function(input, county_data) {
     sympt_odds <- risk2odds(logodds2risk(sympt_covid_logodds))
     exposure_risk <- odds2risk(risk2odds(community_exposure_risk)*sympt_odds)
   } else {
-    # ASSUMPTION: diagnosed cases are not active
-    active_casecount = total_covid_count - casecount
+    # ASSUMPTION: diagnosed cases are not active and undiagnosed cases get better in 2 weeks
+    active_casecount = total_covid_count_newer - casecount_newer
     
     # ASSUMPTION: active community case count cannot be less than 10% of reported cases
-    if (active_casecount < 0.1 * casecount) {
-      active_casecount = 0.1 * casecount
+    if (active_casecount < 0.1 * casecount_newer) {
+      active_casecount = 0.1 * casecount_newer
     }
     prev_active<-active_casecount/population #prevalence of active cases
     exposure_risk <- 1-(1-prev_active*transmissibility_household)^(input$nppl+input$nppl2*transmissibility_household)
@@ -123,15 +124,18 @@ renderLocationHtml <- function(risk) {
   county_data = risk$county_data
   underreport_factor_string = formatNumber(county_data$underreport_factor, "x")
   div(
-      title = "Location",
-      tags$p(div('We found data from ', formatDynamicString(county_data$name), ' for your zip code.',
-                 ' This county has ', formatDynamicString(format(county_data$casecount, big.mark=",")), ' confirmed cases out of a population of ', 
-                 formatDynamicString(format(county_data$population, big.mark = ',')), " as of ", formatDynamicString(latest_day), 
-                 ", and we estimated that your county under-reports by a factor of ", 
-                 underreport_factor_string, '. This means there may be ', formatDynamicString(format(round(county_data$casecount*county_data$underreport_factor), big.mark =",")),
-                 ' actual (confirmed and unconfirmed) cases because many are untested or unreported.'
-      ))
-    )
+    title = "Location",
+    tags$p(div('We found data from ', formatDynamicString(county_data$name), ' for your zip code. As of ', 
+               formatDynamicString(latest_day), ', this county has ', formatDynamicString(format(county_data$casecount, big.mark=",")), 
+               ' total confirmed COVID-19. We estimated that  out of the total confirmed cases',
+               formatDynamicString(format(round(county_data$casecount_newer + county_data$casecount_older), big.mark =",")), 
+               'of people are still sick. Many people who contract COVID-19 are not tested, and therefore not reported. 
+               We estimate that your county has an under-reporting factor of ', underreport_factor_string, 
+               '. Accounting for the under-reporting factor and average lenght of sickness, we estimate there are ',
+               formatDynamicString(format(round(county_data$casecount_newer*county_data$underreport_factor + county_data$casecount_older), big.mark =",")),
+               ' sick people distributed through the county who are not officially reported.'
+    ))
+  )
 }
 
 renderScoreHtml <- function(risk) {
@@ -163,7 +167,7 @@ renderExposureHtml <- function(risk, is_sick) {
   risk_string = formatPercent(risk$exposure_risk)
   
   sickness_html = tags$p(HTML(paste0(
-    "Among people who are the same age, sex, and health status as you, and have behaviors and levels of interaction with others that are similar to yours, the estimated probability of catching COVID-19 through community transmission is ", 
+    "Among people who are the same age, sex, and health status as you, and have behaviors and levels of interaction with others that are similar to yours, the estimated probability of catching COVID-19 through community transmission in a week is ", 
     risk_string, '. ',
     "For comparison, ", prob_flu_string, ' of Americans catch the flu every week during flu season.')))
   
