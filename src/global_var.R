@@ -81,12 +81,14 @@ urls  = list(
   cdc_prevention = "https://www.cdc.gov/coronavirus/2019-ncov/prevent-getting-sick/prevention.html",
   cdc_symptoms = "https://www.cdc.gov/coronavirus/2019-ncov/symptoms-testing/symptoms.html",
   cdc_flu = "https://www.cdc.gov/flu/about/burden/index.html",
+  cdc_hosp_June2020 = "https://www.cdc.gov/mmwr/volumes/69/wr/mm6925e1.htm",
   # NYT
   nytimes_data_article = "https://www.nytimes.com/article/coronavirus-county-data-us.html",
   # papers
   caramelo_etal_2020 = "https://www.medrxiv.org/content/10.1101/2020.02.24.20027268v1",
   russel_etal_2020 = "https://cmmid.github.io/topics/covid19/global_cfr_estimates.html",
   verity_etal_2020 = "https://www.thelancet.com/journals/laninf/article/PIIS1473-3099(20)30243-7/fulltext",
+  open_safely = "https://www.medrxiv.org/content/10.1101/2020.05.06.20092999v1",
   # social
   twitter_button = "https://twitter.com/intent/tweet?text=Find%20your%20COVID-19%20risk%20score!&url=https://19andme.shinyapps.io/covid_risk_score/",
   twitter_widget = "http://platform.twitter.com/widgets.js",
