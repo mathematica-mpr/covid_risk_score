@@ -55,15 +55,28 @@ calculateRisk <- function(input, county_data) {
   death_odds = risk2odds(death_prob)
   
   #If user input more than two comorbidities, only the first two are considered.
-  for (condition_id in input$conditions[1:min(length(input$conditions), 2)]) {
-    # remove "is_" prefix
-    condition_root = substr(condition_id, 4, nchar(condition_id))
-    hosp_odds = hosp_odds * eval(parse(text=paste0(condition_root, "_or[1]")))
-    icu_odds = icu_odds * eval(parse(text=paste0(condition_root, "_or[2]")))
-    death_odds = death_odds * eval(parse(text=paste0(condition_root, "_or[3]")))
+  if (length(input$conditions)>0){
+    for (i in 1:length(input$conditions)) { # loop over indices so we can truncate at 2 for icu
+      condition_id = input$conditions[i]
+      # remove "is_" prefix
+      condition_root = substr(condition_id, 4, nchar(condition_id))
+      
+      # hosp OR are mutually adjusted except for immuno and other - for these 2 only adjust if they are only condition
+      if ( (!condition_root %in% c("immune","other")) | length(input$conditions)==1 ){
+        hosp_odds = hosp_odds * eval(parse(text=paste0(condition_root, "_or[1]")))
+      }
+      # ICU OR are not mutually adjusted, so use first 2 only
+      if (i<=2){
+        icu_odds = icu_odds * eval(parse(text=paste0(condition_root, "_or[2]")))
+      }
+      # Death OR are mutually adjusted except for other - for this one only adjust if it is only condition
+      if ( (!condition_root %in% c("other")) | length(input$conditions)==1 ){
+        death_odds = death_odds * eval(parse(text=paste0(condition_root, "_or[3]")))
+      }
+    }
   }
   if (input$gender == "male") {
-    hosp_odds = hosp_odds * male_or[1] # should be hosp_odds(female) * male_or[1]
+    hosp_odds = hosp_odds * male_or[1] # base odds are the female odds, multiplied by male_or if male
     icu_odds = icu_odds * male_or[2]
     death_odds = death_odds * male_or[3]
   }
