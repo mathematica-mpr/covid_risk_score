@@ -47,6 +47,7 @@ collapseStory <- function() {
                              "Skipped Meals" = "is_skip_meal",
                              "Other symtoms" = "is_other"
                            ))),
+      hr(),
       
       checkboxInput('has_preexisting', div("I have ", tags$a("underlying medical complications", 
                                                              href = urls$cdc_high_risk))),
