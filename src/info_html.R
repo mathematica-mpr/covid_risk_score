@@ -39,9 +39,11 @@ renderMethodsHtml <- function() {
         "to estimate the prevalence of infected people within your county. 
         For the five boroughs in New York City, we use the overall New York City COVID-19 data."),
       tags$li(
-        "Due to rapid spread and insufficient testing during the COVID-19 pandemic, there are likely additional unreported cases beyond the officially reported cases.",
-        "We followed methodology reported by", tags$a("Russell et al (2020)", href = urls$russel_etal_2020),
-        "to calculate the percentage of cases that are currently known, and presumably quarantined, versus the number of cases still distributed throughout the community."),
+        "Due to rapid spread and insufficient testing during the COVID-19 pandemic, there are likely additional unreported cases beyond the 
+        officially reported cases. We combined the methodology reported by ",  tags$a("Russell et al (2020)", href = urls$russel_etal_2020), 
+        " and the average length of sickenss reported by ", tags$a("Wolfel et al (2020)", href = urls$wolfer_etall_2020), " and the ",
+        tags$a("COVID Symptom Study", href = urls$covid_symptom_study), 
+        "to calculate the percentage of cases that are currently known and presumably quarantined, versus the number of active cases in the community."),
       tags$li("Other methods of becoming infected (e.g. touching an infected surface) are not accounted for by this calculator."),
       tags$li(
         "Estimations of the probability of hospitalization, ICU and death among all infected cases, stratified by age groups, were obtained from a Lancet article authored by ",
