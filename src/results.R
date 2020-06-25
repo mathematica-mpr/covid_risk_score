@@ -75,7 +75,7 @@ calculateRisk <- function(input, county_data) {
     }
   }
   if (input$gender == "male") {
-    hosp_odds = hosp_odds * male_or[1] # should be hosp_odds(female) * male_or[1]
+    hosp_odds = hosp_odds * male_or[1] # base odds are the female odds, multiplied by male_or if male
     icu_odds = icu_odds * male_or[2]
     death_odds = death_odds * male_or[3]
   }
