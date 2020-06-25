@@ -23,10 +23,10 @@ calculateRisk <- function(input, county_data) {
   total_covid_count = total_covid_count_newer + casecount_older
   #risk calculator
   if(input$is_sick){
-    # if you're already sick with symptoms, your log_odds of having COVID is:
-    # prediction_model = (-1.32) - (0.01*age) + (0.44*sex) + (1.75*loss_smell_taste) + (0.31*cough) + (0.49*fatigue) + (0.39*skip_meal)
+    # if you're already sick with symptoms, odds of covid come from https://www.nature.com/articles/s41591-020-0916-2
     community_exposure_risk = total_covid_count / population
-    age <- as.numeric(input$age) 
+    # min input age is 18
+    age <- as.numeric(input$age) %>% ifelse(.<18, 18,.)
     sex <- ifelse(input$gender == "male", 1, 0)
     sympt_covid_logodds <- (-1.32) - (0.01*age) + (0.44*sex) + (1.75*"is_loss_smell_taste" %in% input$symptoms)
     + (0.31*"is_cough" %in% input$symptoms) + (0.49*"is_fatigue" %in% input$symptoms) + (0.39*"is_skip_meal" %in% input$symptoms)
