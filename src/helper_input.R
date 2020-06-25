@@ -44,9 +44,8 @@ collapseStory <- function() {
                            c("Loss of smell and taste" = "is_loss_smell_taste",
                              "Persistent cough" = "is_cough",
                              "Fatigue" = "is_fatigue",
-                             "Skipped Meals" = "is_skip_meal",
-                             "Other symtoms" = "is_other"
-                           ))),
+                             "Skipped Meals" = "is_skip_meal"
+                             ))),
       hr(),
       
       checkboxInput('has_preexisting', div("I have ", tags$a("underlying medical complications", 
