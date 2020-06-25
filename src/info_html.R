@@ -51,7 +51,10 @@ renderMethodsHtml <- function() {
         "We chose this study over US CDC reports because this study is larger and more thorough. We do not account for differences between Chinese population and US population."
       ),
       tags$li("Estimations of risk factors associated with underlying medical conditions were obtained from",
-              tags$a("China CDC weekly, 2020 Vol No.2", href = urls$ccdc_vol2_2020), "and gender from this preprint by", 
+              tags$a("China CDC weekly, 2020 Vol No.2", href = urls$ccdc_vol2_2020), ", ",
+              tags$a("Killerby et al (2020)", href = urls$cdc_hosp_June2020), ", and ",
+              tags$a("OpenSafely", href = urls$open_safely),
+              "and gender from this preprint by", 
               tags$a("Caramelo et al (2020).", href = urls$caramelo_etal_2020)
       )
     ),
