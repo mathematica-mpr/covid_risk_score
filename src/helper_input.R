@@ -36,7 +36,7 @@ collapseStory <- function() {
     ), # bsCollapsePanel
     bsCollapsePanel(
       title = "2. Pre-existing Conditions",
-      checkboxInput('is_sick', div("I have ", tags$a("symptoms of COVID", href = urls$cdc_symptoms))),
+      checkboxInput('is_sick', div("I have ", tags$a("potential symptoms of COVID-19", href = urls$cdc_symptoms))),
       
       conditionalPanel(
         condition = "input.is_sick == true",
@@ -44,7 +44,7 @@ collapseStory <- function() {
                            c("Loss of smell and taste" = "is_loss_smell_taste",
                              "Severe or significant persistent cough" = "is_cough",
                              "Severe fatigue" = "is_fatigue",
-                             "Skipped meals" = "is_skip_meal"
+                             "Loss of appetite, skipped meals" = "is_skip_meal"
                              ))),
       hr(),
       
