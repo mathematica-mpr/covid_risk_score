@@ -58,7 +58,7 @@ renderMethodsHtml <- function() {
               tags$a("China CDC weekly, 2020 Vol No.2", href = urls$ccdc_vol2_2020), ", ",
               tags$a("Killerby et al (2020)", href = urls$cdc_hosp_June2020), ", and ",
               tags$a("OpenSafely", href = urls$open_safely),
-              "and gender from this preprint by", 
+              "and sex from this preprint by", 
               tags$a("Caramelo et al (2020).", href = urls$caramelo_etal_2020)
       )
     ),
