@@ -28,12 +28,13 @@ calculateRisk <- function(input, county_data) {
     # min input age is 18
     age <- as.numeric(input$age) %>% ifelse(.<18, 18,.)
     sex <- ifelse(input$gender == "male", 1, 0)
-    sympt_covid_logodds <- (-1.32) - (0.01*age) + (0.44*sex) + (1.75*"is_loss_smell_taste" %in% input$symptoms)
-    + (0.31*"is_cough" %in% input$symptoms) + (0.49*"is_fatigue" %in% input$symptoms) + (0.39*"is_skip_meal" %in% input$symptoms)
-    sympt_odds <- risk2odds(logodds2risk(sympt_covid_logodds))
+    sympt_covid_logodds <- (-1.32) - (0.01*age) + (0.44*sex) + (1.75*"is_loss_smell_taste" %in% input$symptoms) + 
+      (0.31*"is_cough" %in% input$symptoms) + (0.49*"is_fatigue" %in% input$symptoms) + (0.39*"is_skip_meal" %in% input$symptoms)
     
+    sympt_covid_risk <- logodds2risk(sympt_covid_logodds)
+    sympt_odds <- risk2odds(sympt_covid_risk)
     exposure_risk <- odds2risk(risk2odds(community_exposure_risk)*sympt_odds)
-    sympt_covid_risk <- odds2risk(sympt_odds)
+    
   } else {
     # ASSUMPTION: diagnosed cases are not active and undiagnosed cases get better in 2 weeks
     active_casecount = total_covid_count_newer - casecount_newer
@@ -181,8 +182,8 @@ renderScoreHtml <- function(risk) {
 
 renderExposureHtml <- function(risk, is_sick) {
   prob_flu_string = formatPercent(prob_flu)
-  risk_string = formatPercent(risk$sympt_covid_risk)
-  
+  risk_string = formatPercent(risk$exposure_risk)
+  sympt_covid_string = formatPercent(risk$sympt_covid_risk)
   sickness_html = tags$p(HTML(paste0(
     "Among people who are the same age, sex, and health status as you, and have behaviors and levels of interaction with others that are similar to yours, the estimated probability of catching COVID-19 through community transmission in a week is ", 
     risk_string, '. ',
@@ -194,7 +195,7 @@ renderExposureHtml <- function(risk, is_sick) {
       tags$a("the CDC's instructions", href = urls$cdc_if_sick),
       ", or walk through their ",
       tags$a("self-checker", href = urls$cdc_chatbot),
-      ". The probability that you have symptomatic COVID-19 is ", risk_string, '. ')))
+      ". The probability that you have symptomatic COVID-19 is ", sympt_covid_string, '. ')))
   }
   return (sickness_html)
 }
