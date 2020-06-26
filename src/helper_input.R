@@ -42,9 +42,9 @@ collapseStory <- function() {
         condition = "input.is_sick == true",
         checkboxGroupInput("symptoms", "Symptoms",
                            c("Loss of smell and taste" = "is_loss_smell_taste",
-                             "Persistent cough" = "is_cough",
-                             "Fatigue" = "is_fatigue",
-                             "Skipped Meals" = "is_skip_meal"
+                             "Severe or significant persistent cough" = "is_cough",
+                             "Severe fatigue" = "is_fatigue",
+                             "Skipped meals" = "is_skip_meal"
                              ))),
       hr(),
       
