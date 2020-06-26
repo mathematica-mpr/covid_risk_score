@@ -44,6 +44,10 @@ renderMethodsHtml <- function() {
         " and the average length of sickenss reported by ", tags$a("Wolfel et al (2020)", href = urls$wolfer_etall_2020), " and the ",
         tags$a("COVID Symptom Study", href = urls$covid_symptom_study), 
         "to calculate the percentage of cases that are currently known and presumably quarantined, versus the number of active cases in the community."),
+      tags$li(
+        "Estimations of probability of symptomatic COVID-19 is calculated using a linear model developed by ",
+        tags$a("Menni et al (2020).", href = urls$menni_etall_2020)
+      ),
       tags$li("Other methods of becoming infected (e.g. touching an infected surface) are not accounted for by this calculator."),
       tags$li(
         "Estimations of the probability of hospitalization, ICU and death among all infected cases, stratified by age groups, were obtained from a Lancet article authored by ",
