@@ -27,8 +27,14 @@ calculateRisk <- function(input, county_data) {
     community_exposure_risk = total_covid_count / population
     # min input age is 18
     age <- as.numeric(input$age) %>% ifelse(.<18, 18,.)
-    sex <- ifelse(input$sex == "male", 1, 0)
-    sympt_covid_logodds <- (-1.32) - (0.01*age) + (0.44*sex) + (1.75*"is_loss_smell_taste" %in% input$symptoms) + 
+    # sex_other is ave of male and female risk
+    sex_symp_val <- case_when(
+      input$sex == "male" ~ 1,
+      input$sex == "female" ~ 0,
+      input$sex == "sex_other" ~ 0.5,
+      TRUE ~ NA_real_)
+    
+    sympt_covid_logodds <- (-1.32) - (0.01*age) + (0.44*sex_symp_val) + (1.75*"is_loss_smell_taste" %in% input$symptoms) + 
       (0.31*"is_cough" %in% input$symptoms) + (0.49*"is_fatigue" %in% input$symptoms) + (0.39*"is_skip_meal" %in% input$symptoms)
     
     sympt_covid_risk <- logodds2risk(sympt_covid_logodds)
