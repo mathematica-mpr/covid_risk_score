@@ -67,9 +67,18 @@ calculateRisk <- function(input, county_data) {
   #susceptibility calculation
   age = as.numeric(input$age)
   age_index = max(which(age_list <= age))
-  hosp_prob = hosp_list_female[age_index] # start with female and multiply up if user inputs male
-  icu_prob = icu_list_female[age_index]
-  death_prob = death_list_female[age_index]
+  
+  # if sex is "sex_other" then use given probs if else (sex is female or male), calc female probs
+  if(input$sex == "sex_other"){
+    hosp_prob = hosp_list[age_index] # start with female and multiply up if user inputs male
+    icu_prob = icu_list[age_index]
+    death_prob = death_list[age_index]
+  } else {
+    hosp_prob = hosp_list_female[age_index] # start with female and multiply up if user inputs male
+    icu_prob = icu_list_female[age_index]
+    death_prob = death_list_female[age_index]
+    }
+  
   hosp_odds = risk2odds(hosp_prob)
   icu_odds = risk2odds(icu_prob)
   death_odds = risk2odds(death_prob)
