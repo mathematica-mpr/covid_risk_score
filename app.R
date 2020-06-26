@@ -162,10 +162,16 @@ server <- function(input, output, session) {
   updateRisk <- reactive({
     updateInputCollapses()
     county_data<-getCountyData()
+    if (!input$is_sick) {
+      # clear the conditional panel's UI when unchecked
+      updateCheckboxGroupInput(session, "symptoms", selected = character(0))
+    }
+    
     if (!input$has_preexisting) {
       # clear the conditional panel's UI when unchecked
       updateCheckboxGroupInput(session, "conditions", selected = character(0))
     }
+    
     
     # in results.R
     return (calculateRisk(input, county_data))

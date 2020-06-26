@@ -91,6 +91,7 @@ urls  = list(
   open_safely = "https://www.medrxiv.org/content/10.1101/2020.05.06.20092999v1",
   wolfer_etall_2020 = "https://www.nature.com/articles/s41586-020-2196-x",
   covid_symptom_study = "https://covid19.joinzoe.com/us/about", 
+  menni_etall_2020 = "https://www.nature.com/articles/s41591-020-0916-2",
   # social
   twitter_button = "https://twitter.com/intent/tweet?text=Find%20your%20COVID-19%20risk%20score!&url=https://19andme.shinyapps.io/covid_risk_score/",
   twitter_widget = "http://platform.twitter.com/widgets.js",
