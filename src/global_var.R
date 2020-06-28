@@ -29,6 +29,9 @@ hosp_list  = c(0,       0.0408,  1.04,    3.43,    4.25,    8.16,    11.8,   16.
 icu_list   = c(0,       0,       2,       2,       3.7,     5.05,    6.4,    9.3,    8.4) *.657/1.38 /100
 death_list = c(0.00161, 0.00695, 0.0309,  0.0844,  0.161,   0.595,   1.93,   4.28,   7.8)  / 100
 
+# Risk adjustment to suspetibility for comorbidities
+
+## March 2020
 # odds ratios, https://www.cdc.gov/mmwr/volumes/69/wr/mm6913e2.htm
 # CCDC weekly, 2020 Vol No.2
 #The Epidemiological Characteristics of an Outbreak of 2019 Novel
@@ -43,11 +46,10 @@ death_list = c(0.00161, 0.00695, 0.0309,  0.0844,  0.161,   0.595,   1.93,   4.2
 # death https://www.medrxiv.org/content/10.1101/2020.05.06.20092999v1.full.pdf
 #     Notes: hypertension was below 1 and brought up to 1. Other remains the pre-June 2020 numbers and is only used if no other condition.
 
-
 renal_or    = c(2.6, 5.82, 1.72) # death OR not available in CCDC
 cvd_or      = c(1.4, 4.88, 1.27)
 diabetes_or = c(3.1, 4.57, 1.79)
-hyper_or    = c(1.1, 4.57, 1) # use the same as diabetes
+hyper_or    = c(1.1, 4.57, 1) # for ICU same as diabetes
 smoker_or   = c(2.3, 2.64, 1.12) # death OR not available in CCDC
 immune_or   = c(2.58, 2.86, 1.69) # death OR not available in CCDC
 lung_or     = c(1, 2.83, 1.78)
