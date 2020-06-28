@@ -51,6 +51,7 @@ hyper_or    = c(1.1, 4.57, 1) # use the same as diabetes
 smoker_or   = c(2.3, 2.64, 1.12) # death OR not available in CCDC
 immune_or   = c(2.58, 2.86, 1.69) # death OR not available in CCDC
 lung_or     = c(1, 2.83, 1.78)
+obesity_or  = c(1.9, 1, 1.46) # ICU OR not available
 other_or    = c(4.21, 3.33, 6.11) # death OR not available in CCDC
 
 

@@ -61,6 +61,7 @@ collapseStory <- function() {
                              "Current or former smoker" = "is_smoker",
                              "Immunocompromised condition" = "is_immune",
                              "Chronic lung disease or asthma" = "is_lung",
+                             "Obesity" = "is_obesity",
                              "Other chronic disease" = "is_other"
                            ))
       ),
