@@ -45,6 +45,7 @@ death_list = c(0.00161, 0.00695, 0.0309,  0.0844,  0.161,   0.595,   1.93,   4.2
 #     Notes: lung was below 1 and brought up to 1. Other and immuno remain the pre-June 2020 numbers and are only used if no other condition.
 # death https://www.medrxiv.org/content/10.1101/2020.05.06.20092999v1.full.pdf
 #     Notes: hypertension was below 1 and brought up to 1. Other remains the pre-June 2020 numbers and is only used if no other condition.
+# Obesity OR for ICU risk is from https://www.medrxiv.org/content/10.1101/2020.05.06.20092999v1.full.pdf
 
 renal_or    = c(2.6, 5.82, 1.72) # death OR not available in CCDC
 cvd_or      = c(1.4, 4.88, 1.27)
@@ -53,7 +54,7 @@ hyper_or    = c(1.1, 4.57, 1) # for ICU same as diabetes
 smoker_or   = c(2.3, 2.64, 1.12) # death OR not available in CCDC
 immune_or   = c(2.58, 2.86, 1.69) # death OR not available in CCDC
 lung_or     = c(1, 2.83, 1.78)
-obesity_or  = c(1.9, 2.75, 1.46)
+obesity_or  = c(1.9, 3.41, 1.46)
 other_or    = c(4.21, 3.33, 6.11) # death OR not available in CCDC
 
 
