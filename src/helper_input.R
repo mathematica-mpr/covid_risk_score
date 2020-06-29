@@ -2,6 +2,16 @@ library(shiny)
 library(shinyBS)
 source("src/global_var.R")
 
+conditions_list = c("Chronic renal disease" = "is_renal",
+                    "Cardiovascular disease" = "is_cvd",
+                    "Diabetes" = "is_diabetes",
+                    "Hypertension" = "is_hyper",
+                    "Current or former smoker" = "is_smoker",
+                    "Immunocompromised condition" = "is_immune",
+                    "Chronic lung disease or asthma" = "is_lung",
+                    "Obesity (BMI &ge; 30 kg/m&sup2;)" = "is_obesity",
+                    "Other chronic disease" = "is_other")
+
 collapseStory <- function() {
 
   # collapsible UI to streamline input. Everything is open by default.
@@ -53,17 +63,10 @@ collapseStory <- function() {
       
       conditionalPanel(
         condition = "input.has_preexisting == true",
-        checkboxGroupInput("conditions", "Conditions",
-                           c("Chronic renal disease" = "is_renal",
-                             "Cardiovascular disease" = "is_cvd",
-                             "Diabetes" = "is_diabetes",
-                             "Hypertension" = "is_hyper",
-                             "Current or former smoker" = "is_smoker",
-                             "Immunocompromised condition" = "is_immune",
-                             "Chronic lung disease or asthma" = "is_lung",
-                             "Obesity" = "is_obesity",
-                             "Other chronic disease" = "is_other"
-                           ))
+        checkboxGroupInput("Conditions", "Conditions", # this is written this way to allow html math in obesity test
+                           choiceNames = lapply(names(conditions_list), HTML),
+                           choiceValues = unname(conditions_list)
+        ),
       ),
       actionButton('next2', "Next", class = "btn btn-info btn-block")
     ), # bsCollapsePanel
