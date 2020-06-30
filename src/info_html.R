@@ -58,7 +58,7 @@ renderMethodsHtml <- function() {
               tags$a("China CDC weekly, 2020 Vol No.2", href = urls$ccdc_vol2_2020), ", ",
               tags$a("Killerby et al (2020)", href = urls$cdc_hosp_June2020), ", and ",
               tags$a("OpenSafely", href = urls$open_safely),
-              "and gender from this preprint by", 
+              "and sex from this preprint by", 
               tags$a("Caramelo et al (2020).", href = urls$caramelo_etal_2020)
       )
     ),
@@ -114,11 +114,23 @@ renderFaqHtml <- function() {
            "Unfortunately, that is not true of most of the US at present."),
     faqQuestion("My specific medical condition isn't listed. What do I do?"),
     tags$p("Try using \"other conditions\" to get a catch-all estimate of your susceptibility."),
+    
+    faqQuestion("How is my sex assigned at birth used in risk score calculations?"),
+    tags$p("For exposure risk, the ", tags$a("Menni et al (2020)", href = urls$menni_etall_2020), " model inclused 
+           self-reported 'sex at birth' as a binary independent varriable with 1 indicative of male participants and 0 representing 
+           females. Therefore for the app, if sex assigned at birth selected is 'Other' or 'Perfer not to say', 
+           for the estimations of probability of symptomatic COVID-19, we code these inputs as having a 'sex at birth' equal to 0.5."),  
+    tags$p("For susceptibility, we used the original data from ", tags$a("Verity et al (2020)", href = urls$verity_etal_2020), 
+           " for people at different age groups. If the sex assigned at birth selected is 'Male' or 'Female', then we modify the estimates from ",
+           tags$a("Verity et al (2020)", href = urls$verity_etal_2020),  "by male and female odds ratio from this preprint by ", 
+           tags$a("Caramelo et al (2020)", href = urls$caramelo_etal_2020), 
+           "and if the sex assigned at birth selected is 'Other' or 'Perfer not to say', then we do not modify the estimates." ),
+    
     faqQuestion("My hospitalization/ICU/death risk seems out of whack."),
     tags$p("A lot is still unknown about the disease, and data sets are sparse, so our susceptibility scores are",
            "good for ballpark estimates only. We'll update our tool with better numbers as they become available."),
     faqQuestion("I have suggestion X, or know of data set Y, or want feature Z..."),
     tags$p("Let us know at", tags$a("covid.risk.score@gmail.com", href="mailto:covid.risk.score@gmail.com"), 
-    "or visit us on ", tags$a("GitHub", href="https://github.com/mathematica-mpr/covid_risk_score"))
+           "or visit us on ", tags$a("GitHub", href="https://github.com/mathematica-mpr/covid_risk_score"))
   )
 }

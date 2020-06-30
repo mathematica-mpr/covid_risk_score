@@ -27,8 +27,14 @@ calculateRisk <- function(input, county_data) {
     community_exposure_risk = total_covid_count / population
     # min input age is 18
     age <- as.numeric(input$age) %>% ifelse(.<18, 18,.)
-    sex <- ifelse(input$gender == "male", 1, 0)
-    sympt_covid_logodds <- (-1.32) - (0.01*age) + (0.44*sex) + (1.75*"is_loss_smell_taste" %in% input$symptoms) + 
+    # sex_other is ave of male and female risk
+    sex_symp_val <- case_when(
+      input$sex == "male" ~ 1,
+      input$sex == "female" ~ 0,
+      input$sex == "sex_other" ~ 0.5,
+      TRUE ~ NA_real_)
+    
+    sympt_covid_logodds <- (-1.32) - (0.01*age) + (0.44*sex_symp_val) + (1.75*"is_loss_smell_taste" %in% input$symptoms) + 
       (0.31*"is_cough" %in% input$symptoms) + (0.49*"is_fatigue" %in% input$symptoms) + (0.39*"is_skip_meal" %in% input$symptoms)
     
     sympt_covid_risk <- logodds2risk(sympt_covid_logodds)
@@ -61,9 +67,18 @@ calculateRisk <- function(input, county_data) {
   #susceptibility calculation
   age = as.numeric(input$age)
   age_index = max(which(age_list <= age))
-  hosp_prob = hosp_list_female[age_index] # start with female and multiply up if user inputs male
-  icu_prob = icu_list_female[age_index]
-  death_prob = death_list_female[age_index]
+  
+  # if sex is "sex_other" then use given probs if else (sex is female or male), calc female probs
+  if(input$sex == "sex_other"){
+    hosp_prob = hosp_list[age_index] # start with female and multiply up if user inputs male
+    icu_prob = icu_list[age_index]
+    death_prob = death_list[age_index]
+  } else {
+    hosp_prob = hosp_list_female[age_index] # start with female and multiply up if user inputs male
+    icu_prob = icu_list_female[age_index]
+    death_prob = death_list_female[age_index]
+    }
+  
   hosp_odds = risk2odds(hosp_prob)
   icu_odds = risk2odds(icu_prob)
   death_odds = risk2odds(death_prob)
@@ -89,7 +104,7 @@ calculateRisk <- function(input, county_data) {
       }
     }
   }
-  if (input$gender == "male") {
+  if (input$sex == "male") {
     hosp_odds = hosp_odds * male_or[1] # base odds are the female odds, multiplied by male_or if male
     icu_odds = icu_odds * male_or[2]
     death_odds = death_odds * male_or[3]
