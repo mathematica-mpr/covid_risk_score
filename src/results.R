@@ -205,20 +205,24 @@ renderExposureHtml <- function(risk, is_sick) {
   prob_flu_string = formatPercent(prob_flu)
   risk_string = formatPercent(risk$exposure_risk)
   sympt_covid_string = formatPercent(risk$sympt_covid_risk)
-  sickness_html = tags$p(HTML(paste0(
-    "Among people who are the same age, sex, and health status as you, and have behaviors and levels of interaction with others that are similar to yours, the estimated probability of catching COVID-19 through community transmission in a week is ", 
-    risk_string, '. ',
-    "For comparison, ", prob_flu_string, ' of Americans catch the flu every week during flu season.')))
+  exposure_text = paste0(
+    "Among people who are the same age, sex, and health status as you, and have behaviors and levels of interaction 
+    with others that are similar to yours, the estimated probability of catching COVID-19 through community transmission in a week is ", 
+    risk_string, '. ', "For comparison, ", prob_flu_string, ' of Americans catch the flu every week during flu season.')
+  sickness_text = (paste0(
+    "Since you are experiencing symptoms correlated to COVID-19, please immediately consult ", 
+    tags$a("the CDC's instructions", href = urls$cdc_if_sick),
+    ", or walk through their ",
+    tags$a("self-checker", href = urls$cdc_chatbot),
+    ". The probability that you have symptomatic COVID-19 is ", sympt_covid_string, '. '))
   
   if (is_sick == TRUE) {
-    sickness_html = tags$p(HTML(paste0(
-      "Since you are experiencing symptoms correlated to COVID-19, please immediately consult ", 
-      tags$a("the CDC's instructions", href = urls$cdc_if_sick),
-      ", or walk through their ",
-      tags$a("self-checker", href = urls$cdc_chatbot),
-      ". The probability that you have symptomatic COVID-19 is ", sympt_covid_string, '. ')))
+    total_risk_html = tags$p(HTML(paste0(exposure_text, "<br> <br>", sickness_text)))
+  } else {
+    total_risk_html = tags$p(HTML(paste0(exposure_text)))
   }
-  return (sickness_html)
+  
+  return (total_risk_html)
 }
 
 renderSusceptibilityHtml <- function(risk) {
