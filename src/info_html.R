@@ -46,9 +46,7 @@ renderMethodsHtml <- function() {
         "to calculate the percentage of cases that are currently known and presumably quarantined, versus the number of active cases in the community."),
       tags$li(
         "Estimations of probability of symptomatic COVID-19 is calculated using a linear model developed by ",
-        tags$a("Menni et al (2020)", href = urls$menni_etall_2020), ". The linear model inclused self-reported 'sex at birth' as a binary independent varriable. 
-        Therefore, if the sex assigned at birth selected in 19andMe is 'Other' or 'Perfer not to say', for the estimations of probability of symptomatic COVID-19,
-        we code these inputs as having a 'sex at birth' equal to 0.5."
+        tags$a("Menni et al (2020).", href = urls$menni_etall_2020)
       ),
       tags$li("Other methods of becoming infected (e.g. touching an infected surface) are not accounted for by this calculator."),
       tags$li(
@@ -56,11 +54,6 @@ renderMethodsHtml <- function() {
         tags$a("Verity et al (2020).", href = urls$verity_etal_2020),
         "We chose this study over US CDC reports because this study is larger and more thorough. We do not account for differences between Chinese population and US population."
       ),
-      tags$li(
-        "If the sex assigned at birth selected is 'Male' or 'Female', then we modify the estimates from ", tags$a("Verity et al (2020)", href = urls$verity_etal_2020), 
-        "by male and female odds ratio from this preprint by ", tags$a("Caramelo et al (2020)", href = urls$caramelo_etal_2020), 
-        "and if the sex assigned at birth selected is 'Other' or 'Perfer not to say', then we do not modify the estimates."
-      ), 
       tags$li("Estimations of risk factors associated with underlying medical conditions were obtained from",
               tags$a("China CDC weekly, 2020 Vol No.2", href = urls$ccdc_vol2_2020), ", ",
               tags$a("Killerby et al (2020)", href = urls$cdc_hosp_June2020), ", and ",
@@ -121,6 +114,7 @@ renderFaqHtml <- function() {
            "Unfortunately, that is not true of most of the US at present."),
     faqQuestion("My specific medical condition isn't listed. What do I do?"),
     tags$p("Try using \"other conditions\" to get a catch-all estimate of your susceptibility."),
+    
     faqQuestion("How is my sex assigned at birth used in risk score calculations?"),
     tags$p("For exposure risk, the ", tags$a("Menni et al (2020)", href = urls$menni_etall_2020), " model inclused 
            self-reported 'sex at birth' as a binary independent varriable with 1 indicative of male participants and 0 representing 
@@ -131,6 +125,7 @@ renderFaqHtml <- function() {
            tags$a("Verity et al (2020)", href = urls$verity_etal_2020),  "by male and female odds ratio from this preprint by ", 
            tags$a("Caramelo et al (2020)", href = urls$caramelo_etal_2020), 
            "and if the sex assigned at birth selected is 'Other' or 'Perfer not to say', then we do not modify the estimates." ),
+    
     faqQuestion("My hospitalization/ICU/death risk seems out of whack."),
     tags$p("A lot is still unknown about the disease, and data sets are sparse, so our susceptibility scores are",
            "good for ballpark estimates only. We'll update our tool with better numbers as they become available."),
