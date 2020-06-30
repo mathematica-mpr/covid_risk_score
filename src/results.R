@@ -34,6 +34,16 @@ calculateRisk <- function(input, county_data) {
   prev_active<- active_casecount/population #prevalence of active cases
   exposure_risk <- 1-(1-prev_active*transmissibility_household)^(input$nppl+input$nppl2*transmissibility_household)
   
+  # exposure modifier
+  if(input$hand){
+    exposure_risk<-odds2risk(risk2odds(exposure_risk)*hand_or)
+  }
+  
+  if(input$ppe){
+    exposure_risk<-odds2risk(risk2odds(exposure_risk)*ppe_or)
+  }
+  
+  
   # if you're already sick with symptoms, odds of covid come from https://www.nature.com/articles/s41591-020-0916-2
   if(input$is_sick){
     age <- as.numeric(input$age) %>% ifelse(.<18, 18,.) # min input age is 18
@@ -54,15 +64,7 @@ calculateRisk <- function(input, county_data) {
   } else {
     sympt_covid_risk <- 0
   } 
-  
-  # exposure modifier
-  if(input$hand){
-    exposure_risk<-odds2risk(risk2odds(exposure_risk)*hand_or)
-  }
-  
-  if(input$ppe){
-    exposure_risk<-odds2risk(risk2odds(exposure_risk)*ppe_or)
-  }
+
   
   # total risk of covid is the risk you have sympt covid and could get covid through exposure 
   total_covid_risk <- sympt_covid_risk + exposure_risk*(1 - sympt_covid_risk)
@@ -204,7 +206,7 @@ renderExposureHtml <- function(risk, is_sick) {
   risk_string = formatPercent(risk$exposure_risk)
   sympt_covid_string = formatPercent(risk$sympt_covid_risk)
   sickness_html = tags$p(HTML(paste0(
-    "Among 1people who are the same age, sex, and health status as you, and have behaviors and levels of interaction with others that are similar to yours, the estimated probability of catching COVID-19 through community transmission in a week is ", 
+    "Among people who are the same age, sex, and health status as you, and have behaviors and levels of interaction with others that are similar to yours, the estimated probability of catching COVID-19 through community transmission in a week is ", 
     risk_string, '. ',
     "For comparison, ", prob_flu_string, ' of Americans catch the flu every week during flu season.')))
   
