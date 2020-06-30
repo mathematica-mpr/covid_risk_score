@@ -21,12 +21,22 @@ calculateRisk <- function(input, county_data) {
   underreport_factor<-county_data$underreport_factor
   total_covid_count_newer = casecount_newer * underreport_factor
   total_covid_count = total_covid_count_newer + casecount_older
+  
   #risk calculator
+  active_casecount = total_covid_count_newer - casecount_newer
+  
+  # ASSUMPTION: active community case count cannot be less than 10% of reported cases
+  if (active_casecount < 0.1 * casecount_newer) {
+    active_casecount = 0.1 * casecount_newer
+  }
+  
+  # risk of exposure
+  prev_active<- active_casecount/population #prevalence of active cases
+  exposure_risk <- 1-(1-prev_active*transmissibility_household)^(input$nppl+input$nppl2*transmissibility_household)
+  
+  # if you're already sick with symptoms, odds of covid come from https://www.nature.com/articles/s41591-020-0916-2
   if(input$is_sick){
-    # if you're already sick with symptoms, odds of covid come from https://www.nature.com/articles/s41591-020-0916-2
-    community_exposure_risk = total_covid_count / population
-    # min input age is 18
-    age <- as.numeric(input$age) %>% ifelse(.<18, 18,.)
+    age <- as.numeric(input$age) %>% ifelse(.<18, 18,.) # min input age is 18
     # sex_other is ave of male and female risk
     sex_symp_val <- case_when(
       input$sex == "male" ~ 1,
@@ -37,22 +47,12 @@ calculateRisk <- function(input, county_data) {
     sympt_covid_logodds <- (-1.32) - (0.01*age) + (0.44*sex_symp_val) + (1.75*"is_loss_smell_taste" %in% input$symptoms) + 
       (0.31*"is_cough" %in% input$symptoms) + (0.49*"is_fatigue" %in% input$symptoms) + (0.39*"is_skip_meal" %in% input$symptoms)
     
-    sympt_covid_risk <- logodds2risk(sympt_covid_logodds)
-    sympt_odds <- risk2odds(sympt_covid_risk)
-    exposure_risk <- odds2risk(risk2odds(community_exposure_risk)*sympt_odds)
+    sympt_covid_risk <- logodds2risk(sympt_covid_logodds) # option 1
+    #sympt_odds <- risk2odds(sympt_covid_risk) # option 2
+    # sympt_covid_risk <- odds2risk(risk2odds(prev_active)*sympt_odds) #option 2
     
   } else {
-    # ASSUMPTION: diagnosed cases are not active and undiagnosed cases get better in 2 weeks
-    active_casecount = total_covid_count_newer - casecount_newer
-    
-    # ASSUMPTION: active community case count cannot be less than 10% of reported cases
-    if (active_casecount < 0.1 * casecount_newer) {
-      active_casecount = 0.1 * casecount_newer
-    }
-    prev_active<-active_casecount/population #prevalence of active cases
-    exposure_risk <- 1-(1-prev_active*transmissibility_household)^(input$nppl+input$nppl2*transmissibility_household)
     sympt_covid_risk <- 0
-    
   } 
   
   # exposure modifier
@@ -63,6 +63,9 @@ calculateRisk <- function(input, county_data) {
   if(input$ppe){
     exposure_risk<-odds2risk(risk2odds(exposure_risk)*ppe_or)
   }
+  
+  # total risk of covid is the risk you have sympt covid and could get covid through exposure 
+  total_covid_risk <- sympt_covid_risk + exposure_risk*(1 - sympt_covid_risk)
   
   #susceptibility calculation
   age = as.numeric(input$age)
@@ -127,10 +130,11 @@ calculateRisk <- function(input, county_data) {
     # 0 means 1/1000 times the disease burden of flu
     return(normalized)
   }
-  score<-if_else(exposure_risk>0, g(exposure_risk, hosp_risk, icu_risk, death_risk), 1)
+  score<-if_else(total_covid_risk>0, g(total_covid_risk, hosp_risk, icu_risk, death_risk), 1)
   return (list(county_data = county_data,
                sympt_covid_risk = sympt_covid_risk,
                exposure_risk = exposure_risk,
+               total_covid_risk = total_covid_risk,
                hosp_risk = hosp_risk,
                icu_risk = icu_risk,
                death_risk = death_risk,
@@ -200,7 +204,7 @@ renderExposureHtml <- function(risk, is_sick) {
   risk_string = formatPercent(risk$exposure_risk)
   sympt_covid_string = formatPercent(risk$sympt_covid_risk)
   sickness_html = tags$p(HTML(paste0(
-    "Among people who are the same age, sex, and health status as you, and have behaviors and levels of interaction with others that are similar to yours, the estimated probability of catching COVID-19 through community transmission in a week is ", 
+    "Among 1people who are the same age, sex, and health status as you, and have behaviors and levels of interaction with others that are similar to yours, the estimated probability of catching COVID-19 through community transmission in a week is ", 
     risk_string, '. ',
     "For comparison, ", prob_flu_string, ' of Americans catch the flu every week during flu season.')))
   
