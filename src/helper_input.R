@@ -64,7 +64,7 @@ collapseStory <- function() {
       
       conditionalPanel(
         condition = "input.has_preexisting == true",
-        checkboxGroupInput("Conditions", "Conditions", # this is written this way to allow html math in obesity test
+        checkboxGroupInput("conditions", "Conditions", # this is written this way to allow html math in obesity test
                            choiceNames = lapply(names(conditions_list), HTML),
                            choiceValues = unname(conditions_list)
         ),
