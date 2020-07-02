@@ -55,7 +55,8 @@ collapseStory <- function() {
                            c("Loss of smell and taste" = "is_loss_smell_taste",
                              "Severe or significant persistent cough" = "is_cough",
                              "Severe fatigue" = "is_fatigue",
-                             "Loss of appetite, skipped meals" = "is_skip_meal"
+                             "Loss of appetite, skipped meals" = "is_skip_meal",
+                             "My symptoms are not listed here" = "is_other" 
                              ))),
       hr(),
       
