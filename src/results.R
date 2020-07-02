@@ -197,7 +197,7 @@ renderScoreHtml <- function(risk) {
   )))
 }
 
-renderExposureHtml <- function(risk, is_sick) {
+renderExposureHtml <- function(risk, symptoms) {
   prob_flu_string = formatPercent(prob_flu)
   risk_string = formatPercent(risk$exposure_risk)
   sympt_covid_string = formatPercent(risk$sympt_covid_risk)
@@ -212,7 +212,7 @@ renderExposureHtml <- function(risk, is_sick) {
     ", or walk through their ",
     tags$a("self-checker", href = urls$cdc_chatbot), '.'))
   
-  if (is_sick == TRUE) {
+  if (!is.null(symptoms)) {
     total_risk_html = tags$p(HTML(paste0(exposure_text, "<br> <br>", sickness_text)))
   } else {
     total_risk_html = tags$p(HTML(paste0(exposure_text)))
@@ -288,13 +288,13 @@ renderProtectionHtml <- function(risk, hand, ppe){
   return(tags$p(hand_html, ppe_html))
 }
 
-renderResultsHtml <- function(risk, is_sick, hand, ppe) {
+renderResultsHtml <- function(risk, symptoms, hand, ppe) {
   
   # return
   tagList(
     tags$p(""),
     renderLocationHtml(risk),
-    renderExposureHtml(risk, is_sick),
+    renderExposureHtml(risk, symptoms),
     renderSusceptibilityHtml(risk),
     renderProtectionHtml(risk, hand, ppe),
     renderScoreHtml(risk)
