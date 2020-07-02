@@ -39,19 +39,60 @@ renderMethodsHtml <- function() {
         "to estimate the prevalence of infected people within your county. 
         For the five boroughs in New York City, we use the overall New York City COVID-19 data."),
       tags$li(
-        "Due to rapid spread and insufficient testing during the COVID-19 pandemic, there are likely additional unreported cases beyond the officially reported cases.",
-        "We followed methodology reported by", tags$a("Russell et al (2020)", href = urls$russel_etal_2020),
-        "to calculate the percentage of cases that are currently known, and presumably quarantined, versus the number of cases still distributed throughout the community."),
+        "Due to rapid spread and insufficient testing during the COVID-19 pandemic, there are likely additional unreported cases beyond the 
+        officially reported cases. We combined the methodology reported by ",  tags$a("Russell et al (2020)", href = urls$russel_etal_2020), 
+        " and the average length of sickenss reported by ", tags$a("Wolfel et al (2020)", href = urls$wolfer_etall_2020), " and the ",
+        tags$a("COVID Symptom Study", href = urls$covid_symptom_study), 
+        "to calculate the percentage of cases that are currently known and presumably quarantined, versus the number of active cases in the community."),
+      tags$li(
+        "Estimations of probability of symptomatic COVID-19 is calculated using a linear model developed by ",
+        tags$a("Menni et al (2020).", href = urls$menni_etall_2020)
+      ),
       tags$li("Other methods of becoming infected (e.g. touching an infected surface) are not accounted for by this calculator."),
       tags$li(
         "Estimations of the probability of hospitalization, ICU and death among all infected cases, stratified by age groups, were obtained from a Lancet article authored by ",
         tags$a("Verity et al (2020).", href = urls$verity_etal_2020),
         "We chose this study over US CDC reports because this study is larger and more thorough. We do not account for differences between Chinese population and US population."
       ),
-      tags$li("Estimations of risk factors associated with underlying medical conditions were obtained from",
-              tags$a("China CDC weekly, 2020 Vol No.2", href = urls$ccdc_vol2_2020), "and gender from this preprint by", 
+      tags$li("Estimations for risk adjustment based on sex are from this preprint by", 
               tags$a("Caramelo et al (2020).", href = urls$caramelo_etal_2020)
-      )
+      ),
+      tags$li("Estimations of risk factors associated with underlying medical conditions were obtained from",
+              tags$a("China CDC weekly, 2020 Vol No.2", href = urls$ccdc_vol2_2020), ", ",
+              tags$a("Simonnet et al (2020)", href = urls$simonnet_ettal), ", ",
+              tags$a("Killerby et al (2020)", href = urls$cdc_hosp_June2020), ", and ",
+              tags$a("OpenSAFELY. ", href = urls$open_safely), "Mutually adjusted odds ratios ", 
+              "(adjusted for other underlying conditions as well as age and gender) are used when available. ",
+              "Otherwise, unadjusted odds ratios are used but the user's risk is adjusted only for the two highest risk conditions ",
+              "inputted by the user. ", "These adjustment odds ratios will be updated as more research becomes available.",
+              "The following describes the current risk adjustment procedure:",
+              
+              tags$ul(tags$li("To adjust hospitalization risk, we use mutually adjusted odds ratios from ",  
+                              tags$a("Killerby et al (2020)", href = urls$cdc_hosp_June2020), ". ", 
+                              "This paper does not report odds ratios for 'immunocompromised condition' or ", 
+                              "'other chronic disease', so for these two categories we use unadjusted odds ratios from ",
+                              tags$a("China CDC weekly, 2020 Vol No.2", href = urls$ccdc_vol2_2020),
+                              " and only adjust for these two categories if no other conditions are inputted by the user. ",
+                              "When the reported ratio is below 1, we bring it up to 1, ",
+                              "reflecting the assumption that underlying medical conditions do not lessen suseptibility to COVID-19."),
+                      tags$li("To adjust for ICU risk, we use unadjusted odds ratios from ", 
+                              tags$a("China CDC weekly, 2020 Vol No.2", href = urls$ccdc_vol2_2020), " (for all but obesity). ",
+                              "To avoid overinflating risk due to the odds ratios being unadjusted, we adjust only for ",
+                              "the two highest risk conditions inputted by the user. ",
+                              "To adjust for obesity, we use the mutually adjusted odds ratio from ",
+                              tags$a("Simonnet et al (2020)", href = urls$simonnet_ettal), "."),
+                      tags$li("To adjust death risk, we use mutually adjusted odds ratios from ",
+                              tags$a("OpenSAFELY. ", href = urls$open_safely), ". ",
+                              "This paper does not report odds ratios for ", 
+                              "'other chronic disease', so for this one categoriy we use the unadjusted odds ratio from ",
+                              tags$a("China CDC weekly, 2020 Vol No.2", href = urls$ccdc_vol2_2020),
+                              " and only adjust for this category if no other conditions are inputted by the user. ",
+                              "When the reported ratio is below 1, we bring it up to 1, ",
+                              "reflecting the assumption that underlying medical conditions do not lessen suseptibility to COVID-19.",
+                              "The ratios from OpenSAFELY pertain to risk of death from COVID-19 in the entire population, ",
+                              "not only in people with COVID-19. ", "In using these ratios to adjust death risk for individuals with COVID-19, ",
+                              "we make the assumption that risk of contracting COVID-19 is similar for those with and without each condition.")),
+      ),
     ),
     tags$p(""),
     tags$p("We'll be doing our best to update these assumptions as additional knowledge about the virus becomes available.")
@@ -105,11 +146,23 @@ renderFaqHtml <- function() {
            "Unfortunately, that is not true of most of the US at present."),
     faqQuestion("My specific medical condition isn't listed. What do I do?"),
     tags$p("Try using \"other conditions\" to get a catch-all estimate of your susceptibility."),
+    
+    faqQuestion("How is my sex assigned at birth used in risk score calculations?"),
+    tags$p("For exposure risk, the ", tags$a("Menni et al (2020)", href = urls$menni_etall_2020), " model inclused 
+           self-reported 'sex at birth' as a binary independent varriable with 1 indicative of male participants and 0 representing 
+           females. Therefore for the app, if sex assigned at birth selected is 'Other' or 'Perfer not to say', 
+           for the estimations of probability of symptomatic COVID-19, we code these inputs as having a 'sex at birth' equal to 0.5."),  
+    tags$p("For susceptibility, we used the original data from ", tags$a("Verity et al (2020)", href = urls$verity_etal_2020), 
+           " for people at different age groups. If the sex assigned at birth selected is 'Male' or 'Female', then we modify the estimates from ",
+           tags$a("Verity et al (2020)", href = urls$verity_etal_2020),  "by male and female odds ratio from this preprint by ", 
+           tags$a("Caramelo et al (2020)", href = urls$caramelo_etal_2020), 
+           "and if the sex assigned at birth selected is 'Other' or 'Perfer not to say', then we do not modify the estimates." ),
+    
     faqQuestion("My hospitalization/ICU/death risk seems out of whack."),
     tags$p("A lot is still unknown about the disease, and data sets are sparse, so our susceptibility scores are",
            "good for ballpark estimates only. We'll update our tool with better numbers as they become available."),
     faqQuestion("I have suggestion X, or know of data set Y, or want feature Z..."),
     tags$p("Let us know at", tags$a("covid.risk.score@gmail.com", href="mailto:covid.risk.score@gmail.com"), 
-    "or visit us on ", tags$a("GitHub", href="https://github.com/mathematica-mpr/covid_risk_score"))
+           "or visit us on ", tags$a("GitHub", href="https://github.com/mathematica-mpr/covid_risk_score"))
   )
 }

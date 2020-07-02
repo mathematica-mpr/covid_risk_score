@@ -2,6 +2,16 @@ library(shiny)
 library(shinyBS)
 source("src/global_var.R")
 
+conditions_list = c("Chronic renal disease" = "is_renal",
+                    "Cardiovascular disease" = "is_cvd",
+                    "Diabetes" = "is_diabetes",
+                    "Hypertension" = "is_hyper",
+                    "Current or former smoker" = "is_smoker",
+                    "Immunocompromised condition" = "is_immune",
+                    "Chronic lung disease or asthma" = "is_lung",
+                    "Obesity (BMI &ge; 30 kg/m&sup2;)" = "is_obesity",
+                    "Other chronic disease" = "is_other")
+
 collapseStory <- function() {
 
   # collapsible UI to streamline input. Everything is open by default.
@@ -31,26 +41,34 @@ collapseStory <- function() {
       textInput('zip', label = "What is your 5-digit zip code?"),
       uiOutput("zipcontrol"),
       textInput('age', label = "What is your age?"),
-      radioButtons('gender', "Are you female or male?", c("Female" = "female", "Male" = "male"), inline=TRUE),
+      radioButtons('sex', "What sex were you assigned at birth?", 
+                   c("Male" = "male", "Female" = "female",  "Other" = "sex_other", "Perfer not to say" = "sex_other"), inline=TRUE),
       actionButton('next1', "Next", class = "btn btn-info btn-block")
     ), # bsCollapsePanel
     bsCollapsePanel(
       title = "2. Pre-existing Conditions",
-      checkboxInput('is_sick', div("I have ", tags$a("flu-like symptoms", href = urls$cdc_symptoms))),
+      checkboxInput('is_sick', div("I have ", tags$a("potential symptoms of COVID-19", href = urls$cdc_symptoms))),
+      
+      conditionalPanel(
+        condition = "input.is_sick == true",
+        checkboxGroupInput("symptoms", "Symptoms",
+                           c("Loss of smell and taste" = "is_loss_smell_taste",
+                             "Severe or significant persistent cough" = "is_cough",
+                             "Severe fatigue" = "is_fatigue",
+                             "Loss of appetite, skipped meals" = "is_skip_meal",
+                             "My symptoms are not listed here" = "is_other" 
+                             ))),
+      hr(),
+      
       checkboxInput('has_preexisting', div("I have ", tags$a("underlying medical complications", 
                                                              href = urls$cdc_high_risk))),
+      
       conditionalPanel(
         condition = "input.has_preexisting == true",
-        checkboxGroupInput("conditions", "Conditions",
-                           c("Chronic renal disease" = "is_renal",
-                             "Cardiovascular disease" = "is_cvd",
-                             "Diabetes" = "is_diabetes",
-                             "Hypertension" = "is_hyper",
-                             "Current or former smoker" = "is_smoker",
-                             "Immunocompromised condition" = "is_immune",
-                             "Chronic lung disease or asthma" = "is_lung",
-                             "Other chronic disease" = "is_other"
-                           ))
+        checkboxGroupInput("conditions", "Conditions", # this is written this way to allow html math in obesity test
+                           choiceNames = lapply(names(conditions_list), HTML),
+                           choiceValues = unname(conditions_list)
+        ),
       ),
       actionButton('next2', "Next", class = "btn btn-info btn-block")
     ), # bsCollapsePanel

@@ -6,6 +6,7 @@ source("src/helper_input.R")
 source("src/info_html.R")
 source("src/global_var.R")
 source("src/results.R")
+source("src/calculate_female_rate.R")
 
 # Define the UI
 ui <- fluidPage(
@@ -116,12 +117,16 @@ server <- function(input, output, session) {
       population <- NY_fips_ls%>%map(~get_county_pop(.))%>%unlist()%>%sum()
       name <- "New York City (5 Boroughs)"
       casecount <- get_county_casecount("36061", latest_day)
+      casecount_newer <- get_county_moving_casecount("36061", 0, 14)
+      casecount_older <- get_county_moving_casecount("36061", 14, 28)
       underreport_factor <- calc_county_underreport("36061")
     } else{
       #get county-level characteristics
       population <- get_county_pop(fips)
       name <- get_county_name(fips)
       casecount <- get_county_casecount(fips, latest_day)
+      casecount_newer <- get_county_moving_casecount(fips, 0, 14)
+      casecount_older <- get_county_moving_casecount(fips, 14, 28)
       underreport_factor <- calc_county_underreport(fips)
     }
     
@@ -129,6 +134,8 @@ server <- function(input, output, session) {
                  population = population,
                  name = name,
                  casecount = casecount,
+                 casecount_newer = casecount_newer,
+                 casecount_older = casecount_older,
                  underreport_factor = underreport_factor))
   })
 
@@ -155,10 +162,16 @@ server <- function(input, output, session) {
   updateRisk <- reactive({
     updateInputCollapses()
     county_data<-getCountyData()
+    if (!input$is_sick) {
+      # clear the conditional panel's UI when unchecked
+      updateCheckboxGroupInput(session, "symptoms", selected = character(0))
+    }
+    
     if (!input$has_preexisting) {
       # clear the conditional panel's UI when unchecked
       updateCheckboxGroupInput(session, "conditions", selected = character(0))
     }
+    
     
     # in results.R
     return (calculateRisk(input, county_data))
@@ -180,7 +193,7 @@ server <- function(input, output, session) {
   output$res <-renderUI({
     risk <- updateRisk()
     # in src/results.R
-    renderResultsHtml(risk, input$is_sick, input$hand, input$ppe)
+    renderResultsHtml(risk, input$symptoms, input$hand, input$ppe)
   })
   
   output$methods <-renderUI({

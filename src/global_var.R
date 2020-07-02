@@ -29,19 +29,32 @@ hosp_list  = c(0,       0.0408,  1.04,    3.43,    4.25,    8.16,    11.8,   16.
 icu_list   = c(0,       0,       2,       2,       3.7,     5.05,    6.4,    9.3,    8.4) *.657/1.38 /100
 death_list = c(0.00161, 0.00695, 0.0309,  0.0844,  0.161,   0.595,   1.93,   4.28,   7.8)  / 100
 
+# Risk adjustment to suspetibility for comorbidities
+
+## March 2020
 # odds ratios, https://www.cdc.gov/mmwr/volumes/69/wr/mm6913e2.htm
 # CCDC weekly, 2020 Vol No.2
 #The Epidemiological Characteristics of an Outbreak of 2019 Novel
 #Coronavirus Diseases (COVID-19) — China, 2020
 #The Novel Coronavirus Pneumonia Emergency Response Epidemiology Team
 # first is hospitalization odds ratio, second is ICU odds ratio, third is death odds ratio
-renal_or    = c(10.17, 5.82, 6.11) # death OR not available in CCDC
-cvd_or      = c(6.60, 4.88, 7.43)
-diabetes_or = c(5.00, 4.57, 4.70)
-hyper_or    = c(5.00, 4.57, 4.70) # use the same as diabetes
-smoker_or   = c(2.67, 2.64, 6.11) # death OR not available in CCDC
-immune_or   = c(2.58, 2.86, 6.11) # death OR not available in CCDC
-lung_or     = c(2.53, 2.83, 3.59)
+
+## UPDATEs to OR June 2020
+# For more info on assumptions and methodology, see 'doc/June2020_new_comorbidity_OR.xlsx'
+# hospitalization: OR from https://www.cdc.gov/mmwr/volumes/69/wr/mm6925e1.htm?s_cid=mm6925e1_e&deliveryName=USCDC_921-DM30747#F1_down
+#     Notes: lung was below 1 and brought up to 1. Other and immuno remain the pre-June 2020 numbers and are only used if no other condition.
+# death https://www.medrxiv.org/content/10.1101/2020.05.06.20092999v1.full.pdf
+#     Notes: hypertension was below 1 and brought up to 1. Other remains the pre-June 2020 numbers and is only used if no other condition.
+# Obesity OR for ICU risk is from https://www.medrxiv.org/content/10.1101/2020.05.06.20092999v1.full.pdf
+
+renal_or    = c(2.6, 5.82, 1.72) # death OR not available in CCDC
+cvd_or      = c(1.4, 4.88, 1.27)
+diabetes_or = c(3.1, 4.57, 1.79)
+hyper_or    = c(1.1, 4.57, 1) # for ICU same as diabetes
+smoker_or   = c(2.3, 2.64, 1.12) # death OR not available in CCDC
+immune_or   = c(2.58, 2.86, 1.69) # death OR not available in CCDC
+lung_or     = c(1, 2.83, 1.78)
+obesity_or  = c(1.9, 3.41, 1.46)
 other_or    = c(4.21, 3.33, 6.11) # death OR not available in CCDC
 
 
@@ -72,12 +85,18 @@ urls  = list(
   cdc_prevention = "https://www.cdc.gov/coronavirus/2019-ncov/prevent-getting-sick/prevention.html",
   cdc_symptoms = "https://www.cdc.gov/coronavirus/2019-ncov/symptoms-testing/symptoms.html",
   cdc_flu = "https://www.cdc.gov/flu/about/burden/index.html",
+  cdc_hosp_June2020 = "https://www.cdc.gov/mmwr/volumes/69/wr/mm6925e1.htm",
   # NYT
   nytimes_data_article = "https://www.nytimes.com/article/coronavirus-county-data-us.html",
   # papers
   caramelo_etal_2020 = "https://www.medrxiv.org/content/10.1101/2020.02.24.20027268v1",
   russel_etal_2020 = "https://cmmid.github.io/topics/covid19/global_cfr_estimates.html",
   verity_etal_2020 = "https://www.thelancet.com/journals/laninf/article/PIIS1473-3099(20)30243-7/fulltext",
+  open_safely = "https://www.medrxiv.org/content/10.1101/2020.05.06.20092999v1",
+  wolfer_etall_2020 = "https://www.nature.com/articles/s41586-020-2196-x",
+  covid_symptom_study = "https://covid19.joinzoe.com/us/about", 
+  menni_etall_2020 = "https://www.nature.com/articles/s41591-020-0916-2",
+  simonnet_etall_2020 = "https://onlinelibrary.wiley.com/doi/full/10.1002/oby.22831?af=R", 
   # social
   twitter_button = "https://twitter.com/intent/tweet?text=Find%20your%20COVID-19%20risk%20score!&url=https://19andme.shinyapps.io/covid_risk_score/",
   twitter_widget = "http://platform.twitter.com/widgets.js",
