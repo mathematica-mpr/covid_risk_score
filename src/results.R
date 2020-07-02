@@ -43,11 +43,10 @@ calculateRisk <- function(input, county_data) {
     exposure_risk<-odds2risk(risk2odds(exposure_risk)*ppe_or)
   }
   
-  
-  # if you're already sick with symptoms, odds of covid come from https://www.nature.com/articles/s41591-020-0916-2
-  if(input$is_sick){
+  # if you select symptoms, odds of covid come from https://www.nature.com/articles/s41591-020-0916-2
+  if(!is.null(input$symptoms)){
     age <- as.numeric(input$age) %>% ifelse(.<18, 18,.) # min input age is 18
-    # sex_other is ave of male and female risk
+    # sex_other is average of male and female risk
     sex_symp_val <- case_when(
       input$sex == "male" ~ 1,
       input$sex == "female" ~ 0,
@@ -57,10 +56,7 @@ calculateRisk <- function(input, county_data) {
     sympt_covid_logodds <- (-1.32) - (0.01*age) + (0.44*sex_symp_val) + (1.75*"is_loss_smell_taste" %in% input$symptoms) + 
       (0.31*"is_cough" %in% input$symptoms) + (0.49*"is_fatigue" %in% input$symptoms) + (0.39*"is_skip_meal" %in% input$symptoms)
     
-    sympt_covid_risk <- logodds2risk(sympt_covid_logodds) # option 1
-    #sympt_odds <- risk2odds(sympt_covid_risk) # option 2
-    # sympt_covid_risk <- odds2risk(risk2odds(prev_active)*sympt_odds) #option 2
-    
+    sympt_covid_risk <- logodds2risk(sympt_covid_logodds) 
   } else {
     sympt_covid_risk <- 0
   } 
@@ -210,11 +206,11 @@ renderExposureHtml <- function(risk, is_sick) {
     with others that are similar to yours, the estimated probability of catching COVID-19 through community transmission in a week is ", 
     risk_string, '. ', "For comparison, ", prob_flu_string, ' of Americans catch the flu every week during flu season.')
   sickness_text = (paste0(
-    "Since you are experiencing symptoms correlated to COVID-19, please immediately consult ", 
+    "Based on the symptom(s) you selected, the probability that you have symptomatic COVID-19 is ", sympt_covid_string,
+    ". If you are experiencing symptoms associated with COVID-19, please immediately consult ", 
     tags$a("the CDC's instructions", href = urls$cdc_if_sick),
     ", or walk through their ",
-    tags$a("self-checker", href = urls$cdc_chatbot),
-    ". The probability that you have symptomatic COVID-19 is ", sympt_covid_string, '. '))
+    tags$a("self-checker", href = urls$cdc_chatbot), '.'))
   
   if (is_sick == TRUE) {
     total_risk_html = tags$p(HTML(paste0(exposure_text, "<br> <br>", sickness_text)))
