@@ -37,15 +37,18 @@ renderMethodsHtml <- function() {
         "To calculate exposure, we used ",
         tags$a("the New York Times's published data on COVID-19 cases & deaths", href = urls$nytimes_data_article),
         "to estimate the prevalence of infected people within your county. 
-        For the five boroughs in New York City, we use the overall New York City COVID-19 data."),
+        For the five boroughs in New York City, we use the overall New York City COVID-19 data."
+        ),
       tags$li(
-        "Due to rapid spread and insufficient testing during the COVID-19 pandemic, there are likely additional unreported cases beyond the 
-        officially reported cases. We combined the methodology reported by ",  tags$a("Russell et al (2020)", href = urls$russel_etal_2020), 
-        " and the average length of sickenss reported by ", tags$a("Wolfel et al (2020)", href = urls$wolfer_etall_2020), " and the ",
-        tags$a("COVID Symptom Study", href = urls$covid_symptom_study), 
-        "to calculate the percentage of cases that are currently known and presumably quarantined, versus the number of active cases in the community."),
+       "To calculate total number of active cases, we used the average length of sickness reported by ", tags$a("Wolfel et al (2020)", href = urls$wolfer_etall_2020), 
+        " and ",  tags$a("COVID Symptom Study", href = urls$covid_symptom_study), ". We assumed mild cases are active for 14 days, and severe cases are active for 28 days.",
+        " We also assumed severe cases are all reported, and under-reporting only happen among the mild cases. ", 
+        "We applied the methodology reported by ",  tags$a("Russell et al (2020)", href = urls$russel_etal_2020), 
+        " to the county-level delayed case fatality rate to estimate the under-reporting factor.", 
+        "We assumed that cases that are currently known are already in quarantine.", " The number of unreported active cases in your community contribute to your exposure risks."
+        ),
       tags$li(
-        "Estimations of probability of symptomatic COVID-19 is calculated using a linear model developed by ",
+        "Estimations of probability of having COVID-19 given symptoms is calculated using a logistic regression model developed by ",
         tags$a("Menni et al (2020).", href = urls$menni_etall_2020)
       ),
       tags$li("Other methods of becoming infected (e.g. touching an infected surface) are not accounted for by this calculator."),
@@ -156,6 +159,10 @@ renderFaqHtml <- function() {
            tags$a("Verity et al (2020)", href = urls$verity_etal_2020),  "by male and female odds ratio from this preprint by ", 
            tags$a("Caramelo et al (2020)", href = urls$caramelo_etal_2020), 
            "and if the sex assigned at birth selected is 'Other' or 'Perfer not to say', then we do not modify the estimates." ),
+    faqQuestion("Why is race not in your app?"),
+    tags$p("While we acknowledge people from different race groups experience different levels of adverse health outcomes due to COVID-19",
+           ", we think race is an 'indicator', not mechanistically causal. There are other exogenous variables that better explain the health outcomes, ",
+           "such as access to health care, nutrition, residential condition, occupation, etc. We will try to incorporate these other features when data become available."),
     faqQuestion("When you report 'probability of catching COVID-19 through community transmission', over what period of time does this refer to? Is this XX% chance per day?"),
     tags$p("We calculate the probability of community transmission as a function of the number of close contacts in a week and",
            "prevalence in your local community, so this is a weekly probability."),
