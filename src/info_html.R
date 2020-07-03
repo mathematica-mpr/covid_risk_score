@@ -146,7 +146,6 @@ renderFaqHtml <- function() {
            "Unfortunately, that is not true of most of the US at present."),
     faqQuestion("My specific medical condition isn't listed. What do I do?"),
     tags$p("Try using \"other conditions\" to get a catch-all estimate of your susceptibility."),
-    
     faqQuestion("How is my sex assigned at birth used in risk score calculations?"),
     tags$p("For exposure risk, the ", tags$a("Menni et al (2020)", href = urls$menni_etall_2020), " model inclused 
            self-reported 'sex at birth' as a binary independent varriable with 1 indicative of male participants and 0 representing 
@@ -157,10 +156,18 @@ renderFaqHtml <- function() {
            tags$a("Verity et al (2020)", href = urls$verity_etal_2020),  "by male and female odds ratio from this preprint by ", 
            tags$a("Caramelo et al (2020)", href = urls$caramelo_etal_2020), 
            "and if the sex assigned at birth selected is 'Other' or 'Perfer not to say', then we do not modify the estimates." ),
-    
+    faqQuestion("When you report 'probability of catching COVID-19 through community transmission', over what period of time does this refer to? Is this XX% chance per day?"),
+    tags$p("We calculate the probability of community transmission as a function of the number of close contacts in a week and",
+           "prevalence in your local community, so this is a weekly probability."),
     faqQuestion("My hospitalization/ICU/death risk seems out of whack."),
     tags$p("A lot is still unknown about the disease, and data sets are sparse, so our susceptibility scores are",
            "good for ballpark estimates only. We'll update our tool with better numbers as they become available."),
+    faqQuestion("Why is pregnancy not listed as an underlying condition?"),
+    tags$p("COVID-19 is a new disease. Currently there are limited data and information about the impact of underlying medical conditions",
+            "and whether they increase the risk for severe illness from COVID-19. Based on what we know at this time, ",
+            "pergnant women might be at increased risk for severe illness from COVID-19, according to ",
+            tags$a("CDC (2020)", href = urls$cdc_pregnancy),
+            "but we haven't seen any quantitative evidence reported in patient-level studies"),
     faqQuestion("I have suggestion X, or know of data set Y, or want feature Z..."),
     tags$p("Let us know at", tags$a("covid.risk.score@gmail.com", href="mailto:covid.risk.score@gmail.com"), 
            "or visit us on ", tags$a("GitHub", href="https://github.com/mathematica-mpr/covid_risk_score"))

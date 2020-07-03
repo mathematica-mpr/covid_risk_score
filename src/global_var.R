@@ -86,6 +86,7 @@ urls  = list(
   cdc_symptoms = "https://www.cdc.gov/coronavirus/2019-ncov/symptoms-testing/symptoms.html",
   cdc_flu = "https://www.cdc.gov/flu/about/burden/index.html",
   cdc_hosp_June2020 = "https://www.cdc.gov/mmwr/volumes/69/wr/mm6925e1.htm",
+  cdc_pregnancy = "https://www.cdc.gov/coronavirus/2019-ncov/need-extra-precautions/people-with-medical-conditions.html?CDC_AA_refVal=https%3A%2F%2Fwww.cdc.gov%2Fcoronavirus%2F2019-ncov%2Fneed-extra-precautions%2Fgroups-at-higher-risk.html#pregnancy",
   # NYT
   nytimes_data_article = "https://www.nytimes.com/article/coronavirus-county-data-us.html",
   # papers
