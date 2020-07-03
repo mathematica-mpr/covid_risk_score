@@ -12,7 +12,8 @@ source("src/calculate_female_rate.R")
 ui <- fluidPage(
   theme=shinytheme("superhero"),
   titlePanel(fluidRow(column(width = 9, "19 and Me: COVID-19 Risk Score Calculator"),
-                      column(width = 3, img(src = 'MathematicaLogo_White_smaller.png',class = "pull-right")))),
+                      column(width = 3, img(src = 'MathematicaLogo_White_smaller.png',class = "pull-right"))),
+             windowTitle = "19 and Me: COVID-19 Risk Calculator"),
   # google analytics tracking
   tags$head(includeHTML("src/google-analytics.html")),
   
