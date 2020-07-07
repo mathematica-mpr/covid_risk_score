@@ -152,13 +152,13 @@ renderFaqHtml <- function() {
     faqQuestion("How is my sex assigned at birth used in risk score calculations?"),
     tags$p("For exposure risk, the ", tags$a("Menni et al (2020)", href = urls$menni_etall_2020), " model inclused 
            self-reported 'sex at birth' as a binary independent varriable with 1 indicative of male participants and 0 representing 
-           females. Therefore for the app, if sex assigned at birth selected is 'Other' or 'Perfer not to say', 
+           females. Therefore for the app, if sex assigned at birth selected is 'Other' or 'Prefer not to say', 
            for the estimations of probability of symptomatic COVID-19, we code these inputs as having a 'sex at birth' equal to 0.5."),  
     tags$p("For susceptibility, we used the original data from ", tags$a("Verity et al (2020)", href = urls$verity_etal_2020), 
            " for people at different age groups. If the sex assigned at birth selected is 'Male' or 'Female', then we modify the estimates from ",
            tags$a("Verity et al (2020)", href = urls$verity_etal_2020),  "by male and female odds ratio from this preprint by ", 
            tags$a("Caramelo et al (2020)", href = urls$caramelo_etal_2020), 
-           "and if the sex assigned at birth selected is 'Other' or 'Perfer not to say', then we do not modify the estimates." ),
+           "and if the sex assigned at birth selected is 'Other' or 'Prefer not to say', then we do not modify the estimates." ),
     faqQuestion("Why is race not in your app?"),
     tags$p("While we acknowledge people from different race groups experience different levels of adverse health outcomes due to COVID-19",
            ", we think race is an 'indicator', not mechanistically causal. There are other exogenous variables that better explain the health outcomes, ",
