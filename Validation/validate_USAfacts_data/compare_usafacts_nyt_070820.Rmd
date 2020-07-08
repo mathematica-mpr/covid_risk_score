@@ -1,0 +1,100 @@
+---
+title: "Compare USA facts to NYT - 7/8/20"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F)
+
+library(tidyverse)
+library(lubridate)
+library(pander)
+
+dat_nyt <- read_csv("NYT_data_070820.csv") %>% filter(!is.na(fips))
+
+dat_usafacts <- read_csv("covid_confirmed_usafacts_070820.csv") %>%
+  gather(date, cases, names(.)[grepl("^\\d",names(.))]) %>%
+  rename(fips=countyFIPS, county='County Name', state=State) %>%
+  filter(!fips %in% 0:1) %>%
+  mutate(fips = str_pad(fips, width=5, pad="0"),
+         date = mdy(date))
+```
+
+## Compare set of FIPS codes in the two data sets
+
+```{r}
+counties_nyt <- dat_nyt %>% select(fips, state, county) %>% distinct() %>% arrange(fips) 
+counties_usafacts <- dat_usafacts %>% filter(cases!=0) %>%
+  select(fips, state, county) %>% distinct() %>% arrange(fips)
+```
+
+### Counties in NYT and not in USAFacts
+All counties from NYT are in USAFacts.
+
+```{r, results="asis"}
+dat_nyt %>% anti_join(dat_usafacts, by="fips") %>% pandoc.table()
+```
+
+### Counties in USAFacts and not in NYT
+There are a few counties from USAFacts not in NYT (including several from NY with high case counts).
+
+```{r, results="asis"}
+dat_usafacts %>% anti_join(dat_nyt, by="fips") %>% filter(cases!=0) %>%
+  group_by(state, county, fips) %>% 
+  summarise(cummulative_cases = max(cases), earliest_date = min(date), 
+            latest_date = max(date)) %>%
+  pandoc.table(split.table=Inf)
+```
+
+## Compare a single county, all dates (Cook county)
+```{r}
+COOK_FIPS = "17031"
+
+bind_rows(dat_nyt %>% select(date, fips, cases) %>% mutate(source="NYT"),
+          dat_usafacts %>% select(date, fips, cases) %>% mutate(source="USAFacts")) %>%
+  filter(fips==COOK_FIPS) %>%
+  spread(source, cases) %>%
+  mutate_at(c("NYT","USAFacts"), ~ifelse(is.na(.), 0, .)) %>% 
+  ggplot(aes(x=NYT, y=USAFacts)) + geom_point(size=.5) 
+```
+
+## Compare cummulative cases (7/7/20) all counties
+```{r}
+bind_rows(dat_nyt %>% select(date, fips, cases) %>% mutate(source="NYT"),
+          dat_usafacts %>% select(date, fips, cases) %>% mutate(source="USAFacts")) %>%
+  filter(date==max(date)) %>%
+  spread(source, cases) %>%
+  mutate_at(c("NYT","USAFacts"), ~ifelse(is.na(.), 0, .)) %>% 
+  ggplot(aes(x=NYT, y=USAFacts)) + geom_point(size=.5) 
+```
+
+### Look at those with largest percent difference in cummulative cases (greater than 5%)
+```{r, results="asis"}
+bind_rows(dat_nyt %>% select(date, fips, cases) %>% mutate(source="NYT"),
+          dat_usafacts %>% select(date, fips, cases) %>% mutate(source="USAFacts")) %>%
+  filter(date==max(date)) %>%
+  spread(source, cases) %>%
+  mutate_at(c("NYT","USAFacts"), ~ifelse(is.na(.), 0, .)) %>%
+  mutate(percent_error = ifelse(NYT==0, ifelse(USAFacts==0, 0, Inf), (USAFacts-NYT)/NYT),
+         percent_error = round(percent_error, 3)) %>% 
+  filter(percent_error!=0) %>% arrange(desc(abs(percent_error))) %>%
+  left_join(dat_usafacts %>% select(state, county, fips) %>% distinct(), by="fips") %>%
+  select(state, county, fips, NYT, USAFacts, percent_error) %>%
+  filter(abs(percent_error)>.05) %>%
+  pandoc.table(split.table=Inf)
+```
+
+### Plot counties with greater than 5% difference in cummulative cases
+```{r}
+bind_rows(dat_nyt %>% select(date, fips, cases) %>% mutate(source="NYT"),
+          dat_usafacts %>% select(date, fips, cases) %>% mutate(source="USAFacts")) %>%
+  filter(date==max(date)) %>%
+  spread(source, cases) %>%
+  mutate_at(c("NYT","USAFacts"), ~ifelse(is.na(.), 0, .)) %>%
+  mutate(percent_error = ifelse(NYT==0, ifelse(USAFacts==0, 0, Inf), (USAFacts-NYT)/NYT),
+         percent_error = round(percent_error, 3)) %>% 
+  filter(abs(percent_error)>.05, percent_error<1000000000) %>%
+  ggplot(aes(x=NYT, y=USAFacts)) + geom_point() + geom_abline(linetype="dashed") +
+  coord_equal()
+```
+
