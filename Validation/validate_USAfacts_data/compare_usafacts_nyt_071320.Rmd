@@ -4,7 +4,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = F)
+knitr::opts_chunk$set(echo = F, warning=F)
 
 library(tidyverse)
 library(lubridate)
@@ -29,13 +29,78 @@ dat_usafacts_deaths <- read_csv("covid_deaths_usafacts_071420.csv") %>%
 ```
 
 # {.tabset}
-In this document, we explore to what extent the following two data sources for county-level cumulative counts of confirmed COVID-19 cases and deaths are comparable. In our comparison, we focus on cumulative case counts as of 7/13/2020 (data downloaded on 7/14/2020).
+There are several national-level aggregations of county-level COVID case and death data.
 
-**New York Times (NYT)**: The New York times keeps maintains a data set reporting daily cumulative counts of COVID-19 cases and deaths (https://github.com/nytimes/covid-19-data).
+Each source has its own data collection methods, which can result in variations in numbers across sources.
 
-**USAFacts**: USAFacts also maintains a data set reporting daily cumulative counts of COVID-19 cases and deaths.
+On this page, we explore to what extent the following two data sources for county-level cumulative counts of confirmed COVID-19 cases and deaths are comparable. In our comparison, we focus on cumulative case counts as of 7/13/2020 (data accessed on 7/14/2020).
 
-## 1) Comparison of unallocated cases
+**New York Times (NYT)**: The New York times keeps maintains a [data set](https://github.com/nytimes/covid-19-data) reporting daily cumulative counts of COVID-19 cases and deaths.
+
+**USAFacts**: USAFacts also maintains a [data set](https://usafacts.org/visualizations/coronavirus-covid-19-spread-map/) reporting daily cumulative counts of COVID-19 cases and deaths.
+
+The data for each of the two sources are gathered from state and local public health agencies, however there are some differences between the two sources in how the data is reported. This [blog post](https://source.opennews.org/articles/comparison-four-major-covid-19-data-sources/) reviews some of the major differences, for example:
+
+1) **Time of update:** NYT is updated once daily around 8am EDT with case and death counts from the previous day. USAFacts is updated once daily around 12am PDT (3am EDT) for cases from the previous day. Because USAFacts is updated before NYT, USAFacts generally reports lower case and death counts than NYT for a given day.
+
+2) **Geographic exceptions:** NYT reports cases for all five boroughs of New York city as a single area ("New York City"). USAFacts reports New York City cases separately for all five counties, though also has a category for “New York City Unallocated/Probable”. NYT reports all case for Kansas City in a single group ("Kansas City"). The case counts for the four counties that include parts of Kansas City represent only the parts of the counties that are outside of Kansas City. In the USAFacts data, all Kansas City cases are allocated to Jackson County.
+
+3) **Other differences:** See the blog post linked above for more information on the differences between the data sources.
+
+
+## 1) Comparison of total national cases and deaths over time (April 1st, 2020 onward) {.tabset}
+```{r}
+nyt_total <- dat_nyt %>% filter(state!="Puerto Rico") %>%
+  group_by(date) %>% 
+  summarise(cases=sum(cases), deaths=sum(deaths), source="NYT") 
+usafacts_total_cases <- dat_usafacts_cases %>% group_by(date) %>% summarise(cases=sum(cases)) 
+usafacts_total_deaths <- dat_usafacts_deaths %>% group_by(date) %>% summarise(deaths=sum(deaths)) 
+usafacts_total = full_join(usafacts_total_cases, usafacts_total_deaths, by="date") %>% mutate(source="USAFacts")
+```
+
+### Cases
+```{r, fig.height=8}
+bind_rows(nyt_total, usafacts_total) %>% select(-deaths) %>% spread(source, cases) %>% 
+  filter(date>=date("2020-04-01")) %>%
+  mutate(difference = NYT-USAFacts,
+         percent_difference = 100*(NYT-USAFacts)/USAFacts) %>%
+  gather(source, cases, c("NYT","USAFacts","difference","percent_difference")) %>%
+  mutate(panel=case_when(source=="difference"~"Difference",
+                         source=="percent_difference"~"Percent difference",
+                         T~"Cases"),
+         color=case_when(source=="NYT"~"NYT",
+                         source=="USAFacts"~"USAFacts",
+                         T~"Comparison"),
+         color=fct_rev(color)) %>%
+  ggplot(aes(x=date, y=cases, color=color)) + geom_line() + geom_hline(yintercept=0, linetype="dotted") +
+  facet_grid(panel~., scale="free_y") +
+  labs(color="") + ylab("") +
+  theme_bw() +
+  ggtitle("Comparison of national cases reported by each source")
+```
+
+### Deaths
+```{r, fig.height=8}
+bind_rows(nyt_total, usafacts_total) %>% select(-cases) %>% spread(source, deaths) %>% 
+  filter(date>=date("2020-04-01")) %>%
+  mutate(difference = NYT-USAFacts,
+         percent_difference = 100*(NYT-USAFacts)/USAFacts) %>%
+  gather(source, deaths, c("NYT","USAFacts","difference","percent_difference")) %>%
+  mutate(panel=case_when(source=="difference"~"Difference",
+                         source=="percent_difference"~"Percent difference",
+                         T~"Cases"),
+         color=case_when(source=="NYT"~"NYT",
+                         source=="USAFacts"~"USAFacts",
+                         T~"Comparison"),
+         color=fct_rev(color)) %>%
+  ggplot(aes(x=date, y=deaths, color=color)) + geom_line() + geom_hline(yintercept=0, linetype="dotted") +
+  facet_grid(panel~., scale="free_y") + 
+  labs(color="") + ylab("") +
+  theme_bw()  +
+  ggtitle("Comparison of national deaths reported by each source")
+```
+
+## 2) Comparison of unallocated cases
 ```{r}
 nyt_unknown <- dat_nyt %>% filter(county=="Unknown") %>% filter(date==max(date)) %>% 
   select(state, cases, deaths) %>% mutate(source="NYT") %>%
@@ -93,7 +158,7 @@ dat_usafacts_cases <- dat_usafacts_cases %>% filter(!fips %in% c("00000","00001"
 dat_usafacts_deaths <- dat_usafacts_deaths %>% filter(!fips %in% c("00000","00001"))
 ```
 
-## 2) Comparison of counties with reported cases in the two data sets
+## 3) Comparison of counties with reported cases in the two data sets
 
 We check for counties (FIPs codes) where cases were reported in one data set but not in the other.
 
@@ -130,7 +195,7 @@ dat_usafacts_cases %>% anti_join(dat_nyt, by="fips") %>% filter(cases!=0) %>%
   pandoc.table(split.table=Inf)
 ```
 
-## 3) Comparison of cumulative cases for all counties that appear in both data sets
+## 4) Comparison of cumulative cases for all counties that appear in both data sets
 ```{r}
 bind_rows(dat_nyt %>% select(date, fips, cases) %>% mutate(source="NYT"),
           dat_usafacts_cases %>% select(date, fips, cases) %>% mutate(source="USAFacts")) %>%
@@ -179,11 +244,12 @@ case_diff_tab %>%
 ```{r, results="asis"}
 case_diff_tab %>% 
   arrange(desc(abs(NYT-USAFacts))) %>%
+  rename(county_USAFacts=county) %>%
   mutate(percent_error = paste0(round(100*percent_error,0),"%")) %>%
   pandoc.table(split.table=Inf)
 ```
 
-## 4) Comparison of cumulative deaths for all counties that appear in both data sets
+## 5) Comparison of cumulative deaths for all counties that appear in both data sets
 ```{r}
 bind_rows(dat_nyt %>% select(date, fips, deaths) %>% mutate(source="NYT"),
           dat_usafacts_deaths %>% select(date, fips, deaths) %>% mutate(source="USAFacts")) %>%
@@ -233,6 +299,7 @@ death_diff_tab %>%
 ```{r, results="asis"}
 death_diff_tab %>% 
   arrange(desc(abs(NYT-USAFacts))) %>%
+  rename(county_USAFacts=county) %>%
   mutate(percent_error = paste0(round(100*percent_error,0),"%")) %>%
   pandoc.table(split.table=Inf)
 ```
