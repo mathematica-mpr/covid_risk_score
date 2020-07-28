@@ -202,7 +202,7 @@ renderExposureHtml <- function(risk, symptoms) {
   risk_string = formatPercent(risk$exposure_risk)
   sympt_covid_string = formatPercent(risk$sympt_covid_risk)
   exposure_text = paste0(
-    "Among people who are the same age, sex, and health status as you, and have behaviors and levels of interaction 
+    "Among people who are the same health status as you and have behaviors and levels of interaction 
     with others that are similar to yours, the estimated probability of catching COVID-19 through community transmission in a week is ", 
     risk_string, '. ', "For comparison, ", prob_flu_string, ' of Americans catch the flu every week during flu season.')
   sickness_text = (paste0(
