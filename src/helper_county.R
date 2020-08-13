@@ -4,6 +4,7 @@ library(tidycensus)
 library(assertr)
 library(flexdashboard)
 library(httr)
+library(lubridate)
 
 httr::set_config(config(ssl_verifypeer = 0L))
 
@@ -16,20 +17,42 @@ fips_codes<-fips_codes%>%
 
 #Read in NYT covid-19 county-level data
 #NYT county-level data
-nyt_url <- "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv"
+#nyt_url <- "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv"
 #GET(nyt_url, write_disk("data/us-counties.csv", overwrite=TRUE))
-response<-GET(nyt_url)
-df <- response$content%>%
-  rawToChar()%>%
-  read_csv()%>%
-  mutate(fips = case_when(county == "New York City" & state == "New York" ~ "36061",
-                          county == "Kansas City" & state == "Missouri" ~ "29095",
-                          TRUE ~ fips))%>%
-  select(-c(state,county))
+#response<-GET(nyt_url)
+#df <- response$content%>%
+#  rawToChar()%>%
+#  read_csv()%>%
+#  mutate(fips = case_when(county == "New York City" & state == "New York" ~ "36061",
+#                          county == "Kansas City" & state == "Missouri" ~ "29095",
+#                          TRUE ~ fips))%>%
+#  select(-c(state,county))
+#latest_day = df$date%>%max()
+
+# get USAFacts cases and death data
+usafacts_cases_url <- "https://usafactsstatic.blob.core.windows.net/public/data/covid-19/covid_confirmed_usafacts.csv"
+usafacts_deaths_url <- "https://usafactsstatic.blob.core.windows.net/public/data/covid-19/covid_deaths_usafacts.csv"
+
+cases<-GET(usafacts_cases_url) %>% process_usafacts_data(type="cases")
+deaths<-GET(usafacts_deaths_url) %>% process_usafacts_data(type="deaths") 
+df <- full_join(cases, deaths, by=c("date","fips"))
+stopifnot(!is.na(cases), !is.na(deaths))
+
 latest_day = df$date%>%max()
 
-
 #utiity function
+process_usafacts_data <- function(dat_raw, type){
+  stopifnot(type %in% c("cases","deaths"))
+  dat_raw %>% .$content %>% rawToChar() %>% read_csv()  %>%
+    gather(date, !!sym(type), names(.)[grepl("^\\d",names(.))]) %>%
+    set_names(tolower(gsub("[^A-Za-z]","",names(.)))) %>% 
+    rename(fips=countyfips, county=countyname) %>%
+    mutate(fips = str_pad(fips, width=5, pad="0"),
+           date = mdy(date)) %>%
+    filter(grepl("Cass|Clay|Platte|Jackson",county)) %>% count(county)
+    select_if(names(.) %in% c("date","fips","cases","deaths"))
+}
+
 named_group_split <- function(.tbl, ...) {
   grouped <- group_by(.tbl, ...)
   names <- rlang::eval_bare(rlang::expr(paste(!!!group_keys(grouped), sep = " / ")))
