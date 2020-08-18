@@ -111,14 +111,22 @@ server <- function(input, output, session) {
     } else if (is_empty(fips)){
       fips <-input$fips0
     }
-    
-    #get county-level characteristics
-    population <- get_county_pop(fips)
-    name <- get_county_name(fips)
-    casecount <- get_county_casecount(fips, latest_day)
-    casecount_newer <- get_county_moving_casecount(fips, 0, 14)
-    casecount_older <- get_county_moving_casecount(fips, 14, 28)
-    underreport_factor <- calc_county_underreport(fips)
+    if (fips%in%KC_fips_ls){
+      population <- KC_fips_ls %>% map(~get_county_pop(.))%>%unlist()%>%sum()
+      name <- "Kansas City and surrounding counties"
+      casecount <- get_county_casecount("29095", latest_day)
+      casecount_newer <- get_county_moving_casecount("29095", 0, 14)
+      casecount_older <- get_county_moving_casecount("29095", 14, 28)
+      underreport_factor <- calc_county_underreport("29095")
+    } else{
+      #get county-level characteristics
+      population <- get_county_pop(fips)
+      name <- get_county_name(fips)
+      casecount <- get_county_casecount(fips, latest_day)
+      casecount_newer <- get_county_moving_casecount(fips, 0, 14)
+      casecount_older <- get_county_moving_casecount(fips, 14, 28)
+      underreport_factor <- calc_county_underreport(fips)
+    }
     
     return (list(fips = fips,
                  population = population,

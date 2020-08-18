@@ -46,7 +46,9 @@ process_usafacts_data <- function(dat_raw, type){
 
 cases<-GET(usafacts_cases_url) %>% process_usafacts_data(type="cases")
 deaths<-GET(usafacts_deaths_url) %>% process_usafacts_data(type="deaths") 
-df <- full_join(cases, deaths, by=c("date","fips"))
+df <- full_join(cases, deaths, by=c("date","fips")) %>%
+  mutate(fips = case_when(fips %in% KC_fips_ls ~ "29095",
+                          T ~ fips))
 stopifnot(!is.na(cases), !is.na(deaths))
 
 latest_day = df$date%>%max()
