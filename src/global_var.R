@@ -66,7 +66,8 @@ other_or    = c(4.21, 3.33, 6.11) # death OR not available in CCDC
 male_or     = c(1.8518, 1.85, 1.69)
 
 #NYC county fips code
-NY_fips_ls<-c("36005", "36047", "36061", "36081", "36085")
+#NY_fips_ls<-c("36005", "36047", "36061", "36081", "36085")
+KC_fips_ls <- c("29037", "20027", "29047", "20085", "29095", "29165")
 
 # urls class to store our urls
 urls  = list(

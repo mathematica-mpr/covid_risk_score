@@ -111,15 +111,13 @@ server <- function(input, output, session) {
     } else if (is_empty(fips)){
       fips <-input$fips0
     }
-    
-    #fix NYC, all NYC borough data uses NY county
-    if (fips%in%NY_fips_ls){
-      population <- NY_fips_ls%>%map(~get_county_pop(.))%>%unlist()%>%sum()
-      name <- "New York City (5 Boroughs)"
-      casecount <- get_county_casecount("36061", latest_day)
-      casecount_newer <- get_county_moving_casecount("36061", 0, 14)
-      casecount_older <- get_county_moving_casecount("36061", 14, 28)
-      underreport_factor <- calc_county_underreport("36061")
+    if (fips%in%KC_fips_ls){
+      population <- KC_fips_ls %>% map(~get_county_pop(.))%>%unlist()%>%sum()
+      name <- "Kansas City and surrounding counties"
+      casecount <- get_county_casecount("29095", latest_day)
+      casecount_newer <- get_county_moving_casecount("29095", 0, 14)
+      casecount_older <- get_county_moving_casecount("29095", 14, 28)
+      underreport_factor <- calc_county_underreport("29095")
     } else{
       #get county-level characteristics
       population <- get_county_pop(fips)
