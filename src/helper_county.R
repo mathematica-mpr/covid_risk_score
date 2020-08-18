@@ -33,14 +33,6 @@ fips_codes<-fips_codes%>%
 usafacts_cases_url <- "https://usafactsstatic.blob.core.windows.net/public/data/covid-19/covid_confirmed_usafacts.csv"
 usafacts_deaths_url <- "https://usafactsstatic.blob.core.windows.net/public/data/covid-19/covid_deaths_usafacts.csv"
 
-cases<-GET(usafacts_cases_url) %>% process_usafacts_data(type="cases")
-deaths<-GET(usafacts_deaths_url) %>% process_usafacts_data(type="deaths") 
-df <- full_join(cases, deaths, by=c("date","fips"))
-stopifnot(!is.na(cases), !is.na(deaths))
-
-latest_day = df$date%>%max()
-
-#utiity function
 process_usafacts_data <- function(dat_raw, type){
   stopifnot(type %in% c("cases","deaths"))
   dat_raw %>% .$content %>% rawToChar() %>% read_csv()  %>%
@@ -49,9 +41,15 @@ process_usafacts_data <- function(dat_raw, type){
     rename(fips=countyfips, county=countyname) %>%
     mutate(fips = str_pad(fips, width=5, pad="0"),
            date = mdy(date)) %>%
-    filter(grepl("Cass|Clay|Platte|Jackson",county)) %>% count(county)
     select_if(names(.) %in% c("date","fips","cases","deaths"))
 }
+
+cases<-GET(usafacts_cases_url) %>% process_usafacts_data(type="cases")
+deaths<-GET(usafacts_deaths_url) %>% process_usafacts_data(type="deaths") 
+df <- full_join(cases, deaths, by=c("date","fips"))
+stopifnot(!is.na(cases), !is.na(deaths))
+
+latest_day = df$date%>%max()
 
 named_group_split <- function(.tbl, ...) {
   grouped <- group_by(.tbl, ...)
