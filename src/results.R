@@ -18,15 +18,9 @@ calculateRisk <- function(input, county_data) {
   moving_casecount <- county_data$moving_casecount
   population<-county_data$population
   underreport_factor<-county_data$underreport_factor
-  total_moving_casecount = moving_casecount * underreport_factor
 
   #risk calculator
-  active_casecount = total_moving_casecount - moving_casecount
-  
-  # ASSUMPTION: active community case count cannot be less than 10% of reported cases
-  if (active_casecount < 0.1 * moving_casecount) {
-    active_casecount = 0.1 * moving_casecount
-  }
+  active_casecount = moving_casecount * underreport_factor
   
   # risk of exposure
   prev_active<- active_casecount/population #prevalence of active cases
@@ -165,7 +159,7 @@ renderLocationHtml <- function(risk) {
                ' confirmed COVID-19 cases total. Many people who contract COVID-19 are not tested, and therefore not reported. 
                We estimate that your county has an under-reporting factor of ', underreport_factor_string, 
                '. Accounting for the under-reporting factor and average length of sickness, we estimate there are ',
-               formatDynamicString(format(round(county_data$moving_casecount*(county_data$underreport_factor-1)), big.mark =",")),
+               formatDynamicString(format(round(county_data$moving_casecount*county_data$underreport_factor), big.mark =",")),
                ' sick people distributed through the county who are not officially reported.'
     ))
   )
