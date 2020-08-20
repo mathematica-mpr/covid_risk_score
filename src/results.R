@@ -153,12 +153,12 @@ renderLocationHtml <- function(risk) {
   div(
     title = "Location",
     tags$p(div('We found data from ', formatDynamicString(county_data$name), ' for your zip code. As of ', 
-               formatDynamicString(latest_day), ', this county has reported', formatDynamicString(format(round(county_data$moving_casecount), big.mark =",")),
-               ' confirmed COVID-19 over the last 14 days and ',
+               formatDynamicString(latest_day), ', this county had', formatDynamicString(format(round(county_data$moving_casecount), big.mark =",")),
+               ' new reported cases in the last 14 days and ',
                formatDynamicString(format(county_data$casecount, big.mark=",")), 
-               ' confirmed COVID-19 cases total. Many people who contract COVID-19 are not tested, and therefore not reported. 
+               ' cases total of COVID-19. Many people who contract COVID-19 are not tested, and therefore not reported. 
                We estimate that your county has an under-reporting factor of ', underreport_factor_string, 
-               '. Accounting for the under-reporting factor and average length of sickness, we estimate there are ',
+               '. Taking into account the under-reporting factor, incubation period, and time from symptom onset to recovery, we estimate there are ',
                formatDynamicString(format(round(county_data$moving_casecount*county_data$underreport_factor), big.mark =",")),
                ' sick people distributed through the county who are not officially reported.'
     ))
