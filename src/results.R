@@ -40,6 +40,12 @@ calculateRisk <- function(input, county_data) {
   }
   
   if(input$ppe){
+    print(input$ppe_type)
+    ppe_or = case_when(input$ppe_type == "n95" ~ n95_or,
+                       input$ppe_type == "surgical" ~ surgicalmasks_or,
+                       input$ppe_type == "othermasks" ~ 1, # no evidence for other types of masks
+                       input$ppe_type == "eyeprotection" ~ eyeprotection_or
+    )
     exposure_risk<-odds2risk(risk2odds(exposure_risk)*ppe_or)
   }
   
@@ -232,7 +238,7 @@ renderSusceptibilityHtml <- function(risk) {
   )))
 }
 
-renderProtectionHtml <- function(risk, hand, ppe){
+renderProtectionHtml <- function(risk, hand, ppe, ppe_type){
   
   risk_hand_0<-risk$exposure_risk
   risk_hand_1<-if_else(hand == TRUE,
@@ -248,15 +254,21 @@ renderProtectionHtml <- function(risk, hand, ppe){
   prob_hand_string<- formatPercent(risk_hand_delta)
 
   risk_ppe_0<-risk$exposure_risk
+  ppe_or = case_when(ppe_type == "n95" ~ n95_or,
+                     ppe_type == "surgical" ~ surgicalmasks_or,
+                     ppe_type == "othermasks" ~ 1, # no evidence for other types of masks
+                     ppe_type == "eyeprotection" ~ eyeprotection_or,
+                     TRUE ~ 1 #if ppe_type is NULL, then OR is 1, no risk reduction
+    )
   risk_ppe_1<-if_else(ppe == TRUE,
                        # default is wearing PPE, H1 is no PPE, divide OR
                        odds2risk(risk2odds(risk_ppe_0)/ppe_or),
                        # default is no PPE, H1 is with PPE, multiply OR
                        odds2risk(risk2odds(risk_ppe_0)*ppe_or))
   risk_ppe_delta<-if_else(ppe == TRUE,
-                          # default is hand washing, H1 is no hand washing, H0/H1
+                          # default is PPE, H1 is no PPE, H0/H1
                           abs(risk_ppe_0/risk_ppe_1-1),
-                          # default is no hand washing, H1 is hand washing, H1/H0
+                          # default is no PPE, H1 is PPE, H1/H0
                           abs(risk_ppe_1/risk_ppe_0-1))
   prob_ppe_string<- formatPercent(risk_ppe_delta)
   
@@ -273,22 +285,28 @@ renderProtectionHtml <- function(risk, hand, ppe){
       ". In general, this would lower people's risk of being exposed to COVID-19 by ", prob_hand_string, " . "))
   }
   
-  if (ppe == TRUE){
+  if (ppe == TRUE & ppe_type != "othermasks"){
     ppe_html = HTML(paste0(
       "Good to know you wear personal protection equipment per ", 
       tags$a("CDC guidelines", href = urls$cdc_ppe),
       ". In general, this lowers people's risk of being exposed to COVID-19 by ", prob_ppe_string, " . "))
-  } else{
+  } else if (ppe_type == "othermasks") {
+     ppe_html = HTML(paste0(
+      "Good to know you wear personal protection equipment per ", 
+      tags$a("CDC guidelines", href = urls$cdc_ppe),
+      ". While it certainly helps with slowing the spread of the disease, 
+      we don't have enough data to quantify the efficacy of masks other than surgical masks and N95 at the moment."))
+  }else{
     ppe_html = HTML(paste0(
       "We recommend you wear personal protection equipment per ", 
       tags$a("CDC guidelines", href = urls$cdc_ppe),
-      ". In general, this would lower people's risk of being exposed to COVID-19 by ", prob_ppe_string, " . "))
+      ". This would lower people's risk of being exposed to COVID-19."))
   }
   
   return(tags$p(hand_html, ppe_html))
 }
 
-renderResultsHtml <- function(risk, symptoms, hand, ppe) {
+renderResultsHtml <- function(risk, symptoms, hand, ppe, ppe_type = NULL) {
   
   # return
   tagList(
@@ -296,7 +314,7 @@ renderResultsHtml <- function(risk, symptoms, hand, ppe) {
     renderLocationHtml(risk),
     renderExposureHtml(risk, symptoms),
     renderSusceptibilityHtml(risk),
-    renderProtectionHtml(risk, hand, ppe),
+    renderProtectionHtml(risk, hand, ppe, ppe_type),
     renderScoreHtml(risk)
     # fluidRow(column(width = 4,
     #                 offset = 2,

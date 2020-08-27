@@ -191,7 +191,7 @@ server <- function(input, output, session) {
   output$res <-renderUI({
     risk <- updateRisk()
     # in src/results.R
-    renderResultsHtml(risk, input$symptoms, input$hand, input$ppe)
+    renderResultsHtml(risk, input$symptoms, input$hand, input$ppe, input$ppe_type)
   })
   
   output$methods <-renderUI({

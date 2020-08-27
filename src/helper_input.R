@@ -42,7 +42,7 @@ collapseStory <- function() {
       uiOutput("zipcontrol"),
       textInput('age', label = "What is your age?"),
       radioButtons('sex', "What sex were you assigned at birth?", 
-                   c("Male" = "male", "Female" = "female",  "Other" = "sex_other", "Perfer not to say" = "sex_other"), inline=TRUE),
+                   c("Male" = "male", "Female" = "female",  "Other" = "sex_other", "Prefer not to say" = "sex_other"), inline=TRUE),
       actionButton('next1', "Next", class = "btn btn-info btn-block")
     ), # bsCollapsePanel
     bsCollapsePanel(
@@ -87,6 +87,15 @@ collapseStory <- function() {
                                 tags$a("CDC guidance", href = urls$cdc_hand_hygiene))),
       checkboxInput("ppe", div("I wear personal protection equipment consistent with ",
                                tags$a("CDC guidelines", href = urls$cdc_ppe))),
+      #if ppe is true, then offer more choices                        
+      conditionalPanel(
+        condition = "input.ppe == true",
+        radioButtons("ppe_type", "What kind of PPE?",
+                           c("N95" = "n95",
+                             "Surgical masks" = "surgical",
+                             "Other masks" = "othermasks",
+                             "Eye protection" = "eyeprotection"
+                             ))),
       actionButton('go', "Calculate", class = "btn btn-primary btn-block")
     ) # bsCollapsePanel
   ) # bsCollapse

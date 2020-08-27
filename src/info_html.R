@@ -93,6 +93,9 @@ renderMethodsHtml <- function() {
                               "not only in people with COVID-19. ", "In using these ratios to adjust death risk for individuals with COVID-19, ",
                               "we make the assumption that risk of contracting COVID-19 is similar for those with and without each condition.")),
       ),
+       tags$li("Estimations for the effects of face masks and eye protection on virus transmission are from", 
+              tags$a("Chu et al (2020).", href = urls$chu_etal_2020)
+      )
     ),
     tags$p(""),
     tags$p("We'll be doing our best to update these assumptions as additional knowledge about the virus becomes available.")
