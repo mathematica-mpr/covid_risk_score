@@ -15,19 +15,17 @@ logodds2risk <- function(logodds){
   }
 
 calculateRisk <- function(input, county_data) {
-  casecount_newer <- county_data$casecount_newer
-  casecount_older<-county_data$casecount_older
+  moving_casecount <- county_data$moving_casecount
   population<-county_data$population
   underreport_factor<-county_data$underreport_factor
-  total_covid_count_newer = casecount_newer * underreport_factor
-  total_covid_count = total_covid_count_newer + casecount_older
-  
+  total_moving_casecount = moving_casecount * underreport_factor
+
   #risk calculator
-  active_casecount = total_covid_count_newer - casecount_newer
+  active_casecount = total_moving_casecount - moving_casecount
   
   # ASSUMPTION: active community case count cannot be less than 10% of reported cases
-  if (active_casecount < 0.1 * casecount_newer) {
-    active_casecount = 0.1 * casecount_newer
+  if (active_casecount < 0.1 * moving_casecount) {
+    active_casecount = 0.1 * moving_casecount
   }
   
   # risk of exposure
@@ -167,13 +165,13 @@ renderLocationHtml <- function(risk) {
   div(
     title = "Location",
     tags$p(div('We found data from ', formatDynamicString(county_data$name), ' for your zip code. As of ', 
-               formatDynamicString(latest_day), ', this county has ', formatDynamicString(format(county_data$casecount, big.mark=",")), 
-               ' total confirmed COVID-19. We estimated that  out of the total confirmed cases',
-               formatDynamicString(format(round(county_data$casecount_newer + county_data$casecount_older), big.mark =",")), 
-               'of people are still sick. Many people who contract COVID-19 are not tested, and therefore not reported. 
+               formatDynamicString(latest_day), ', this county has reported', formatDynamicString(format(round(county_data$moving_casecount), big.mark =",")),
+               ' confirmed COVID-19 over the last 14 days and ',
+               formatDynamicString(format(county_data$casecount, big.mark=",")), 
+               ' confirmed COVID-19 cases total. Many people who contract COVID-19 are not tested, and therefore not reported. 
                We estimate that your county has an under-reporting factor of ', underreport_factor_string, 
-               '. Accounting for the under-reporting factor and average lenght of sickness, we estimate there are ',
-               formatDynamicString(format(round(county_data$casecount_newer*county_data$underreport_factor + county_data$casecount_older), big.mark =",")),
+               '. Accounting for the under-reporting factor and average length of sickness, we estimate there are ',
+               formatDynamicString(format(round(county_data$moving_casecount*(county_data$underreport_factor-1)), big.mark =",")),
                ' sick people distributed through the county who are not officially reported.'
     ))
   )
