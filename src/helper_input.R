@@ -91,10 +91,10 @@ collapseStory <- function() {
       conditionalPanel(
         condition = "input.ppe == true",
         radioButtons("ppe_type", "What kind of PPE?",
-                           c("N95" = "n95",
-                             "Surgical masks" = "surgical",
-                             "Other masks" = "othermasks",
-                             "Eye protection" = "eyeprotection"
+                           c("N95 respirators or similar" = "n95",
+                             "Surgical or similar masks (eg, 12-16 layer cotton or gauze masks)" = "surgical",
+                             "Other masks (cotton, fleece, bandana)" = "othermasks",
+                             "Eye protection (eg, goggles or face shields)" = "eyeprotection"
                              ))),
       actionButton('go', "Calculate", class = "btn btn-primary btn-block")
     ) # bsCollapsePanel
