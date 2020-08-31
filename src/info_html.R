@@ -44,6 +44,15 @@ renderMethodsHtml <- function() {
         " and the average length of sickenss reported by ", tags$a("Wolfel et al (2020)", href = urls$wolfer_etall_2020), " and the ",
         tags$a("COVID Symptom Study", href = urls$covid_symptom_study), 
         "to calculate the percentage of cases that are currently known and presumably quarantined, versus the number of active cases in the community."),
+        
+       tags$ul(tags$li("The methodoloy from ", tags$a("Russell et al (2020)", href = urls$russel_etal_2020),
+                       " uses the county-level case fatality rate (CFR) to estimate the percentage of cases that are not reported. ",
+                       "Because the CFR is noisy for counties with few cases, we use a ", 
+                       tags$a("Bayesian adjustment", href = urls$conjugate_priors), " to shrink the county CFR ",
+                       "towards the state CFR.",
+                       "The result is that for counties with many cases, we essentially use the county-level CFR, ",
+                       "but for counties with only a few cases we use a CFR that is partway between the county and state CFRs.")),
+  
       tags$li(
         "Estimations of probability of symptomatic COVID-19 is calculated using a linear model developed by ",
         tags$a("Menni et al (2020).", href = urls$menni_etall_2020)
