@@ -1,10 +1,10 @@
 library(shiny)
 library(shinycssloaders)
 library(shinythemes)
+source("src/global_var.R")
 source("src/helper_county.R")
 source("src/helper_input.R")
 source("src/info_html.R")
-source("src/global_var.R")
 source("src/results.R")
 source("src/calculate_female_rate.R")
 
@@ -115,16 +115,14 @@ server <- function(input, output, session) {
       population <- KC_fips_ls %>% map(~get_county_pop(.))%>%unlist()%>%sum()
       name <- "Kansas City and surrounding counties"
       casecount <- get_county_casecount("29095", latest_day)
-      casecount_newer <- get_county_moving_casecount("29095", 0, 14)
-      casecount_older <- get_county_moving_casecount("29095", 14, 28)
+      moving_casecount <- get_county_moving_casecount("36061", 0, 14)
       underreport_factor <- calc_county_underreport("29095")
     } else{
       #get county-level characteristics
       population <- get_county_pop(fips)
       name <- get_county_name(fips)
       casecount <- get_county_casecount(fips, latest_day)
-      casecount_newer <- get_county_moving_casecount(fips, 0, 14)
-      casecount_older <- get_county_moving_casecount(fips, 14, 28)
+      moving_casecount <- get_county_moving_casecount(fips, 0, 14)
       underreport_factor <- calc_county_underreport(fips)
     }
     
@@ -132,8 +130,7 @@ server <- function(input, output, session) {
                  population = population,
                  name = name,
                  casecount = casecount,
-                 casecount_newer = casecount_newer,
-                 casecount_older = casecount_older,
+                 moving_casecount = moving_casecount,
                  underreport_factor = underreport_factor))
   })
 
