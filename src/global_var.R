@@ -10,15 +10,7 @@ fips<-""
 #odds ratio for hand washing
 hand_or<-0.45 #https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2190272/
 #odds ratio for wearing PPE
-n95_or <- 0.04 #https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(20)31142-9/fulltext
-surgicalmasks_or <- 0.33
-eyeprotection_or <- 0.22
-# droplet transmission adjustment from (Fischer et al, 2020)
-# cotton <- 0.1032
-# bandana <- 0.5184
-# surgical <- 0.02
-# n95 <- 0.001
-
+ppe_or<-0.32 #https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2190272/
 #transmissibility of regular close contact
 transmissibility<-0.0045 #https://www.cdc.gov/mmwr/volumes/69/wr/pdfs/mm6909e1-H.pdf
 #transmissibility of household close contact
@@ -108,8 +100,6 @@ urls  = list(
   covid_symptom_study = "https://covid19.joinzoe.com/us/about", 
   menni_etall_2020 = "https://www.nature.com/articles/s41591-020-0916-2",
   simonnet_etall_2020 = "https://onlinelibrary.wiley.com/doi/full/10.1002/oby.22831?af=R", 
-  chu_etal_2020 = "https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(20)31142-9/fulltext",
-  fischer_etal_2020 = "https://advances.sciencemag.org/content/early/2020/08/07/sciadv.abd3083",
   # misc
   conjugate_priors = "https://en.wikipedia.org/wiki/Conjugate_prior",
   # social
