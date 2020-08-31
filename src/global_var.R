@@ -97,7 +97,8 @@ urls  = list(
   cdc_hosp_June2020 = "https://www.cdc.gov/mmwr/volumes/69/wr/mm6925e1.htm",
   cdc_pregnancy = "https://www.cdc.gov/coronavirus/2019-ncov/need-extra-precautions/people-with-medical-conditions.html?CDC_AA_refVal=https%3A%2F%2Fwww.cdc.gov%2Fcoronavirus%2F2019-ncov%2Fneed-extra-precautions%2Fgroups-at-higher-risk.html#pregnancy",
   # NYT
-  nytimes_data_article = "https://www.nytimes.com/article/coronavirus-county-data-us.html",
+  #nytimes_data_article = "https://www.nytimes.com/article/coronavirus-county-data-us.html",
+  usafacts_data = "https://usafacts.org/visualizations/coronavirus-covid-19-spread-map/",
   # papers
   caramelo_etal_2020 = "https://www.medrxiv.org/content/10.1101/2020.02.24.20027268v1",
   russel_etal_2020 = "https://cmmid.github.io/topics/covid19/global_cfr_estimates.html",
@@ -107,8 +108,13 @@ urls  = list(
   covid_symptom_study = "https://covid19.joinzoe.com/us/about", 
   menni_etall_2020 = "https://www.nature.com/articles/s41591-020-0916-2",
   simonnet_etall_2020 = "https://onlinelibrary.wiley.com/doi/full/10.1002/oby.22831?af=R", 
+<<<<<<< HEAD
   chu_etal_2020 = "https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(20)31142-9/fulltext",
   fischer_etal_2020 = "https://advances.sciencemag.org/content/early/2020/08/07/sciadv.abd3083",
+=======
+  # misc
+  conjugate_priors = "https://en.wikipedia.org/wiki/Conjugate_prior",
+>>>>>>> 0f8d59ad07f4f91ee9b2de72d4bb2cdb62855dea
   # social
   twitter_button = "https://twitter.com/intent/tweet?text=Find%20your%20COVID-19%20risk%20score!&url=https://19andme.shinyapps.io/covid_risk_score/",
   twitter_widget = "http://platform.twitter.com/widgets.js",

@@ -35,15 +35,25 @@ renderMethodsHtml <- function() {
     tags$ol(
       tags$li(
         "To calculate exposure, we used ",
-        tags$a("the New York Times's published data on COVID-19 cases & deaths", href = urls$nytimes_data_article),
+        tags$a("the USAFacts published data on COVID-19 cases & deaths", href = urls$usafacts_data),
         "to estimate the prevalence of infected people within your county. 
-        For the five boroughs in New York City, we use the overall New York City COVID-19 data."),
+        USAFacts reports all Kansas city cases under Jackson County, MO even though three other counties overlap Kansas City,", 
+        "so we report cases for all four of these counties aggregated together into 'Kansas City and surrounding counties'."),
       tags$li(
         "Due to rapid spread and insufficient testing during the COVID-19 pandemic, there are likely additional unreported cases beyond the 
         officially reported cases. We combined the methodology reported by ",  tags$a("Russell et al (2020)", href = urls$russel_etal_2020), 
         " and the average length of sickenss reported by ", tags$a("Wolfel et al (2020)", href = urls$wolfer_etall_2020), " and the ",
         tags$a("COVID Symptom Study", href = urls$covid_symptom_study), 
         "to calculate the percentage of cases that are currently known and presumably quarantined, versus the number of active cases in the community."),
+        
+       tags$ul(tags$li("The methodoloy from ", tags$a("Russell et al (2020)", href = urls$russel_etal_2020),
+                       " uses the county-level case fatality rate (CFR) to estimate the percentage of cases that are not reported. ",
+                       "Because the CFR is noisy for counties with few cases, we use a ", 
+                       tags$a("Bayesian adjustment", href = urls$conjugate_priors), " to shrink the county CFR ",
+                       "towards the state CFR.",
+                       "The result is that for counties with many cases, we essentially use the county-level CFR, ",
+                       "but for counties with only a few cases we use a CFR that is partway between the county and state CFRs.")),
+  
       tags$li(
         "Estimations of probability of symptomatic COVID-19 is calculated using a linear model developed by ",
         tags$a("Menni et al (2020).", href = urls$menni_etall_2020)
