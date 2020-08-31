@@ -35,9 +35,10 @@ renderMethodsHtml <- function() {
     tags$ol(
       tags$li(
         "To calculate exposure, we used ",
-        tags$a("the New York Times's published data on COVID-19 cases & deaths", href = urls$nytimes_data_article),
+        tags$a("the USAFacts published data on COVID-19 cases & deaths", href = urls$usafacts_data),
         "to estimate the prevalence of infected people within your county. 
-        For the five boroughs in New York City, we use the overall New York City COVID-19 data."),
+        USAFacts reports all Kansas city cases under Jackson County, MO even though three other counties overlap Kansas City,", 
+        "so we report cases for all four of these counties aggregated together into 'Kansas City and surrounding counties'."),
       tags$li(
         "Due to rapid spread and insufficient testing during the COVID-19 pandemic, there are likely additional unreported cases beyond the 
         officially reported cases. We combined the methodology reported by ",  tags$a("Russell et al (2020)", href = urls$russel_etal_2020), 
