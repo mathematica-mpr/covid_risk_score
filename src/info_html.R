@@ -80,7 +80,7 @@ renderMethodsHtml <- function() {
                               "To avoid overinflating risk due to the odds ratios being unadjusted, we adjust only for ",
                               "the two highest risk conditions inputted by the user. ",
                               "To adjust for obesity, we use the mutually adjusted odds ratio from ",
-                              tags$a("Simonnet et al (2020)", href = urls$simonnet_ettal), "."),
+                              tags$a("Simonnet et al (2020)", href = urls$simonnet_etall_2020), "."),
                       tags$li("To adjust death risk, we use mutually adjusted odds ratios from ",
                               tags$a("OpenSAFELY. ", href = urls$open_safely), ". ",
                               "This paper does not report odds ratios for ", 
