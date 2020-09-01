@@ -89,7 +89,7 @@ renderMethodsHtml <- function() {
                               " and only adjust for this category if no other conditions are inputted by the user. ",
                               "When the reported ratio is below 1, we bring it up to 1, ",
                               "reflecting the assumption that underlying medical conditions do not lessen suseptibility to COVID-19.",
-                              "The ratios from OpenSAFELY pertain to risk of death from COVID-19 in the entire population, ",
+                              "The ratios from OpenSAFELY pertain to risk of in hospital death from COVID-19 in the entire population, ",
                               "not only in people with COVID-19. ", "In using these ratios to adjust death risk for individuals with COVID-19, ",
                               "we make the assumption that risk of contracting COVID-19 is similar for those with and without each condition.")),
       ),
