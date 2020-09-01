@@ -15,39 +15,22 @@ logodds2risk <- function(logodds){
   }
 
 calculateRisk <- function(input, county_data) {
-  casecount_newer <- county_data$casecount_newer
-  casecount_older<-county_data$casecount_older
+  moving_casecount <- county_data$moving_casecount
   population<-county_data$population
   underreport_factor<-county_data$underreport_factor
-  total_covid_count_newer = casecount_newer * underreport_factor
-  total_covid_count = total_covid_count_newer + casecount_older
+  total_moving_casecount = moving_casecount * underreport_factor
+
   #risk calculator
-  if(input$is_sick){
-    # if you're already sick with symptoms, odds of covid come from https://www.nature.com/articles/s41591-020-0916-2
-    community_exposure_risk = total_covid_count / population
-    # min input age is 18
-    age <- as.numeric(input$age) %>% ifelse(.<18, 18,.)
-    sex <- ifelse(input$gender == "male", 1, 0)
-    sympt_covid_logodds <- (-1.32) - (0.01*age) + (0.44*sex) + (1.75*"is_loss_smell_taste" %in% input$symptoms) + 
-      (0.31*"is_cough" %in% input$symptoms) + (0.49*"is_fatigue" %in% input$symptoms) + (0.39*"is_skip_meal" %in% input$symptoms)
-    
-    sympt_covid_risk <- logodds2risk(sympt_covid_logodds)
-    sympt_odds <- risk2odds(sympt_covid_risk)
-    exposure_risk <- odds2risk(risk2odds(community_exposure_risk)*sympt_odds)
-    
-  } else {
-    # ASSUMPTION: diagnosed cases are not active and undiagnosed cases get better in 2 weeks
-    active_casecount = total_covid_count_newer - casecount_newer
-    
-    # ASSUMPTION: active community case count cannot be less than 10% of reported cases
-    if (active_casecount < 0.1 * casecount_newer) {
-      active_casecount = 0.1 * casecount_newer
-    }
-    prev_active<-active_casecount/population #prevalence of active cases
-    exposure_risk <- 1-(1-prev_active*transmissibility_household)^(input$nppl+input$nppl2*transmissibility_household)
-    sympt_covid_risk <- 0
-    
-  } 
+  active_casecount = total_moving_casecount - moving_casecount
+  
+  # ASSUMPTION: active community case count cannot be less than 10% of reported cases
+  if (active_casecount < 0.1 * moving_casecount) {
+    active_casecount = 0.1 * moving_casecount
+  }
+  
+  # risk of exposure
+  prev_active<- active_casecount/population #prevalence of active cases
+  exposure_risk <- 1-(1-prev_active*transmissibility_household)^(input$nppl+input$nppl2*transmissibility_household)
   
   # exposure modifier
   if(input$hand){
@@ -58,12 +41,43 @@ calculateRisk <- function(input, county_data) {
     exposure_risk<-odds2risk(risk2odds(exposure_risk)*ppe_or)
   }
   
+  # if you select symptoms, odds of covid come from https://www.nature.com/articles/s41591-020-0916-2
+  if(!is.null(input$symptoms)){
+    age <- as.numeric(input$age) %>% ifelse(.<18, 18,.) # min input age is 18
+    # sex_other is average of male and female risk
+    sex_symp_val <- case_when(
+      input$sex == "male" ~ 1,
+      input$sex == "female" ~ 0,
+      input$sex == "sex_other" ~ 0.5,
+      TRUE ~ NA_real_)
+    
+    sympt_covid_logodds <- (-1.32) - (0.01*age) + (0.44*sex_symp_val) + (1.75*"is_loss_smell_taste" %in% input$symptoms) + 
+      (0.31*"is_cough" %in% input$symptoms) + (0.49*"is_fatigue" %in% input$symptoms) + (0.39*"is_skip_meal" %in% input$symptoms)
+    
+    sympt_covid_risk <- logodds2risk(sympt_covid_logodds) 
+  } else {
+    sympt_covid_risk <- 0
+  } 
+
+  
+  # total risk of covid is the risk you have sympt covid and could get covid through exposure 
+  total_covid_risk <- sympt_covid_risk + exposure_risk*(1 - sympt_covid_risk)
+  
   # susceptibility calculation
   age = as.numeric(input$age)
   age_index = max(which(age_list <= age))
-  hosp_prob = hosp_list_female[age_index] # start with female and multiply up if user inputs male
-  icu_prob = icu_list_female[age_index]
-  death_prob = death_list_female[age_index]
+  
+  # if sex is "sex_other" then use given probs if else (sex is female or male), calc female probs
+  if(input$sex == "sex_other"){
+    hosp_prob = hosp_list[age_index] # start with female and multiply up if user inputs male
+    icu_prob = icu_list[age_index]
+    death_prob = death_list[age_index]
+  } else {
+    hosp_prob = hosp_list_female[age_index] # start with female and multiply up if user inputs male
+    icu_prob = icu_list_female[age_index]
+    death_prob = death_list_female[age_index]
+    }
+  
   hosp_odds = risk2odds(hosp_prob)
   icu_odds = risk2odds(icu_prob)
   death_odds = risk2odds(death_prob)
@@ -89,9 +103,7 @@ calculateRisk <- function(input, county_data) {
     icu_odds = icu_odds * prod(conditions_df$icu, na.rm=T)
     death_odds = death_odds * prod(conditions_df$death, na.rm=T)
   }
-  
-  ## Adjust for sex
-  if (input$gender == "male") {
+  if (input$sex == "male") {
     hosp_odds = hosp_odds * male_or[1] # base odds are the female odds, multiplied by male_or if male
     icu_odds = icu_odds * male_or[2]
     death_odds = death_odds * male_or[3]
@@ -114,10 +126,11 @@ calculateRisk <- function(input, county_data) {
     # 0 means 1/1000 times the disease burden of flu
     return(normalized)
   }
-  score<-if_else(exposure_risk>0, g(exposure_risk, hosp_risk, icu_risk, death_risk), 1)
+  score<-if_else(total_covid_risk>0, g(total_covid_risk, hosp_risk, icu_risk, death_risk), 1)
   return (list(county_data = county_data,
                sympt_covid_risk = sympt_covid_risk,
                exposure_risk = exposure_risk,
+               total_covid_risk = total_covid_risk,
                hosp_risk = hosp_risk,
                icu_risk = icu_risk,
                death_risk = death_risk,
@@ -146,13 +159,13 @@ renderLocationHtml <- function(risk) {
   div(
     title = "Location",
     tags$p(div('We found data from ', formatDynamicString(county_data$name), ' for your zip code. As of ', 
-               formatDynamicString(latest_day), ', this county has ', formatDynamicString(format(county_data$casecount, big.mark=",")), 
-               ' total confirmed COVID-19. We estimated that  out of the total confirmed cases',
-               formatDynamicString(format(round(county_data$casecount_newer + county_data$casecount_older), big.mark =",")), 
-               'of people are still sick. Many people who contract COVID-19 are not tested, and therefore not reported. 
+               formatDynamicString(latest_day), ', this county has reported', formatDynamicString(format(round(county_data$moving_casecount), big.mark =",")),
+               ' confirmed COVID-19 over the last 14 days and ',
+               formatDynamicString(format(county_data$casecount, big.mark=",")), 
+               ' confirmed COVID-19 cases total. Many people who contract COVID-19 are not tested, and therefore not reported. 
                We estimate that your county has an under-reporting factor of ', underreport_factor_string, 
-               '. Accounting for the under-reporting factor and average lenght of sickness, we estimate there are ',
-               formatDynamicString(format(round(county_data$casecount_newer*county_data$underreport_factor + county_data$casecount_older), big.mark =",")),
+               '. Accounting for the under-reporting factor and average length of sickness, we estimate there are ',
+               formatDynamicString(format(round(county_data$moving_casecount*(county_data$underreport_factor-1)), big.mark =",")),
                ' sick people distributed through the county who are not officially reported.'
     ))
   )
@@ -182,24 +195,28 @@ renderScoreHtml <- function(risk) {
   )))
 }
 
-renderExposureHtml <- function(risk, is_sick) {
+renderExposureHtml <- function(risk, symptoms) {
   prob_flu_string = formatPercent(prob_flu)
   risk_string = formatPercent(risk$exposure_risk)
   sympt_covid_string = formatPercent(risk$sympt_covid_risk)
-  sickness_html = tags$p(HTML(paste0(
-    "Among people who are the same age, sex, and health status as you, and have behaviors and levels of interaction with others that are similar to yours, the estimated probability of catching COVID-19 through community transmission in a week is ", 
-    risk_string, '. ',
-    "For comparison, ", prob_flu_string, ' of Americans catch the flu every week during flu season.')))
+  exposure_text = paste0(
+    "Among people who are the same health status as you and have behaviors and levels of interaction 
+    with others that are similar to yours, the estimated probability of catching COVID-19 through community transmission in a week is ", 
+    risk_string, '. ', "For comparison, ", prob_flu_string, ' of Americans catch the flu every week during flu season.')
+  sickness_text = (paste0(
+    "Based on the symptom(s) you selected, the probability that you have symptomatic COVID-19 is ", sympt_covid_string,
+    ". If you are experiencing symptoms associated with COVID-19, please immediately consult ", 
+    tags$a("the CDC's instructions", href = urls$cdc_if_sick),
+    ", or walk through their ",
+    tags$a("self-checker", href = urls$cdc_chatbot), '.'))
   
-  if (is_sick == TRUE) {
-    sickness_html = tags$p(HTML(paste0(
-      "Since you are experiencing symptoms correlated to COVID-19, please immediately consult ", 
-      tags$a("the CDC's instructions", href = urls$cdc_if_sick),
-      ", or walk through their ",
-      tags$a("self-checker", href = urls$cdc_chatbot),
-      ". The probability that you have symptomatic COVID-19 is ", sympt_covid_string, '. ')))
+  if (!is.null(symptoms)) {
+    total_risk_html = tags$p(HTML(paste0(exposure_text, "<br> <br>", sickness_text)))
+  } else {
+    total_risk_html = tags$p(HTML(paste0(exposure_text)))
   }
-  return (sickness_html)
+  
+  return (total_risk_html)
 }
 
 renderSusceptibilityHtml <- function(risk) {
@@ -269,13 +286,13 @@ renderProtectionHtml <- function(risk, hand, ppe){
   return(tags$p(hand_html, ppe_html))
 }
 
-renderResultsHtml <- function(risk, is_sick, hand, ppe) {
+renderResultsHtml <- function(risk, symptoms, hand, ppe) {
   
   # return
   tagList(
     tags$p(""),
     renderLocationHtml(risk),
-    renderExposureHtml(risk, is_sick),
+    renderExposureHtml(risk, symptoms),
     renderSusceptibilityHtml(risk),
     renderProtectionHtml(risk, hand, ppe),
     renderScoreHtml(risk)

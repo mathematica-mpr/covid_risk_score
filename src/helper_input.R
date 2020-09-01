@@ -41,7 +41,8 @@ collapseStory <- function() {
       textInput('zip', label = "What is your 5-digit zip code?"),
       uiOutput("zipcontrol"),
       textInput('age', label = "What is your age?"),
-      radioButtons('gender', "Are you female or male?", c("Female" = "female", "Male" = "male"), inline=TRUE),
+      radioButtons('sex', "What sex were you assigned at birth?", 
+                   c("Male" = "male", "Female" = "female",  "Other" = "sex_other", "Prefer not to say" = "sex_other"), inline=TRUE),
       actionButton('next1', "Next", class = "btn btn-info btn-block")
     ), # bsCollapsePanel
     bsCollapsePanel(
@@ -54,7 +55,8 @@ collapseStory <- function() {
                            c("Loss of smell and taste" = "is_loss_smell_taste",
                              "Severe or significant persistent cough" = "is_cough",
                              "Severe fatigue" = "is_fatigue",
-                             "Loss of appetite, skipped meals" = "is_skip_meal"
+                             "Loss of appetite, skipped meals" = "is_skip_meal",
+                             "My symptoms are not listed here" = "is_other" 
                              ))),
       hr(),
       
@@ -63,7 +65,7 @@ collapseStory <- function() {
       
       conditionalPanel(
         condition = "input.has_preexisting == true",
-        checkboxGroupInput("Conditions", "Conditions", # this is written this way to allow html math in obesity test
+        checkboxGroupInput("conditions", "Conditions", # this is written this way to allow html math in obesity test
                            choiceNames = lapply(names(conditions_list), HTML),
                            choiceValues = unname(conditions_list)
         ),

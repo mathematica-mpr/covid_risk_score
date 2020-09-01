@@ -4,6 +4,7 @@ library(tidycensus)
 library(assertr)
 library(flexdashboard)
 library(httr)
+library(lubridate)
 
 httr::set_config(config(ssl_verifypeer = 0L))
 
@@ -14,22 +15,50 @@ data("fips_codes")
 fips_codes<-fips_codes%>%
   mutate(fips = paste0(state_code, county_code))
 
+#priors for de-noising CFR
+CFR_state_priors <- read_csv("data/state_CFR_priors.csv")
+
 #Read in NYT covid-19 county-level data
 #NYT county-level data
-nyt_url <- "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv"
+#nyt_url <- "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv"
 #GET(nyt_url, write_disk("data/us-counties.csv", overwrite=TRUE))
-response<-GET(nyt_url)
-df <- response$content%>%
-  rawToChar()%>%
-  read_csv()%>%
-  mutate(fips = case_when(county == "New York City" & state == "New York" ~ "36061",
-                          county == "Kansas City" & state == "Missouri" ~ "29095",
-                          TRUE ~ fips))%>%
-  select(-c(state,county))
+#response<-GET(nyt_url)
+#df <- response$content%>%
+#  rawToChar()%>%
+#  read_csv()%>%
+#  mutate(fips = case_when(county == "New York City" & state == "New York" ~ "36061",
+#                          county == "Kansas City" & state == "Missouri" ~ "29095",
+#                          TRUE ~ fips))%>%
+#  select(-c(state,county))
+#latest_day = df$date%>%max()
+
+# get USAFacts cases and death data
+usafacts_cases_url <- "https://usafactsstatic.blob.core.windows.net/public/data/covid-19/covid_confirmed_usafacts.csv"
+usafacts_deaths_url <- "https://usafactsstatic.blob.core.windows.net/public/data/covid-19/covid_deaths_usafacts.csv"
+
+process_usafacts_data <- function(dat_raw, type){
+  stopifnot(type %in% c("cases","deaths"))
+  dat_raw %>% .$content %>% rawToChar() %>% read_csv()  %>%
+    gather(date, !!sym(type), names(.)[grepl("^\\d",names(.))]) %>%
+    set_names(tolower(gsub("[^A-Za-z]","",names(.)))) %>% 
+    rename(fips=countyfips, county=countyname) %>%
+    mutate(fips = str_pad(fips, width=5, pad="0"),
+           date = mdy(date)) %>%
+    select_if(names(.) %in% c("date","fips","cases","deaths", "state"))
+}
+
+cases<-GET(usafacts_cases_url) %>% process_usafacts_data(type="cases")
+deaths<-GET(usafacts_deaths_url) %>% process_usafacts_data(type="deaths") 
+df <- full_join(cases, deaths, by=c("date","fips","state")) %>%
+  mutate(fips = case_when(fips %in% KC_fips_ls ~ "29095",
+                          T ~ fips),
+         state = case_when(fips %in% KC_fips_ls ~ "MO",
+                          T ~ state)) %>% 
+  group_by(fips, date, state) %>% summarise_at(c("cases","deaths"), sum) %>% ungroup()
+stopifnot(!is.na(cases), !is.na(deaths))
+
 latest_day = df$date%>%max()
 
-
-#utiity function
 named_group_split <- function(.tbl, ...) {
   grouped <- group_by(.tbl, ...)
   names <- rlang::eval_bare(rlang::expr(paste(!!!group_keys(grouped), sep = " / ")))
@@ -146,6 +175,10 @@ get_county_deathcount<-function(key, date){
 #                           get_county_casecount("06001", as.Date("2020-03-27")-13))
 
 calc_county_underreport<-function(fips){
+  state = unique(df$state[df$fips==fips])
+  stopifnot(length(state)==1)
+  prior_dist <- CFR_state_priors[CFR_state_priors$state==state,]
+  
   #calculate the underreporting factor using case fatality rate, following methods in (TW Russell, 2020)
   true_mortality_rate <-0.0138 # a big study from China
   #number of death today
@@ -153,7 +186,12 @@ calc_county_underreport<-function(fips){
   #number of infected cases 13 days ago
   n_case_13d<-get_county_casecount(fips, latest_day-13)
   #calculate underreporting factor as cfr/true mortality
-  fac_underreport <- n_death_today/n_case_13d/true_mortality_rate
+  if (state=="DC"){fac_underreport <- n_death_today/n_case_13d/true_mortality_rate}
+  else {
+    stopifnot(nrow(prior_dist)==1)
+    # Bayesian adjustment using beta prior
+    fac_underreport <- (n_death_today + prior_dist$shape1)/(n_case_13d + prior_dist$shape2)/true_mortality_rate 
+  }
   #if cfr is zero, the underreporting factor is NA, then force it to be US average
   us_average<-us_death_today/us_case_13d/true_mortality_rate
   return(case_when(fac_underreport==0 ~ us_average,

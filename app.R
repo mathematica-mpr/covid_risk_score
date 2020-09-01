@@ -1,10 +1,10 @@
 library(shiny)
 library(shinycssloaders)
 library(shinythemes)
+source("src/global_var.R")
 source("src/helper_county.R")
 source("src/helper_input.R")
 source("src/info_html.R")
-source("src/global_var.R")
 source("src/results.R")
 source("src/calculate_female_rate.R")
 
@@ -12,7 +12,8 @@ source("src/calculate_female_rate.R")
 ui <- fluidPage(
   theme=shinytheme("superhero"),
   titlePanel(fluidRow(column(width = 9, "19 and Me: COVID-19 Risk Score Calculator"),
-                      column(width = 3, img(src = 'MathematicaLogo_White_smaller.png',class = "pull-right")))),
+                      column(width = 3, img(src = 'MathematicaLogo_White_smaller.png',class = "pull-right"))),
+             windowTitle = "19 and Me: COVID-19 Risk Calculator"),
   # google analytics tracking
   tags$head(includeHTML("src/google-analytics.html")),
   
@@ -111,22 +112,18 @@ server <- function(input, output, session) {
     } else if (is_empty(fips)){
       fips <-input$fips0
     }
-    
-    #fix NYC, all NYC borough data uses NY county
-    if (fips%in%NY_fips_ls){
-      population <- NY_fips_ls%>%map(~get_county_pop(.))%>%unlist()%>%sum()
-      name <- "New York City (5 Boroughs)"
-      casecount <- get_county_casecount("36061", latest_day)
-      casecount_newer <- get_county_moving_casecount("36061", 0, 14)
-      casecount_older <- get_county_moving_casecount("36061", 14, 28)
-      underreport_factor <- calc_county_underreport("36061")
+    if (fips%in%KC_fips_ls){
+      population <- KC_fips_ls %>% map(~get_county_pop(.))%>%unlist()%>%sum()
+      name <- "Kansas City and surrounding counties"
+      casecount <- get_county_casecount("29095", latest_day)
+      moving_casecount <- get_county_moving_casecount("36061", 0, 14)
+      underreport_factor <- calc_county_underreport("29095")
     } else{
       #get county-level characteristics
       population <- get_county_pop(fips)
       name <- get_county_name(fips)
       casecount <- get_county_casecount(fips, latest_day)
-      casecount_newer <- get_county_moving_casecount(fips, 0, 14)
-      casecount_older <- get_county_moving_casecount(fips, 14, 28)
+      moving_casecount <- get_county_moving_casecount(fips, 0, 14)
       underreport_factor <- calc_county_underreport(fips)
     }
     
@@ -134,8 +131,7 @@ server <- function(input, output, session) {
                  population = population,
                  name = name,
                  casecount = casecount,
-                 casecount_newer = casecount_newer,
-                 casecount_older = casecount_older,
+                 moving_casecount = moving_casecount,
                  underreport_factor = underreport_factor))
   })
 
@@ -193,7 +189,7 @@ server <- function(input, output, session) {
   output$res <-renderUI({
     risk <- updateRisk()
     # in src/results.R
-    renderResultsHtml(risk, input$is_sick, input$hand, input$ppe)
+    renderResultsHtml(risk, input$symptoms, input$hand, input$ppe)
   })
   
   output$methods <-renderUI({

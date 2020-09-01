@@ -35,17 +35,27 @@ renderMethodsHtml <- function() {
     tags$ol(
       tags$li(
         "To calculate exposure, we used ",
-        tags$a("the New York Times's published data on COVID-19 cases & deaths", href = urls$nytimes_data_article),
+        tags$a("the USAFacts published data on COVID-19 cases & deaths", href = urls$usafacts_data),
         "to estimate the prevalence of infected people within your county. 
-        For the five boroughs in New York City, we use the overall New York City COVID-19 data."),
+        USAFacts reports all Kansas city cases under Jackson County, MO even though three other counties overlap Kansas City,", 
+        "so we report cases for all four of these counties aggregated together into 'Kansas City and surrounding counties'."),
       tags$li(
         "Due to rapid spread and insufficient testing during the COVID-19 pandemic, there are likely additional unreported cases beyond the 
         officially reported cases. We combined the methodology reported by ",  tags$a("Russell et al (2020)", href = urls$russel_etal_2020), 
         " and the average length of sickenss reported by ", tags$a("Wolfel et al (2020)", href = urls$wolfer_etall_2020), " and the ",
         tags$a("COVID Symptom Study", href = urls$covid_symptom_study), 
         "to calculate the percentage of cases that are currently known and presumably quarantined, versus the number of active cases in the community."),
+        
+       tags$ul(tags$li("The methodoloy from ", tags$a("Russell et al (2020)", href = urls$russel_etal_2020),
+                       " uses the county-level case fatality rate (CFR) to estimate the percentage of cases that are not reported. ",
+                       "Because the CFR is noisy for counties with few cases, we use a ", 
+                       tags$a("Bayesian adjustment", href = urls$conjugate_priors), " to shrink the county CFR ",
+                       "towards the state CFR.",
+                       "The result is that for counties with many cases, we essentially use the county-level CFR, ",
+                       "but for counties with only a few cases we use a CFR that is partway between the county and state CFRs.")),
+  
       tags$li(
-        "Estimations of probability of symptomatic COVID-19 is calculated using a linear model developed by ",
+        "Estimations of probability of having COVID-19 given symptoms is calculated using a logistic regression model developed by ",
         tags$a("Menni et al (2020).", href = urls$menni_etall_2020)
       ),
       tags$li("Other methods of becoming infected (e.g. touching an infected surface) are not accounted for by this calculator."),
@@ -54,7 +64,7 @@ renderMethodsHtml <- function() {
         tags$a("Verity et al (2020).", href = urls$verity_etal_2020),
         "We chose this study over US CDC reports because this study is larger and more thorough. We do not account for differences between Chinese population and US population."
       ),
-      tags$li("Estimations for risk adjustment based on gender are from this preprint by", 
+      tags$li("Estimations for risk adjustment based on sex are from this preprint by", 
               tags$a("Caramelo et al (2020).", href = urls$caramelo_etal_2020)
       ),
       tags$li("Estimations of risk factors associated with underlying medical conditions were obtained from",
@@ -146,11 +156,34 @@ renderFaqHtml <- function() {
            "Unfortunately, that is not true of most of the US at present."),
     faqQuestion("My specific medical condition isn't listed. What do I do?"),
     tags$p("Try using \"other conditions\" to get a catch-all estimate of your susceptibility."),
+    faqQuestion("How is my sex assigned at birth used in risk score calculations?"),
+    tags$p("For exposure risk, the ", tags$a("Menni et al (2020)", href = urls$menni_etall_2020), " model inclused 
+           self-reported 'sex at birth' as a binary independent varriable with 1 indicative of male participants and 0 representing 
+           females. Therefore for the app, if sex assigned at birth selected is 'Other' or 'Prefer not to say', 
+           for the estimations of probability of symptomatic COVID-19, we code these inputs as having a 'sex at birth' equal to 0.5."),  
+    tags$p("For susceptibility, we used the original data from ", tags$a("Verity et al (2020)", href = urls$verity_etal_2020), 
+           " for people at different age groups. If the sex assigned at birth selected is 'Male' or 'Female', then we modify the estimates from ",
+           tags$a("Verity et al (2020)", href = urls$verity_etal_2020),  "by male and female odds ratio from this preprint by ", 
+           tags$a("Caramelo et al (2020)", href = urls$caramelo_etal_2020), 
+           "and if the sex assigned at birth selected is 'Other' or 'Prefer not to say', then we do not modify the estimates." ),
+    faqQuestion("Why is race not in your app?"),
+    tags$p("While we acknowledge people from different race groups experience different levels of adverse health outcomes due to COVID-19",
+           ", we think race is an 'indicator', not mechanistically causal. There are other exogenous variables that better explain the health outcomes, ",
+           "such as access to health care, nutrition, residential condition, occupation, etc. We will try to incorporate these other features when data become available."),
+    faqQuestion("When you report 'probability of catching COVID-19 through community transmission', over what period of time does this refer to? Is this XX% chance per day?"),
+    tags$p("We calculate the probability of community transmission as a function of the number of close contacts in a week and",
+           "prevalence in your local community, so this is a weekly probability."),
     faqQuestion("My hospitalization/ICU/death risk seems out of whack."),
     tags$p("A lot is still unknown about the disease, and data sets are sparse, so our susceptibility scores are",
            "good for ballpark estimates only. We'll update our tool with better numbers as they become available."),
+    faqQuestion("Why is pregnancy not listed as an underlying condition?"),
+    tags$p("COVID-19 is a new disease. Currently there are limited data and information about the impact of underlying medical conditions",
+            "and whether they increase the risk for severe illness from COVID-19. Based on what we know at this time, ",
+            "pergnant women might be at increased risk for severe illness from COVID-19, according to ",
+            tags$a("CDC (2020)", href = urls$cdc_pregnancy),
+            "but we haven't seen any quantitative evidence reported in patient-level studies"),
     faqQuestion("I have suggestion X, or know of data set Y, or want feature Z..."),
     tags$p("Let us know at", tags$a("covid.risk.score@gmail.com", href="mailto:covid.risk.score@gmail.com"), 
-    "or visit us on ", tags$a("GitHub", href="https://github.com/mathematica-mpr/covid_risk_score"))
+           "or visit us on ", tags$a("GitHub", href="https://github.com/mathematica-mpr/covid_risk_score"))
   )
 }
