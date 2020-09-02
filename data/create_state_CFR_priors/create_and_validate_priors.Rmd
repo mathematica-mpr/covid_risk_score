@@ -238,7 +238,7 @@ state_fitted_dists %>%
 ### Compare adjusted CFR from model to adjusted CFR computed using empirical Bayes with the state-specific beta prior
 ```{r}
 adjust_CFR_EB <- function(deaths, cases, shape1, shape2, ...){
-  (deaths + shape1)/(cases+shape2)
+  (deaths + shape1)/(cases+shape1+shape2)
 }
 
 dat <- dat %>% left_join(state_fitted_dists %>% dplyr::select(state, shape1, shape2), by="state") %>%
