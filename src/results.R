@@ -156,7 +156,7 @@ renderLocationHtml <- function(risk) {
                formatDynamicString(latest_day), ', this county had', formatDynamicString(format(round(county_data$moving_casecount), big.mark =",")),
                ' new reported cases in the last 14 days and ',
                formatDynamicString(format(county_data$casecount, big.mark=",")), 
-               ' cases total of COVID-19. Many people who contract COVID-19 are not tested, and therefore not reported. 
+               ' total reported cases of COVID-19. Many people who contract COVID-19 are not tested, and therefore not reported. 
                We estimate that your county has an under-reporting factor of ', underreport_factor_string, 
                '. Taking into account the under-reporting factor, incubation period, and time from symptom onset to recovery, we estimate there are ',
                formatDynamicString(format(round(county_data$moving_casecount*county_data$underreport_factor), big.mark =",")),
