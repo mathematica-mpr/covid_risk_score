@@ -17,6 +17,7 @@ An interactive dashboard for users to calculate their individualized risk score 
 ## Authors
 * **Cindy Hu** - *back-end lead*
 * **George Luo** - *front-end lead*
+* **Emma Pendl-Robinson, Erin Lipman** - *back-end developer*
 
 ## Reviewers and Support
 * **Margaret Luo** - *Docker guru*
