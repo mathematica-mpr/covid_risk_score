@@ -8,7 +8,7 @@ conditions_list = c("Chronic renal disease" = "is_renal",
                     "Hypertension" = "is_hyper",
                     "Current or former smoker" = "is_smoker",
                     "Immunocompromised condition" = "is_immune",
-                    "Chronic lung disease or asthma" = "is_lung",
+                    "Chronic lung disease" = "is_lung",
                     "Obesity (BMI &ge; 30 kg/m&sup2;)" = "is_obesity",
                     "Other chronic disease" = "is_other")
 
