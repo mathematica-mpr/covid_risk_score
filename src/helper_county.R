@@ -190,7 +190,7 @@ calc_county_underreport<-function(fips){
   else {
     stopifnot(nrow(prior_dist)==1)
     # Bayesian adjustment using beta prior
-    fac_underreport <- (n_death_today + prior_dist$shape1)/(n_case_13d + prior_dist$shape2)/true_mortality_rate 
+    fac_underreport <- (n_death_today + prior_dist$shape1)/(n_case_13d + prior_dist$shape1 + prior_dist$shape2)/true_mortality_rate 
   }
   #if cfr is zero, the underreporting factor is NA, then force it to be US average
   us_average<-us_death_today/us_case_13d/true_mortality_rate
