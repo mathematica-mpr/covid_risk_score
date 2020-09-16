@@ -72,19 +72,20 @@ We could in theory obtain more precise estimates by placing a more informative p
 ### Model with intercept and state and county random effect
 
 ```{r}
-# stopifnot(length(unique(dat$fips))==nrow(dat))
-# my_priors1 <- prior(normal(0,1.6), class=Intercept) + prior(normal(0,1), class="sd")
-# 
-# fit1 <- brm(deaths | trials(cases) ~ (1|state) + (1|fips),  
-#                         data = dat, 
-#                         family = binomial(link = "logit"),
-#     prior = my_priors1,
-#     iter=1000,
-#     chains=4, cores=2) 
-# 
-# fit1 %>% saveRDS(file.path("brms_fits","fit1.RDS"))
+#  stopifnot(length(unique(dat$fips))==nrow(dat))
+#  my_priors1 <- prior(normal(0,1.6), class=Intercept) + prior(normal(0,1), class="sd")
+#  
+#  fit1 <- brm(deaths | trials(cases) ~ (1|state) + (1|fips),  
+#                          data = dat, 
+#                          family = binomial(link = "logit"),
+#      prior = my_priors1,
+#      iter=2000,
+#      chains=4, cores=2,
+#      seed=090120) 
+#  
+# fit1 %>% saveRDS(file.path("fit1.RDS"))
 
-fit1 <- readRDS(file.path("brms_fits", "fit1.RDS"))
+fit1 <- readRDS(file.path("fit1.RDS"))
 ```
 
 ```{r}
@@ -237,7 +238,7 @@ state_fitted_dists %>%
 ### Compare adjusted CFR from model to adjusted CFR computed using empirical Bayes with the state-specific beta prior
 ```{r}
 adjust_CFR_EB <- function(deaths, cases, shape1, shape2, ...){
-  (deaths + shape1)/(cases+shape2)
+  (deaths + shape1)/(cases+shape1+shape2)
 }
 
 dat <- dat %>% left_join(state_fitted_dists %>% dplyr::select(state, shape1, shape2), by="state") %>%
