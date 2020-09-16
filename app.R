@@ -97,44 +97,6 @@ server <- function(input, output, session) {
     }
   }
   
-  getCountyData<- eventReactive(input$go, {
-    #validate number of people for close contact
-    validate_nppl()
-    output$output_intro <-renderUI({
-      # in src/results.R
-      renderOutputIntroHtml()
-    })
-    fips<-get_fips_from_zip(input$zip)
-    
-    # if zip code matches multiple counties, read the input$fips
-    if(length(fips)>1){
-      fips <-input$fips
-    } else if (is_empty(fips)){
-      fips <-input$fips0
-    }
-    if (fips%in%KC_fips_ls){
-      population <- KC_fips_ls %>% map(~get_county_pop(.))%>%unlist()%>%sum()
-      name <- "Kansas City and surrounding counties"
-      casecount <- get_county_casecount("29095", latest_day)
-      moving_casecount <- get_county_moving_casecount("36061", 0, 14)
-      underreport_factor <- calc_county_underreport("29095")
-    } else{
-      #get county-level characteristics
-      population <- get_county_pop(fips)
-      name <- get_county_name(fips)
-      casecount <- get_county_casecount(fips, latest_day)
-      moving_casecount <- get_county_moving_casecount(fips, 0, 14)
-      underreport_factor <- calc_county_underreport(fips)
-    }
-    
-    return (list(fips = fips,
-                 population = population,
-                 name = name,
-                 casecount = casecount,
-                 moving_casecount = moving_casecount,
-                 underreport_factor = underreport_factor))
-  })
-
   # Sidebar Collapse updates
   updateInputCollapse1 <- eventReactive(input$next0, {
     updateCollapse(session, id = "collapse_main", open = "1. About You", close = "Introduction")
@@ -157,7 +119,11 @@ server <- function(input, output, session) {
   
   updateRisk <- reactive({
     updateInputCollapses()
-    county_data<-getCountyData()
+    validate_nppl()
+    output$output_intro <-renderUI({
+      # in src/results.R
+      renderOutputIntroHtml()
+    })
     if (!input$is_sick) {
       # clear the conditional panel's UI when unchecked
       updateCheckboxGroupInput(session, "symptoms", selected = character(0))
@@ -170,7 +136,7 @@ server <- function(input, output, session) {
     
     
     # in results.R
-    return (calculateRisk(input, county_data))
+    return (calculateRisk(input))
   })
 
   
