@@ -97,6 +97,22 @@ server <- function(input, output, session) {
     }
   }
   
+  getCountyData<- eventReactive(input$go, {
+    #validate number of people for close contact
+    validate_nppl()
+    output$output_intro <-renderUI({
+      # in src/results.R
+      renderOutputIntroHtml()
+    })
+    fips<-get_fips_from_zip(input$zip)
+    
+    # if zip code matches multiple counties, read the input$fips
+    if(length(fips)>1){
+      fips <-input$fips
+    } else if (is_empty(fips)){
+      fips <-input$fips0
+    }})
+  
   # Sidebar Collapse updates
   updateInputCollapse1 <- eventReactive(input$next0, {
     updateCollapse(session, id = "collapse_main", open = "1. About You", close = "Introduction")
@@ -119,7 +135,7 @@ server <- function(input, output, session) {
   
   updateRisk <- reactive({
     updateInputCollapses()
-    validate_nppl()
+    getCountyData()
     output$output_intro <-renderUI({
       # in src/results.R
       renderOutputIntroHtml()
