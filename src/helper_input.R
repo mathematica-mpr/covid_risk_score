@@ -38,7 +38,7 @@ collapseStory <- function() {
     ),
     bsCollapsePanel(
       title = "1. About You",
-      textInput('zip', label = "What is your 5-digit zip code?"),
+      textInput('zip', label = "This tool is designed for the United States. What is your 5-digit zip code?"),
       uiOutput("zipcontrol"),
       textInput('age', label = "What is your age?"),
       radioButtons('sex', "What sex were you assigned at birth?", 
