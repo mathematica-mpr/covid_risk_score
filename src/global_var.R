@@ -110,6 +110,7 @@ urls  = list(
   covid_symptom_study = "https://covid19.joinzoe.com/us/about", 
   menni_etall_2020 = "https://www.nature.com/articles/s41591-020-0916-2",
   simonnet_etall_2020 = "https://onlinelibrary.wiley.com/doi/full/10.1002/oby.22831?af=R", 
+  lipman_2020 = "https://mathematica-mpr.github.io/covidinfo/compare_usafacts_nyt_083120.html",
   # misc
   conjugate_priors = "https://en.wikipedia.org/wiki/Conjugate_prior"
 )
