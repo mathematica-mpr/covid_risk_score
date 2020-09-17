@@ -29,41 +29,52 @@ hosp_list  = c(0,       0.0408,  1.04,    3.43,    4.25,    8.16,    11.8,   16.
 icu_list   = c(0,       0,       2,       2,       3.7,     5.05,    6.4,    9.3,    8.4) *.657/1.38 /100
 death_list = c(0.00161, 0.00695, 0.0309,  0.0844,  0.161,   0.595,   1.93,   4.28,   7.8)  / 100
 
-# Risk adjustment to suspetibility for comorbidities
+# Risk adjustment to susceptibility for comorbidities
 
-## March 2020
-# odds ratios, https://www.cdc.gov/mmwr/volumes/69/wr/mm6913e2.htm
-# CCDC weekly, 2020 Vol No.2
-#The Epidemiological Characteristics of an Outbreak of 2019 Novel
-#Coronavirus Diseases (COVID-19) — China, 2020
-#The Novel Coronavirus Pneumonia Emergency Response Epidemiology Team
-# first is hospitalization odds ratio, second is ICU odds ratio, third is death odds ratio
-
-## UPDATEs to OR June 2020
+## UPDATEs to aOR June 2020
 # For more info on assumptions and methodology, see 'doc/June2020_new_comorbidity_OR.xlsx'
-# hospitalization: OR from https://www.cdc.gov/mmwr/volumes/69/wr/mm6925e1.htm?s_cid=mm6925e1_e&deliveryName=USCDC_921-DM30747#F1_down
-#     Notes: lung was below 1 and brought up to 1. Other and immuno remain the pre-June 2020 numbers and are only used if no other condition.
-# death https://www.medrxiv.org/content/10.1101/2020.05.06.20092999v1.full.pdf
-#     Notes: hypertension was below 1 and brought up to 1. Other remains the pre-June 2020 numbers and is only used if no other condition.
-# Obesity OR for ICU risk is from https://www.medrxiv.org/content/10.1101/2020.05.06.20092999v1.full.pdf
+# hospitalization aOR: Killerby et al
+# death aOR: OPENSAFELY
+#     Notes: "Other chronic conditions" remains the pre-June 2020 numbers and is only used if no other condition.
+# ICU aOR: Simonnet et al
 
-renal_or    = c(2.6, 5.82, 1.72) # death OR not available in CCDC
+# The first is hospitalization odds ratio, second is ICU odds ratio, third is death odds ratio
+# renal disease hosp aOR from Killerby figure, ICU crude OR from CDC MMWR 69(13), death aOR from OPENSAFELY
+renal_or    = c(2.6, 5.82, 1.72) 
+# heart disease hosp aOR from Killerby figure, ICU crude OR from CDC MMWR 69(13), death aOR from OPENSAFELY
 cvd_or      = c(1.4, 4.88, 1.27)
-diabetes_or = c(3.1, 4.57, 1.79)
-hyper_or    = c(1.1, 4.57, 1) # for ICU same as diabetes
-smoker_or   = c(2.3, 2.64, 1.12) # death OR not available in CCDC
-immune_or   = c(2.58, 2.86, 1.69) # death OR not available in CCDC
+# diabetes hosp aOR from Killerby text, ICU aOR from Simonnet, death aOR from OPENSAFELY
+diabetes_or = c(3.1, 1.60, 1.79)
+# hypertension hosp aOR from Killerby text, ICU aOR from Simonnet, death aOR from OPENSAFELY (0.95 brought up to 1)
+hyper_or    = c(1.1, 2.29, 1)
+# smoking hosp aOR from Killerby text, ICU crude OR from CDC MMWR 69(13), death aOR from OPENSAFELY
+smoker_or   = c(2.3, 2.64, 1.12) 
+# immuno disease hosp crude OR from CDC MMWR 69(13), ICU crude OR from CDC MMWR 69(13), death aOR from OPENSAFELY
+immune_or   = c(2.58, 2.86, 1.69) 
+# lung disease hosp aOR from Killerby figure (0.7 brought up to 1), ICU crude OR from CDC MMWR 69(13), death aOR from OPENSAFELY
 lung_or     = c(1, 2.83, 1.78)
-obesity_or  = c(1.9, 3.41, 1.46)
-other_or    = c(4.21, 3.33, 6.11) # death OR not available in CCDC
+# obesity hosp aOR from Killerby text, ICU aOR from Simonnet, death aOR from OPENSAFELY
+obesity_or  = c(1.9, 3.41, 1.46) 
+# other hosp crude OR, ICU crude OR and death crude OR are from CDC MMWR 69(13)
+other_or    = c(4.21, 3.33, 6.11) 
 
 
-#pregnant_or = c(1.23, 0.42, 1)
-#neuro_or    = c(6.18, 2.30, 6.11) # death OR not available in CCDC
-#liver_or    = c(2.44, 3.05, 6.11) # death OR not available in CCDC
-#all_conditions_death_or = 27.84
-# OR source: https://www.medrxiv.org/content/10.1101/2020.02.24.20027268v1
-male_or     = c(1.8518, 1.85, 1.69)
+#Male aOR for hospitalization comes from Killerby et al, https://www.cdc.gov/mmwr/volumes/69/wr/mm6925e1.htm
+#Male aOR for death comes from OPENSAFELY https://www.medrxiv.org/content/10.1101/2020.05.06.20092999v1.full.pdf
+#Male aOR for ICU comes from Simonnet et al https://onlinelibrary.wiley.com/doi/full/10.1002/oby.22831?af=R
+male_or     = c(2.4, 2.83, 1.99)
+
+# Prob(ICU | hosp) for different comorbidities, see 'doc/June2020_new_comorbidity_OR.xlsx'
+renal_cp = 0.37
+cvd_cp = 0.35
+diabetes_cp = 0.37
+hyper_cp = 0.32 # hypertension is in other category
+smoker_cp = 0.36
+immune_cp = 0.39
+lung_cp = 0.38
+obesity_cp = 0.32 # obesity is in other category
+other_cp = 0.32
+none_cp = 0.25
 
 #NYC county fips code
 #NY_fips_ls<-c("36005", "36047", "36061", "36081", "36085")
@@ -88,8 +99,7 @@ urls  = list(
   cdc_flu = "https://www.cdc.gov/flu/about/burden/index.html",
   cdc_hosp_June2020 = "https://www.cdc.gov/mmwr/volumes/69/wr/mm6925e1.htm",
   cdc_pregnancy = "https://www.cdc.gov/coronavirus/2019-ncov/need-extra-precautions/people-with-medical-conditions.html?CDC_AA_refVal=https%3A%2F%2Fwww.cdc.gov%2Fcoronavirus%2F2019-ncov%2Fneed-extra-precautions%2Fgroups-at-higher-risk.html#pregnancy",
-  # NYT
-  #nytimes_data_article = "https://www.nytimes.com/article/coronavirus-county-data-us.html",
+  # USA Facts
   usafacts_data = "https://usafacts.org/visualizations/coronavirus-covid-19-spread-map/",
   # papers
   caramelo_etal_2020 = "https://www.medrxiv.org/content/10.1101/2020.02.24.20027268v1",
@@ -101,10 +111,5 @@ urls  = list(
   menni_etall_2020 = "https://www.nature.com/articles/s41591-020-0916-2",
   simonnet_etall_2020 = "https://onlinelibrary.wiley.com/doi/full/10.1002/oby.22831?af=R", 
   # misc
-  conjugate_priors = "https://en.wikipedia.org/wiki/Conjugate_prior",
-  # social
-  twitter_button = "https://twitter.com/intent/tweet?text=Find%20your%20COVID-19%20risk%20score!&url=https://19andme.shinyapps.io/covid_risk_score/",
-  twitter_widget = "http://platform.twitter.com/widgets.js",
-  facebook_button = "https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2F19andme.shinyapps.io%2Fcovid_risk_score%2F",
-  facebook_widget = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0"
+  conjugate_priors = "https://en.wikipedia.org/wiki/Conjugate_prior"
 )

@@ -82,6 +82,7 @@ calculateRisk <- function(input, county_data) {
     conditions_df$hosp <- sapply(conditions_df$condition, function(x){eval(parse(text=paste0(x, "_or[1]")))})
     conditions_df$icu <- sapply(conditions_df$condition, function(x){eval(parse(text=paste0(x, "_or[2]")))})
     conditions_df$death <- sapply(conditions_df$condition, function(x){eval(parse(text=paste0(x, "_or[3]")))})
+    conditions_df$icu_cp <-sapply(conditions_df$condition, function(x){eval(parse(text=paste0(x, "_cp")))})
     
     ### hosp OR are mutually adjusted except for immuno and other - for these 2 only adjust if they are only condition
     ### ICU OR are not mutually adjusted, so use first 2 only
@@ -104,7 +105,15 @@ calculateRisk <- function(input, county_data) {
   }
   
   hosp_risk = odds2risk(hosp_odds)
-  icu_risk = odds2risk(icu_odds)
+  #icu_risk = odds2risk(icu_odds)
+  if (!is.null(input$conditions)>0){
+    #if some chronic conditions, take the highest conditional probability and multiply with hosp risk
+    icu_risk = hosp_risk * max(conditions_df$icu_cp)
+  }else{
+    #if no conditions, use the conditional prob for no chronic conditions
+    icu_risk = hosp_risk * none_cp
+    }
+  
   death_risk = odds2risk(death_odds)
   
   g<-function(exposure, hospitalization, icu, death){
