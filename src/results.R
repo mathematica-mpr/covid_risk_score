@@ -9,7 +9,21 @@ bol2char <- function(bol){
 }
 
 calculateRisk <- function(input) {
-  query <- "" #URL goes here
+  query <- paste0("https://suwkdl9zdg.execute-api.us-east-2.amazonaws.com/dev/score?",
+                  "zip=", input$zip,
+                  "&age=", input$age,
+                  "&sex=", input$sex,
+                  "&is_sick=", bol2char(input$is_sick),
+                  ifelse(input$is_sick == TRUE, paste0("&symptoms=", input$symptoms), ""), 
+                  "&nppl=", input$nppl,
+                  "&is_roommate=", bol2char(input$is_roommate),
+                  ifelse(input$is_roommate == TRUE, paste0("&nppl2=", input$nppl2), ""), 
+                  "&hand=", bol2char(input$hand),
+                  "&ppe=", bol2char(input$ppe),
+                  "&has_preexisting=", bol2char(input$has_preexisting), 
+                  ifelse(input$has_preexisting == TRUE, paste0("&conditions=", input$conditions), ""), 
+                  "&conditions=",input$conditions)
+  
   resp<-GET(url = query)
   result <- httr::content(resp, as = "parsed")
   
@@ -37,13 +51,13 @@ renderLocationHtml <- function(risk) {
   div(
     title = "Location",
     tags$p(div('We found data from ', formatDynamicString(risk$county_name), ' for your zip code. As of ', 
-               formatDynamicString(latest_day), ', this county had', formatDynamicString(format(round(county_data$moving_casecount), big.mark =",")),
+               formatDynamicString(latest_day), ', this county had', formatDynamicString(format(round(risk$casecount), big.mark =",")),
                ' new reported cases in the last 14 days and ',
                formatDynamicString(format(risk$casecount, big.mark=",")), 
                ' total reported cases of COVID-19. Many people who contract COVID-19 are not tested, and therefore not reported. 
                We estimate that your county has an under-reporting factor of ', underreport_factor_string, 
                '. Taking into account the under-reporting factor, incubation period, and time from symptom onset to recovery, we estimate there are ',
-               formatDynamicString(format(round(county_data$moving_casecount*risk$underreport_factor), big.mark =",")),
+               formatDynamicString(format(round(risk$casecount*risk$underreport_factor), big.mark =",")),
                ' sick people distributed through the county who are not officially reported.'
     ))
   )
