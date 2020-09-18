@@ -7,10 +7,10 @@ conditions_list = c("Chronic renal disease" = "is_renal",
                     "Diabetes" = "is_diabetes",
                     "Hypertension" = "is_hyper",
                     "Current or former smoker" = "is_smoker",
-                    "Immunocompromised condition <sub class = 'text-info'>(select this will unselect other selections due to lack of mutually adjusted odds ratios)</sub>" = "is_immune",
+                    "Immunocompromised condition <sub class = 'text-info'>(the hospitalization risk for immune disease is slightly overestimated due to lack of mutually adjusted odds ratios)</sub>" = "is_immune",
                     "Chronic lung disease" = "is_lung",
                     "Obesity (BMI &ge; 30 kg/m&sup2;)" = "is_obesity",
-                    "My chronic condition is not listed <sub class = 'text-info'>(select this will unselect other selections due to lack of mutually adjusted odds ratios)</sub>" = "is_other")
+                    "My chronic condition is not listed <sub class = 'text-info'>(selecting this will unselect other conditions due to lack of mutually adjusted odds ratios)</sub>" = "is_other")
 
 collapseStory <- function() {
 

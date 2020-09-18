@@ -160,10 +160,6 @@ server <- function(input, output, session) {
       # if other chronic condition is selected, clear all other selections
       updateCheckboxGroupInput(session, "conditions", selected = "is_other")
     }
-    if ("is_immune" %in% input$conditions) {
-      # if immune disease is selected, clear all other selections
-      updateCheckboxGroupInput(session, "conditions", selected = "is_immune")
-    }
   })
   updateRisk <- reactive({
     updateInputCollapses()
