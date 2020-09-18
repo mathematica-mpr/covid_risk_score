@@ -2,6 +2,24 @@ library(shiny)
 source("src/global_var.R")
 
 
+get_fips_from_zip<-function(zip){
+  #HUD_API_KEY <- Sys.getenv("HUD_API_KEY")
+  HUD_API_KEY <- paste(readLines("doc/HUD_API_KEY.txt"), collapse=" ")
+  query<-paste0("https://www.huduser.gov/hudapi/public/usps?type=2&query=", zip)
+  resp<-GET(url = query, add_headers(Authorization = paste("Bearer", HUD_API_KEY)))
+  result <- httr::content(resp, as = "parsed")
+  fips<-sapply(result$data$results, '[[', 'geoid')
+  return(fips)
+}
+
+risk2odds<-function(prob) {
+  return (prob / (1 - prob))
+}
+
+odds2risk<-function(odds) {
+  return (odds / (1 + odds))
+}
+
 bol2char <- function(bol){
   # convert boolean to char
   # bol : boolean
@@ -57,7 +75,7 @@ renderLocationHtml <- function(risk) {
                ' total reported cases of COVID-19. Many people who contract COVID-19 are not tested, and therefore not reported. 
                We estimate that your county has an under-reporting factor of ', underreport_factor_string, 
                '. Taking into account the under-reporting factor, incubation period, and time from symptom onset to recovery, we estimate there are ',
-               formatDynamicString(format(round(risk$casecount*risk$underreport_factor), big.mark =",")),
+               formatDynamicString(format(round(moving_casecount*risk$underreport_factor), big.mark =",")),
                ' sick people distributed through the county who are not officially reported.'
     ))
   )
