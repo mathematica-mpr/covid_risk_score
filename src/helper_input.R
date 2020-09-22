@@ -42,7 +42,7 @@ collapseStory <- function() {
       uiOutput("zipcontrol"),
       textInput('age', label = "What is your age?"),
       radioButtons('sex', "What sex were you assigned at birth?", 
-                   c("Male" = "M", "Female" = "F",  "Other" = "other", "Prefer not to say" = "other"), inline=TRUE),
+                   c("Male" = "male", "Female" = "female",  "Other" = "sex_other", "Prefer not to say" = "sex_other"), inline=TRUE),
       actionButton('next1', "Next", class = "btn btn-info btn-block")
     ), # bsCollapsePanel
     bsCollapsePanel(

@@ -27,7 +27,7 @@ bol2char <- function(bol){
 }
 
 calculateRisk <- function(input) {
-  query <- paste0("https://suwkdl9zdg.execute-api.us-east-2.amazonaws.com/dev/score?",
+  query <- paste0("https://dev.services.19andme.covid19.mathematica.org/health/covid/score/0-0?",
                   "zip=", input$zip,
                   "&age=", input$age,
                   "&sex=", input$sex,
