@@ -75,7 +75,7 @@ renderLocationHtml <- function(risk) {
                ' total reported cases of COVID-19. Many people who contract COVID-19 are not tested, and therefore not reported. 
                We estimate that your county has an under-reporting factor of ', underreport_factor_string, 
                '. Taking into account the under-reporting factor, incubation period, and time from symptom onset to recovery, we estimate there are ',
-               formatDynamicString(format(round(moving_casecount*risk$underreport_factor), big.mark =",")),
+               formatDynamicString(format(round(risk$est_unreported_sick), big.mark =",")),
                ' sick people distributed through the county who are not officially reported.'
     ))
   )

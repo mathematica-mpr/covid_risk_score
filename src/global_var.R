@@ -1,7 +1,6 @@
 # Global variables can go here
 
 # place holder vars
-moving_casecount <- 1000
 latest_day <- "latest_day"
 
 #Flu data from CDC https://www.cdc.gov/flu/about/burden/index.html
