@@ -54,14 +54,6 @@ server <- function(input, output, session) {
   showModal(disclaimer_message)
 
   
-  validate_age<-function(){
-    age<-input$age%>%as.numeric()
-    validate(need(!is.na(age), "Age must be a number."))
-    validate(need(age >= 0, "Age can't be negative."))
-    validate(need(age < 123, "According to the Guinness World Records, age must be smaller than 123."))
-  }
-  
-  
   hit_api<- eventReactive(input$go, {
 
     output$output_intro <-renderUI({
@@ -77,7 +69,6 @@ server <- function(input, output, session) {
     updateCollapse(session, id = "collapse_main", open = "1. About You", close = "Introduction")
   })
   updateInputCollapse2 <- eventReactive(input$next1, {
-    validate_age()
     updateCollapse(session, id = "collapse_main", open = "2. Pre-existing Conditions", 
                    close = "1. About You")
   })
