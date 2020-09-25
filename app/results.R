@@ -1,5 +1,3 @@
-library(shiny)
-source("src/global_var.R")
 
 risk2odds<-function(prob) {
   return (prob / (1 - prob))

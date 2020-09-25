@@ -1,6 +1,3 @@
-library(shiny)
-library(shinyBS)
-source("src/global_var.R")
 
 conditions_list = c("Chronic renal disease" = "is_renal",
                     "Cardiovascular disease" = "is_cvd",

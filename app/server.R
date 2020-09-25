@@ -1,47 +1,3 @@
-library(shiny)
-library(shinycssloaders)
-library(shinythemes)
-source("src/global_var.R")
-source("src/helper_input.R")
-source("src/info_html.R")
-source("src/results.R")
-
-# Define the UI
-ui <- fluidPage(
-  theme=shinytheme("superhero"),
-  titlePanel(fluidRow(column(width = 9, "19 and Me: COVID-19 Risk Score Calculator"),
-                      column(width = 3, img(src = 'MathematicaLogo_White_smaller.png',class = "pull-right"))),
-             windowTitle = "19 and Me: COVID-19 Risk Calculator"),
-  # google analytics tracking
-  tags$head(includeHTML("src/google-analytics.html")),
-  
-  includeCSS("src/style.css"),
-  #INPUT
-  sidebarLayout(
-    sidebarPanel(
-      # in helper_input.R
-      collapseStory(),
-      width = 4
-    ), # sidebarPanel
-    
-    # OUTPUT
-    mainPanel(
-      tabsetPanel(
-        type = c("pills"),
-        tabPanel("Score",
-                 fluidRow(column(width = 8, htmlOutput("output_intro"))),
-                 fluidRow(column(width = 8, withSpinner(gaugeOutput("gauge", height = '600%'), type = 1))),
-                 fluidRow(column(width = 8,htmlOutput("res")))
-                 ),
-        # tabPanel("Map"),
-        tabPanel("Method", htmlOutput("methods")),
-        tabPanel("FAQ", htmlOutput("faq"))
-      ),
-      width = 8
-    ) # mainPanel
-  ) # sidebarLayout
-) # fluidPage
-
 # Define the server code
 server <- function(input, output, session) {
 
@@ -52,7 +8,6 @@ server <- function(input, output, session) {
   
   # Show the model on start up ...
   showModal(disclaimer_message)
-
   
   hit_api<- eventReactive(input$go, {
 
@@ -129,6 +84,3 @@ server <- function(input, output, session) {
   })
   
 }
-
-# Return a Shiny app object
-shinyApp(ui = ui, server = server)

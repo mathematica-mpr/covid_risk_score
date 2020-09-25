@@ -1,5 +1,3 @@
-library(shiny)
-source("src/global_var.R")
 
 # disclaimer popup
 disclaimerpopupHTML <- function(){

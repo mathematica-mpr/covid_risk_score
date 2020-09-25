@@ -1,3 +1,13 @@
+# helper functions
+source("helper_input.R")
+source("info_html.R")
+source("results.R")
+
+# libraries 
+library(shiny)
+library(shinycssloaders)
+library(shinythemes)
+
 # Global variables can go here
 
 # place holder vars
