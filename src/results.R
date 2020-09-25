@@ -170,7 +170,7 @@ renderLocationHtml <- function(risk) {
                We estimate that your county has an under-reporting factor of ', underreport_factor_string, 
                '. Taking into account the under-reporting factor, incubation period, and time from symptom onset to recovery, we estimate there are ',
                formatDynamicString(format(round(county_data$moving_casecount*county_data$underreport_factor), big.mark =",")),
-               ' sick people distributed through the county who are not officially reported.'
+               ' total sick people distributed throughout the county, including those who are not officially reported.'
     ))
   )
 }
