@@ -1,17 +1,6 @@
 library(shiny)
 source("src/global_var.R")
 
-
-get_fips_from_zip<-function(zip){
-  #HUD_API_KEY <- Sys.getenv("HUD_API_KEY")
-  HUD_API_KEY <- paste(readLines("doc/HUD_API_KEY.txt"), collapse=" ")
-  query<-paste0("https://www.huduser.gov/hudapi/public/usps?type=2&query=", zip)
-  resp<-GET(url = query, add_headers(Authorization = paste("Bearer", HUD_API_KEY)))
-  result <- httr::content(resp, as = "parsed")
-  fips<-sapply(result$data$results, '[[', 'geoid')
-  return(fips)
-}
-
 risk2odds<-function(prob) {
   return (prob / (1 - prob))
 }

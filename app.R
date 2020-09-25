@@ -52,34 +52,7 @@ server <- function(input, output, session) {
   
   # Show the model on start up ...
   showModal(disclaimer_message)
-  
-  validate_fips<-function(){
-    #make sure zipcode is a five-digit number
-    validate(need(!is.na(input$zip%>%as.numeric()), "zip code must only contain numbers."))
-    validate(need(input$zip%>%as.numeric()<=99999, "zip code must be 5 digits."))
-    
-    fips<-get_fips_from_zip(input$zip)
-     #deal with foreign zipcode
-    if (length(fips) ==0){
-      output$zipcontrol <- renderUI({
-        textInput("fips0",label = "Please supply the FIPS code of your county")
-      })
-      fips<-input$fips0
-      updateTextInput(session, "fips0", value = fips)
-    } else if(length(fips)  >1){
-        #deal with zipcode mapping to >1 counties 
-      output$zipcontrol <- renderUI({
-        fips<-get_fips_from_zip(input$zip)
-        fips_names<-lapply(fips, get_county_name)%>%unlist()
-        radioButtons("fips",label = "Choose a county and resubmit", choiceNames = fips_names, choiceValues  = fips, selected = NULL)
-      })
-      fips<-input$fips
-      updateRadioButtons(session, "fips", selected = fips)
-    }
-    validate(need(!is.na(fips), "If your zip code matches multiple counties, please select the correct county and continue. If you don't see any choices, please input your county 5-digit FIPS code to proceed."))
-    
-    
-  }
+
   
   validate_age<-function(){
     age<-input$age%>%as.numeric()
@@ -95,28 +68,22 @@ server <- function(input, output, session) {
     }
   }
   
-  getCountyData<- eventReactive(input$go, {
+  hit_api<- eventReactive(input$go, {
     #validate number of people for close contact
     validate_nppl()
     output$output_intro <-renderUI({
       # in src/results.R
       renderOutputIntroHtml()
+      })
+    return(calculateRisk(input))
     })
-    fips<-get_fips_from_zip(input$zip)
-    
-    # if zip code matches multiple counties, read the input$fips
-    if(length(fips)>1){
-      fips <-input$fips
-    } else if (is_empty(fips)){
-      fips <-input$fips0
-    }})
+
   
   # Sidebar Collapse updates
   updateInputCollapse1 <- eventReactive(input$next0, {
     updateCollapse(session, id = "collapse_main", open = "1. About You", close = "Introduction")
   })
   updateInputCollapse2 <- eventReactive(input$next1, {
-    validate_fips()
     validate_age()
     updateCollapse(session, id = "collapse_main", open = "2. Pre-existing Conditions", 
                    close = "1. About You")
@@ -133,11 +100,6 @@ server <- function(input, output, session) {
   
   updateRisk <- reactive({
     updateInputCollapses()
-    getCountyData()
-    output$output_intro <-renderUI({
-      # in src/results.R
-      renderOutputIntroHtml()
-    })
     if (!input$is_sick) {
       # clear the conditional panel's UI when unchecked
       updateCheckboxGroupInput(session, "symptoms", selected = character(0))
@@ -147,10 +109,10 @@ server <- function(input, output, session) {
       # clear the conditional panel's UI when unchecked
       updateCheckboxGroupInput(session, "conditions", selected = character(0))
     }
-    
+    risk_data <- hit_api()
     
     # in results.R
-    return (calculateRisk(input))
+    return (risk_data)
   })
 
   
