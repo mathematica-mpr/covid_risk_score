@@ -61,16 +61,9 @@ server <- function(input, output, session) {
     validate(need(age < 123, "According to the Guinness World Records, age must be smaller than 123."))
   }
   
-  validate_nppl<-function(){
-    #if user checks "I live with others", then input$nppl has to be greater than 0
-    if(input$is_roommate){
-      validate(need(input$nppl>=1, "Since you live with other people, you must have come into close contact with one or more people."))
-    }
-  }
   
   hit_api<- eventReactive(input$go, {
-    #validate number of people for close contact
-    validate_nppl()
+
     output$output_intro <-renderUI({
       # in src/results.R
       renderOutputIntroHtml()
