@@ -193,20 +193,5 @@ renderResultsHtml <- function(risk, symptoms, hand, ppe) {
     renderSusceptibilityHtml(risk),
     renderProtectionHtml(risk, hand, ppe),
     renderScoreHtml(risk)
-    # fluidRow(column(width = 4,
-    #                 offset = 2,
-    #                 tags$a(href=urls$facebook_button,
-    #                        "Share on Facebook",
-    #                        class="btn btn-facebook btn-block"),
-    #                 includeScript(urls$facebook_widget)),
-    #          # column(width = 3,
-    #          #        offset = 1,
-    #          #        tags$a(href=urls$w_button, "Share on WhatsApp", class="btn btn-success btn-block")
-    #          #        ),
-    #          column(width = 4,
-    #                 offset = 2,
-    #                 tags$a(href=urls$twitter_button, "Share on Twitter", class="btn btn-info btn-block"),
-    #                 includeScript(urls$twitter_widget)))
-    
   )
 }
