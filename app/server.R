@@ -20,25 +20,16 @@ server <- function(input, output, session) {
 
   
   # Sidebar Collapse updates
-  updateInputCollapse1 <- eventReactive(input$next0, {
+  observeEvent(input$next0, {
     updateCollapse(session, id = "collapse_main", open = "1. About You", close = "Introduction")
   })
-  updateInputCollapse2 <- eventReactive(input$next1, {
+  observeEvent(input$next1, {
     updateCollapse(session, id = "collapse_main", open = "2. Pre-existing Conditions", 
                    close = "1. About You")
   })
-  updateInputCollapse3 <- eventReactive(input$next2, {
+  observeEvent(input$next2, {
     updateCollapse(session, id = "collapse_main", open = "3. Your Behavior", 
                    close = "2. Pre-existing Conditions")
-  })
-  updateInputCollapses <- function() {
-    updateInputCollapse1()
-    updateInputCollapse2()
-    updateInputCollapse3()
-  }
-  
-  updateRisk <- reactive({
-    updateInputCollapses()
     if (!input$is_sick) {
       # clear the conditional panel's UI when unchecked
       updateCheckboxGroupInput(session, "symptoms", selected = character(0))
@@ -48,15 +39,10 @@ server <- function(input, output, session) {
       # clear the conditional panel's UI when unchecked
       updateCheckboxGroupInput(session, "conditions", selected = character(0))
     }
-    risk_data <- hit_api()
-    
-    # in results.R
-    return (risk_data)
   })
 
-  
   output$gauge <-renderGauge({
-    risk<-updateRisk()
+    risk<-hit_api()
     gauge(case_when(risk$score<1 ~ 1,
                     risk$score>100 ~ 100,
                 TRUE ~round(risk$score)), 
@@ -68,7 +54,7 @@ server <- function(input, output, session) {
   })
   
   output$res <-renderUI({
-    risk <- updateRisk()
+    risk <- hit_api()
     # in src/results.R
     renderResultsHtml(risk, input$symptoms, input$hand, input$ppe)
   })
