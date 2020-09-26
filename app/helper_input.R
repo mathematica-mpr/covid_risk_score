@@ -1,14 +1,4 @@
 
-conditions_list = c("Chronic renal disease" = "is_renal",
-                    "Cardiovascular disease" = "is_cvd",
-                    "Diabetes" = "is_diabetes",
-                    "Hypertension" = "is_hyper",
-                    "Current or former smoker" = "is_smoker",
-                    "Immunocompromised condition" = "is_immune",
-                    "Chronic lung disease" = "is_lung",
-                    "Obesity (BMI &ge; 30 kg/m&sup2;)" = "is_obesity",
-                    "Other chronic disease" = "is_other")
-
 collapseStory <- function() {
 
   # collapsible UI to streamline input. Everything is open by default.
