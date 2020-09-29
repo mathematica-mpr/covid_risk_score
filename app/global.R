@@ -10,9 +10,6 @@ library(shinythemes)
 
 # Global variables can go here
 
-# place holder vars
-latest_day <- "latest_day"
-
 #Flu data from CDC https://www.cdc.gov/flu/about/burden/index.html
 prob_flu<- 35520883/(329.45*10^6)/26 #assume 26 weeks of flu season
 
@@ -20,7 +17,6 @@ prob_flu<- 35520883/(329.45*10^6)/26 #assume 26 weeks of flu season
 hand_or<-0.45 #https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2190272/
 #odds ratio for wearing PPE
 ppe_or<-0.32 #https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2190272/
-
 
 # possible input conditions
 conditions_list = c("Chronic renal disease" = "is_renal",
