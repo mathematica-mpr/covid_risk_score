@@ -73,7 +73,8 @@ collapseStory <- function() {
                                 tags$a("CDC guidance", href = urls$cdc_hand_hygiene))),
       checkboxInput("ppe", div("I wear personal protection equipment consistent with ",
                                tags$a("CDC guidelines", href = urls$cdc_ppe))),
-      actionButton('go', "Calculate", class = "btn btn-primary btn-block")
+      actionButton('go', "Calculate", class = "btn btn-primary btn-block"), 
+      uiOutput("zipcontrol")
     ) # bsCollapsePanel
   ) # bsCollapse
 }

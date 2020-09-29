@@ -10,11 +10,11 @@ server <- function(input, output, session) {
   showModal(disclaimer_message)
   
   hit_api<- eventReactive(input$go, {
-
     output$output_intro <-renderUI({
       # in src/results.R
       renderOutputIntroHtml()
       })
+    
     return(calculateRisk(input))
     })
 
@@ -40,9 +40,39 @@ server <- function(input, output, session) {
       updateCheckboxGroupInput(session, "conditions", selected = character(0))
     }
   })
+  
+  get_risk_info <- reactive({
+    # hit the API
+    api_out <- hit_api()
+    
+    # number of outputs
+    n_out <- length(api_out)
+
+    # if the length of output is more than one
+    if(n_out > 1 ){
+      #deal with zipcode mapping to >1 counties 
+      output$zipcontrol <- renderUI({
+        list_opts <- as.character(1:length(api_out))
+        fips_names<-sapply(api_out, `[`, "name") %>% as.character()
+        radioButtons("fips",label = "There is more than one county that matches your 5-digit zip code. \nPlease choose a county:", 
+                     choiceNames = fips_names, choiceValues  = list_opts, selected = character(0))
+      })
+      which_county<- as.numeric(input$fips)
+      
+      #eventReactive(input$fips, {
+      #  updateRadioButtons(session, "fips", selected = which_county)
+      #})
+      
+    } else {
+      # if there is only one output county, select the first output county
+      which_county <- 1}
+    
+    one_county <- api_out[[which_county]]
+    return (one_county)
+  })
 
   output$gauge <-renderGauge({
-    risk<-hit_api()
+    risk<-get_risk_info()
     gauge(case_when(risk$score<1 ~ 1,
                     risk$score>100 ~ 100,
                 TRUE ~round(risk$score)), 
@@ -54,7 +84,7 @@ server <- function(input, output, session) {
   })
   
   output$res <-renderUI({
-    risk <- hit_api()
+    risk <- get_risk_info()
     # in src/results.R
     renderResultsHtml(risk, input$symptoms, input$hand, input$ppe)
   })
