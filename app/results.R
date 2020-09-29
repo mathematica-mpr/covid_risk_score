@@ -29,10 +29,10 @@ calculateRisk <- function(input) {
                   ifelse(input$has_preexisting == TRUE, paste0("&conditions=", input$conditions), ""), 
                   "&conditions=",input$conditions)
   
-  resp<-GET(url = query)
-  result <- httr::content(resp, as = "parsed")
-  
-  return (result)
+  resp <- GET(url = query)
+  api_return <- httr::content(resp, as = "parsed")
+  results <- api_return$results
+  return (results)
 }
 
 formatDynamicString <- function(string) {
@@ -55,10 +55,10 @@ renderLocationHtml <- function(risk) {
   underreport_factor_string = formatNumber(risk$underreport_factor, "x")
   div(
     title = "Location",
-    tags$p(div('We found data from ', formatDynamicString(risk$county_name), ' for your zip code. As of ', 
-               formatDynamicString(latest_day), ', this county had', formatDynamicString(format(round(risk$casecount), big.mark =",")),
+    tags$p(div('We found data from ', formatDynamicString(risk$name), ' for your zip code. As of ', 
+               formatDynamicString(risk$latest_day), ', this county had', formatDynamicString(format(round(risk$moving_casecount), big.mark =",")),
                ' new reported cases in the last 14 days and ',
-               formatDynamicString(format(risk$casecount, big.mark=",")), 
+               formatDynamicString(format(risk$n_case_today, big.mark=",")), 
                ' total reported cases of COVID-19. Many people who contract COVID-19 are not tested, and therefore not reported. 
                We estimate that your county has an under-reporting factor of ', underreport_factor_string, 
                '. Taking into account the under-reporting factor, incubation period, and time from symptom onset to recovery, we estimate there are ',
