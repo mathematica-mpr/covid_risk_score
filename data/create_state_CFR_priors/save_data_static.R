@@ -23,4 +23,4 @@ df <- full_join(cases, deaths, by=c("date","fips", "state")) %>%
   filter(fips!="00000") 
 stopifnot(!is.na(cases), !is.na(deaths)) 
 
-df %>% saveRDS(file.path("Sandbox", "usafacts_082420.RDS"))
+df %>% saveRDS(file.path("data", "create_state_CFR_priors", "usafacts_100320.RDS"))
