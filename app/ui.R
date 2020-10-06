@@ -21,6 +21,7 @@ ui <- fluidPage(
       tabsetPanel(
         type = c("pills"),
         tabPanel("Score",
+                 uiOutput("zipcontrol"),
                  fluidRow(column(width = 8, htmlOutput("output_intro"))),
                  fluidRow(column(width = 8, withSpinner(gaugeOutput("gauge", height = '600%'), type = 1))),
                  fluidRow(column(width = 8,htmlOutput("res")))
