@@ -54,7 +54,7 @@ server <- function(input, output, session) {
       output$zipcontrol <- renderUI({
         list_opts <- as.character(1:length(api_out))
         fips_names<-sapply(api_out, `[`, "name") %>% as.character()
-        radioButtons("fips",label = "There is more than one county that matches your 5-digit zip code. \nPlease choose a county:", 
+        radioButtons("fips",label = "There is more than one county that matches your 5-digit zip code. Please choose a county:", 
                      choiceNames = fips_names, choiceValues  = list_opts, selected = character(0))
       })
       which_county<- as.numeric(input$fips)
