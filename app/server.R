@@ -65,10 +65,6 @@ server <- function(input, output, session) {
       
       which_county<- as.numeric(input$ordinal_county)
       
-      #eventReactive(input$ordinal_county, {
-      #  updateRadioButtons(session, "ordinal_county", selected = which_county)
-      #})
-      
     } else {
       # if there is only one output county, select the first output county
       which_county <- 1}
