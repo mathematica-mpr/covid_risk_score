@@ -10,10 +10,6 @@ server <- function(input, output, session) {
   showModal(disclaimer_message)
   
   hit_api<- eventReactive(input$go, {
-    output$output_intro <-renderUI({
-      # in src/results.R
-      renderOutputIntroHtml()
-      })
     
     return(calculateRisk(input))
     })
@@ -42,6 +38,7 @@ server <- function(input, output, session) {
   })
   
   get_risk_info <- reactive({
+    
     # hit the API
     api_out <- hit_api()
     
@@ -54,9 +51,11 @@ server <- function(input, output, session) {
       output$zipcontrol <- renderUI({
         list_opts <- as.character(1:length(api_out))
         fips_names<-sapply(api_out, `[`, "name") %>% as.character()
-        radioButtons("fips",label = "There is more than one county that matches your 5-digit zip code. Please choose a county:", 
+        radioButtons("fips", label = "There is more than one county that matches your 5-digit zip code. Please choose a county:", 
                      choiceNames = fips_names, choiceValues  = list_opts, selected = character(0))
-      })
+        })
+      validate(need(!is.null(input$fips), ""))
+      
       which_county<- as.numeric(input$fips)
       
       #eventReactive(input$fips, {
@@ -68,11 +67,19 @@ server <- function(input, output, session) {
       which_county <- 1}
     
     one_county <- api_out[[which_county]]
+    
     return (one_county)
   })
 
   output$gauge <-renderGauge({
+    
     risk<-get_risk_info()
+    
+    output$output_intro <- renderUI({
+      # in src/results.R
+      renderOutputIntroHtml()
+    })
+    
     gauge(case_when(risk$score<1 ~ 1,
                     risk$score>100 ~ 100,
                 TRUE ~round(risk$score)), 
