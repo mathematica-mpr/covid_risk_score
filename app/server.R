@@ -49,24 +49,24 @@ server <- function(input, output, session) {
     if(n_out > 1 ){
       #deal with zipcode mapping to >1 counties 
       output$select_county <- renderUI({
-      validate(need(is.null(input$fips), ""))
+      validate(need(is.null(input$ordinal_county), ""))
       tagList(
         tags$h4("There is more than one county that matches your 5-digit zip code."),
         tags$h4("Please choose a county:")
       )})
       output$zipcontrol <- renderUI({
-        validate(need(is.null(input$fips), ""))
+        validate(need(is.null(input$ordinal_county), ""))
         list_opts <- as.character(1:length(api_out))
-        fips_names<-sapply(api_out, `[`, "name") %>% as.character()
-        radioButtons("fips", label = "Counties:", 
-                     choiceNames = fips_names, choiceValues  = list_opts, selected = character(0))
+        county_names<-sapply(api_out, `[`, "name") %>% as.character()
+        radioButtons("ordinal_county", label = "Counties:", 
+                     choiceNames = county_names, choiceValues  = list_opts, selected = character(0))
         })
-      validate(need(!is.null(input$fips), ""))
+      validate(need(!is.null(input$ordinal_county), ""))
       
-      which_county<- as.numeric(input$fips)
+      which_county<- as.numeric(input$ordinal_county)
       
-      #eventReactive(input$fips, {
-      #  updateRadioButtons(session, "fips", selected = which_county)
+      #eventReactive(input$ordinal_county, {
+      #  updateRadioButtons(session, "ordinal_county", selected = which_county)
       #})
       
     } else {
