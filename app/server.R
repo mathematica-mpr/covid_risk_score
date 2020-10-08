@@ -78,6 +78,8 @@ server <- function(input, output, session) {
     
     risk<-get_risk_info()
     
+    validate(need(!is.null(risk), ""))
+    
     output$output_intro <- renderUI({
       # in src/results.R
       renderOutputIntroHtml()
