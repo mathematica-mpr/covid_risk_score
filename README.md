@@ -55,7 +55,7 @@ PASSWORD=mystrongpassword
 ```
 There is an example [sample.env](sample.env) you can also use.  Copy it and rename it to `.env`. 
 
-2. Generate username and API key for USPS ZIP CODE CROSSWALK [here](https://www.huduser.gov/portal/dataset/uspszip-api.html). We will use this to look up the FIPS county code for the zip code submitted by the user. Add API key to doc/HUD_API_KEY.txt
+2. Generate x-api-key for [TODO: WHERE USERS GET A KEY]. We will use this to make POST requests for the covid-risk-score-api. Add X_API_KEY to your `.Renviron` file.
 
 3. Start the environment
 `docker-compose up`
