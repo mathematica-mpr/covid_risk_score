@@ -7,30 +7,31 @@ odds2risk<-function(odds) {
   return (odds / (1 + odds))
 }
 
-bol2char <- function(bol){
+bool2char <- function(bol){
   # convert boolean to char
   # bol : boolean
-  substr(as.character(bol), 1,1)
+  stringr::str_to_sentence(bol)
 }
 
 calculateRisk <- function(input) {
-  query <- paste0("https://dev.services.19andme.covid19.mathematica.org/health/covid/score/0-0?",
-                  "zip=", input$zip,
-                  "&age=", input$age,
-                  "&sex=", input$sex,
-                  "&is_sick=", bol2char(input$is_sick),
-                  ifelse(input$is_sick == TRUE, paste0("&symptoms=", input$symptoms), ""), 
-                  "&nppl=", input$nppl,
-                  "&is_roommate=", bol2char(input$is_roommate),
-                  ifelse(input$is_roommate == TRUE, paste0("&nppl2=", input$nppl2), ""), 
-                  "&hand=", bol2char(input$hand),
-                  "&ppe=", bol2char(input$ppe),
-                  "&has_preexisting=", bol2char(input$has_preexisting), 
-                  ifelse(input$has_preexisting == TRUE, paste0("&conditions=", input$conditions), ""), 
-                  "&conditions=",input$conditions)
   
-  resp <- GET(url = query)
-  api_return <- httr::content(resp, as = "parsed")
+  request_url <- "api.covid19.mathematica.org/score"
+  
+  request_body <- list(
+    "zip" = input$zip,
+    "age"= input$age,
+    "sex" = input$sex,
+    "symptoms" = list(input$symptoms),
+    "nppl" = input$nppl,
+    "is_roommate"= bool2char(input$is_roommate),
+    "nppl2" = input$nppl2,
+    "hand"= bool2char(input$hand),
+    "ppe"= bool2char(input$ppe),
+    "conditions" = list(input$conditions)
+  )
+  
+  resp <- POST(request_url, add_headers("x-api-key" = Sys.getenv("X_API_KEY")), body = request_body, encode = "json")
+  api_return <- content(resp)
   results <- api_return$results
   return (results)
 }
