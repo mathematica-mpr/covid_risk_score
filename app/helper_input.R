@@ -10,7 +10,6 @@ conditions_list = c("Chronic renal disease" = "is_renal",
                     "Obesity (BMI &ge; 30 kg/m&sup2;)" = "is_obesity",
                     "My chronic condition is not listed <sub class = 'text-info'>(selecting this will unselect other conditions due to lack of mutually adjusted odds ratios)</sub>" = "is_other")
 
-
 collapseStory <- function() {
 
   # collapsible UI to streamline input. Everything is open by default.
