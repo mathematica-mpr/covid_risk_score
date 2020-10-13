@@ -24,15 +24,6 @@ hand_or<-0.45 #https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2190272/
 #odds ratio for wearing PPE
 ppe_or<-0.32 #https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2190272/
 
-# possible input conditions
-conditions_list = c("Chronic renal disease" = "is_renal",
-                    "Cardiovascular disease" = "is_cvd",
-                    "Diabetes" = "is_diabetes",
-                    "Hypertension" = "is_hyper",
-                    "Current or former smoker" = "is_smoker",
-                    "Immunocompromised condition <sub class = 'text-info'>(the hospitalization risk for immune disease is slightly overestimated due to lack of mutually adjusted odds ratios)</sub>" = "is_immune",                    "Chronic lung disease" = "is_lung",
-                    "Obesity (BMI &ge; 30 kg/m&sup2;)" = "is_obesity",
-                    "My chronic condition is not listed <sub class = 'text-info'>(selecting this will unselect other conditions due to lack of mutually adjusted odds ratios)</sub>" = "is_other")
 
 # urls class to store our urls
 urls  = list(
