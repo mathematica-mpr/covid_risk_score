@@ -40,8 +40,7 @@ calculateRisk <- function(input) {
     "nppl2" = input$nppl2,
     "hand"= bool2char(input$hand),
     "ppe"= bool2char(input$ppe),
-    "conditions" = conditions_vector
-  )
+    "conditions" = conditions_vector)
   
   resp <- POST(request_url, add_headers("x-api-key" = Sys.getenv("X_API_KEY")), body = request_body, encode = "json")
   api_return <- content(resp)
