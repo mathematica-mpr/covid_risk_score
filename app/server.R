@@ -11,7 +11,12 @@ server <- function(input, output, session) {
   
   hit_api<- eventReactive(input$go, {
     
-    return(calculateRisk(input))
+    api_return <- calculateRisk(input)
+    
+    # if a message is returned, display the message
+    validate(need(is.null(api_return$message), api_return$message))
+    
+    return(api_return$results)
     })
 
   

@@ -31,8 +31,8 @@ calculateRisk <- function(input) {
   
   resp <- POST(request_url, add_headers("x-api-key" = Sys.getenv("X_API_KEY")), body = request_body, encode = "json")
   api_return <- content(resp)
-  results <- api_return$results
-  return (results)
+
+  return (api_return)
 }
 
 formatDynamicString <- function(string) {
