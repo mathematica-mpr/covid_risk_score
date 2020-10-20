@@ -78,7 +78,7 @@ collapseStory <- function() {
       conditionalPanel(
         condition = "input.is_roommate == true",
         sliderInput('nppl2', 
-                    'Indirect exposure: how many people in total do your other household members come into close contact with in a week?', 
+                    'Indirect exposure: how many people in total do your other household members come into close contact with in a week? (Do not include yourself in this count.)', 
                     min = 0, max = 100, value = 0, step =1)),
       checkboxInput("hand", div("I perform hand hygiene according to ", 
                                 tags$a("CDC guidance", href = urls$cdc_hand_hygiene))),
