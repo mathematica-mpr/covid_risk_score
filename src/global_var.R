@@ -112,5 +112,5 @@ urls  = list(
   simonnet_etall_2020 = "https://onlinelibrary.wiley.com/doi/full/10.1002/oby.22831?af=R", 
   lipman_2020 = "https://mathematica-mpr.github.io/covidinfo/compare_usafacts_nyt_083120.html",
   # misc
-  conjugate_priors = "https://en.wikipedia.org/wiki/Conjugate_prior"
+  empirical_bayes = "https://en.wikipedia.org/wiki/Empirical_Bayes_method"
 )
