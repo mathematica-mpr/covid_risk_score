@@ -22,7 +22,12 @@ server <- function(input, output, session) {
 
   # update some input values when input$go is pressed
   calc_input_vals <- eventReactive(input$go, {
-    return(list("hand" = input$hand, "ppe" = input$ppe))
+    
+    val_list <- list("hand" = input$hand, 
+                     "ppe" = input$ppe, 
+                     "symptoms" = input$symptoms)
+    
+    return(val_list)
   })
   
   # Sidebar Collapse updates
@@ -117,7 +122,7 @@ server <- function(input, output, session) {
     risk <- get_risk_info()
     input_vals <- calc_input_vals()
     # in app/results.R
-    renderResultsHtml(risk, input$symptoms, input_vals$hand, input_vals$ppe)
+    renderResultsHtml(risk, input_vals$symptoms, input_vals$hand, input_vals$ppe)
   })
   
   output$methods <-renderUI({
