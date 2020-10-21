@@ -33,3 +33,10 @@
 .text-muted {
     color: #777;
 }
+
+.shiny-output-error-validation {
+  color: #DC7633;
+  font-weight: 400;
+  font-size: 18px;
+  
+}
