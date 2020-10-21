@@ -9,6 +9,7 @@ server <- function(input, output, session) {
   # Show the model on start up ...
   showModal(disclaimer_message)
   
+  # function to make request to API
   hit_api<- eventReactive(input$go, {
     
     api_return <- calculateRisk(input)
@@ -57,9 +58,8 @@ server <- function(input, output, session) {
     # number of outputs
     n_out <- length(api_out)
 
-    # if the length of output is more than one
+    # if the length of output is more than one have user select one county
     if(n_out > 1 ){
-      #deal with zipcode mapping to >1 counties 
       output$select_county <- renderUI({
       validate(need(is.null(input$ordinal_county), ""))
       tagList(
@@ -73,6 +73,8 @@ server <- function(input, output, session) {
         radioButtons("ordinal_county", label = "Counties:", 
                      choiceNames = county_names, choiceValues  = list_opts, selected = character(0))
         })
+      
+      # stop if county is not selected
       validate(need(!is.null(input$ordinal_county), ""))
       
       which_county<- as.numeric(input$ordinal_county)
@@ -93,7 +95,7 @@ server <- function(input, output, session) {
     validate(need(!is.null(risk), ""))
     
     output$output_intro <- renderUI({
-      # in src/results.R
+      # in app/results.R
       renderOutputIntroHtml()
     })
     
@@ -109,17 +111,17 @@ server <- function(input, output, session) {
   
   output$res <-renderUI({
     risk <- get_risk_info()
-    # in src/results.R
+    # in app/results.R
     renderResultsHtml(risk, input$symptoms, input$hand, input$ppe)
   })
   
   output$methods <-renderUI({
-    # in src/info_html.R
+    # in app/info_html.R
     renderMethodsHtml()
   })
   
   output$faq <- renderUI({
-    # in src/info_html.R
+    # in app/info_html.R
     renderFaqHtml()
   })
   
