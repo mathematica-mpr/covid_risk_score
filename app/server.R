@@ -14,7 +14,7 @@ server <- function(input, output, session) {
     api_return <- calculateRisk(input)
     
     # if a message is returned, display the message
-    validate(need(is.null(api_return$message), api_return$message))
+    validate(need(is.null(api_return$message), gsub("Bad Request: ","\nPlease Correct:\n",as.character(api_return$message))))
     
     return(api_return$results)
     })
