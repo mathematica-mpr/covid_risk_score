@@ -19,12 +19,12 @@ calculateRisk <- function(input) {
 
   request_body <- list(
     "zip" = input$zip,
-    "age"= input$age,
+    "age"= as.numeric(input$age),
     "sex" = input$sex,
     "symptoms" = as.list(input$symptoms),
-    "nppl" = input$nppl,
+    "nppl" = as.numeric(input$nppl),
     "is_roommate"= bool2char(input$is_roommate),
-    "nppl2" = input$nppl2,
+    "nppl2" = as.numeric(input$nppl2),
     "hand"= bool2char(input$hand),
     "ppe"= bool2char(input$ppe),
     "conditions" = as.list(input$conditions))
