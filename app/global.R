@@ -28,7 +28,7 @@ ppe_or<-0.32 #https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2190272/
 # urls class to store our urls
 urls  = list(
   # CCDC
-  ccdc_vol2_2020 = "https://www.unboundmedicine.com/medline/citation/32064853/[The_epidemiological_characteristics_of_an_outbreak_of_2019_novel_coronavirus_diseases__COVID_19__in_China]_",
+  ccdc_vol2_2020 = "https://www.unboundmedicine.com/medline/citation/32064853/[The_epidemiological_characteristics_of_an_outbreak_of_2019_novel_coronavirus_diseases__COVID_19__in_China]",
   # CDC
   cdc_chatbot = "https://www.cdc.gov/coronavirus/2019-ncov/symptoms-testing/index.html#cdc-chat-bot-open",
   cdc_get_ready = "https://www.cdc.gov/coronavirus/2019-ncov/daily-life-coping/get-your-household-ready-for-COVID-19.html",
@@ -57,5 +57,5 @@ urls  = list(
   menni_etall_2020 = "https://www.nature.com/articles/s41591-020-0916-2",
   simonnet_etall_2020 = "https://onlinelibrary.wiley.com/doi/full/10.1002/oby.22831?af=R", 
   # misc
-  conjugate_priors = "https://en.wikipedia.org/wiki/Conjugate_prior",
+  conjugate_priors = "https://en.wikipedia.org/wiki/Conjugate_prior"
 )
