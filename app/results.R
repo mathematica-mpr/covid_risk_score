@@ -122,7 +122,7 @@ renderSusceptibilityHtml <- function(risk) {
     formatPercent(risk$hosp_risk),
     ", the risk of requiring an ICU is ",
     formatPercent(risk$icu_risk),
-    ", and the risk of dying is ",
+    ", and the risk of not surviving is ",
     formatPercent(risk$death_risk), "."
   )))
 }
