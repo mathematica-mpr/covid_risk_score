@@ -14,6 +14,7 @@ server <- function(input, output, session) {
     
     # do not procced if go was not clicked at all
     validate(need(input$go > 0, ""))
+    validate(need(nchar(input$zip) >= 5, ""))
     api_return <- calculateRisk(input)
     
     # if a message is returned, display the message
