@@ -58,9 +58,4 @@ urls  = list(
   simonnet_etall_2020 = "https://onlinelibrary.wiley.com/doi/full/10.1002/oby.22831?af=R", 
   # misc
   conjugate_priors = "https://en.wikipedia.org/wiki/Conjugate_prior",
-  # social
-  twitter_button = "https://twitter.com/intent/tweet?text=Find%20your%20COVID-19%20risk%20score!&url=https://19andme.shinyapps.io/covid_risk_score/",
-  twitter_widget = "http://platform.twitter.com/widgets.js",
-  facebook_button = "https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2F19andme.shinyapps.io%2Fcovid_risk_score%2F",
-  facebook_widget = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0"
 )
