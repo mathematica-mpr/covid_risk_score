@@ -10,8 +10,10 @@ server <- function(input, output, session) {
   showModal(disclaimer_message)
   
   # function to make request to API
-  hit_api<- eventReactive(input$go, {
+  hit_api<- reactive({
     
+    # do not procced if go was not clicked at all
+    validate(need(input$go > 0, ""))
     api_return <- calculateRisk(input)
     
     # if a message is returned, display the message
@@ -19,16 +21,6 @@ server <- function(input, output, session) {
     
     return(api_return$results)
     })
-
-  # update some input values when input$go is pressed
-  calc_input_vals <- eventReactive(input$go, {
-    
-    val_list <- list("hand" = input$hand, 
-                     "ppe" = input$ppe, 
-                     "symptoms" = input$symptoms)
-    
-    return(val_list)
-  })
   
   # Sidebar Collapse updates
   observeEvent(input$next0, {
@@ -120,9 +112,8 @@ server <- function(input, output, session) {
   
   output$res <-renderUI({
     risk <- get_risk_info()
-    input_vals <- calc_input_vals()
     # in app/results.R
-    renderResultsHtml(risk, input_vals$symptoms, input_vals$hand, input_vals$ppe)
+    renderResultsHtml(risk, input$symptoms, input$hand, input$ppe)
   })
   
   output$methods <-renderUI({
