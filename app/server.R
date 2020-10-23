@@ -20,13 +20,14 @@ server <- function(input, output, session) {
   observeEvent(input$next2, {
     updateCollapse(session, id = "collapse_main", open = "3. Your Behavior", 
                    close = "2. Pre-existing Conditions")
+  })
+  
+  observe({
+    
     if (!input$is_sick) {
       # clear the conditional panel's UI when unchecked
       updateCheckboxGroupInput(session, "symptoms", selected = character(0))
     }
-  })
-  
-  observe({
     # handle special cases (immune and other) in chronic conditions 
     if ("is_other" %in% input$conditions) {
       # if other chronic condition is selected, clear all other selections
