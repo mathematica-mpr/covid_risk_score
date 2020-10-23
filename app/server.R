@@ -9,20 +9,6 @@ server <- function(input, output, session) {
   # Show the model on start up ...
   showModal(disclaimer_message)
   
-  # function to make request to API
-  hit_api<- reactive({
-    
-    # do not procced if go was not clicked at all
-    validate(need(input$go > 0, ""))
-    validate(need(nchar(input$zip) >= 5, ""))
-    api_return <- calculateRisk(input)
-    
-    # if a message is returned, display the message
-    validate(need(is.null(api_return$message), gsub("Bad Request: ","\nPlease Correct:\n",as.character(api_return$message))))
-    
-    return(api_return$results)
-    })
-  
   # Sidebar Collapse updates
   observeEvent(input$next0, {
     updateCollapse(session, id = "collapse_main", open = "1. About You", close = "Introduction")
@@ -55,7 +41,15 @@ server <- function(input, output, session) {
   get_risk_info <- reactive({
     
     # hit the API
-    api_out <- hit_api()
+    # do not procced if go was not clicked at all
+    validate(need(input$go > 0, ""))
+    validate(need(nchar(input$zip) >= 5, ""))
+    api_return <- calculateRisk(input)
+    
+    # if a message is returned, display the message
+    validate(need(is.null(api_return$message), gsub("Bad Request: ","\nPlease Correct:\n",as.character(api_return$message))))
+    
+    api_out <- api_return$results
     
     # number of outputs
     n_out <- length(api_out)
