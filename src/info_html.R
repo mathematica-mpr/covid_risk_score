@@ -50,8 +50,10 @@ renderMethodsHtml <- function() {
         
        tags$ul(tags$li("The methodoloy from ", tags$a("Russell et al (2020)", href = urls$russel_etal_2020),
                        " uses the county-level case fatality rate (CFR) to estimate the percentage of cases that are not reported. ",
-                       "Because the CFR is noisy for counties with few cases, we use a ", 
-                       tags$a("Bayesian adjustment", href = urls$conjugate_priors), " to shrink the county CFR ",
+                       "Because under-reporting has decreased since the beginning of the pandemic (in part due to increased access to testing), ",
+                       " we use a 90-day moving window for cases and deaths to calculate the county-level CFR. ",
+                       "Because the CFR is noisy for counties with few cases, we use an ", 
+                       tags$a("empirical Bayes", href = urls$empirical_bayes), " adjustment to shrink the county CFR ",
                        "towards the state CFR.",
                        "The result is that for counties with many cases, we essentially use the county-level CFR, ",
                        "but for counties with only a few cases we use a CFR that is partway between the county and state CFRs.")),
