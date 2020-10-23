@@ -54,7 +54,7 @@ PASSWORD=mystrongpassword
 ```
 There is an example [sample.env](sample.env) you can also use.  Copy it and rename it to `.env`. 
 
-2. Contact the Mathematica Communications Department to get an x-api-key. We will use this to make POST requests for the covid-risk-score-api. Add X_API_KEY to your `.Renviron` file.
+2. Email the [Mathematica Communications team](Communications@mathematica-mpr.com ) to get an x-api-key. We will use this to make POST requests for the covid-risk-score-api. Add X_API_KEY to your `.Renviron` file.
 
 3. Start the environment
 `docker-compose up`
