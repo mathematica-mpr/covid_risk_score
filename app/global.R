@@ -57,5 +57,5 @@ urls  = list(
   menni_etall_2020 = "https://www.nature.com/articles/s41591-020-0916-2",
   simonnet_etall_2020 = "https://onlinelibrary.wiley.com/doi/full/10.1002/oby.22831?af=R", 
   # misc
-  conjugate_priors = "https://en.wikipedia.org/wiki/Conjugate_prior"
+  empirical_bayes = "https://en.wikipedia.org/wiki/Empirical_Bayes_method"
 )
