@@ -1,0 +1,17 @@
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-162518390-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-162518390-2');
+  
+  $(document).on('change', 'text', function(e) {
+    ga('send', 'event', 'widget', 'new text', $(e.currentTarget).val());
+  });
+
+  $(document).on('click', 'button', function() {
+    ga('send', 'event', 'button', 'calculate');
+  });
+</script>
