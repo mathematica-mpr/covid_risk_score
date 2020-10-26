@@ -82,15 +82,15 @@ server <- function(input, output, session) {
       
       return (one_county)
     } else  {
-      return(api_return$message)
+      return(api_return)
     }   
   })
   
   output$output_intro <- renderUI({
     risk<-get_risk_info()
     
-    if (grepl("Bad Request", paste0(risk, collapse = ", "))) {
-      HTML(paste0(risk, collapse = "<br/>"))
+    if (!is.null(risk$message)) {
+      HTML(paste0(risk$message, collapse = "<br/>"))
     } else {
       renderOutputIntroHtml()
     }
@@ -100,7 +100,7 @@ server <- function(input, output, session) {
     
     risk<-get_risk_info()
     
-    if (!grepl("Bad Request", paste0(risk, collapse = ", "))) {
+    if (is.null(risk$message)) {
       validate(need(!is.null(risk), ""))
       
       gauge(case_when(risk$score<1 ~ 1,
@@ -117,7 +117,7 @@ server <- function(input, output, session) {
   output$res <-renderUI({
     risk <- get_risk_info()
     # in app/results.R
-    if (!grepl("Bad Request", paste0(risk, collapse = ", "))) {
+    if (is.null(risk$message)) {
       renderResultsHtml(risk, input$symptoms, input$hand, input$ppe)
     } 
   })
