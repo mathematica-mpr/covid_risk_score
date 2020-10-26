@@ -86,22 +86,22 @@ server <- function(input, output, session) {
     }   
   })
   
+  output$output_intro <- renderUI({
+    risk<-get_risk_info()
+    
+    if (grepl("Bad Request", paste0(risk, collapse = ", "))) {
+      HTML(paste0(risk, collapse = "<br/>"))
+    } else {
+      renderOutputIntroHtml()
+    }
+  })
+  
   output$gauge <-renderGauge({
     
     risk<-get_risk_info()
     
-    if (grepl("Bad Request", paste0(risk, collapse = ", "))) {
-      output$output_intro <- renderUI({
-          HTML(paste0(risk, collapse = "<br/>"))
-      })
-      
-    } else {
+    if (!grepl("Bad Request", paste0(risk, collapse = ", "))) {
       validate(need(!is.null(risk), ""))
-      
-      output$output_intro <- renderUI({
-        # in app/results.R
-        renderOutputIntroHtml()
-      })
       
       gauge(case_when(risk$score<1 ~ 1,
                       risk$score>100 ~ 100,
