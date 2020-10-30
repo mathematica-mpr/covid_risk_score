@@ -1,7 +1,13 @@
 # 19andMe
-An interactive dashboard for users to calculate their individualized risk score of contracting COVID-19 and related adverse health outcomes.
 
-How 19andMe Works?<img src = "app/www/How_19andMe_Works.png">
+## Introduction
+19andMe is an interactive dashboard for users to calculate their individualized risk score of contracting COVID-19 and related adverse health outcomes. https://19andme.covid19.mathematica.org/
+
+How 19andMe Works?
+
+19andMe takes user input on where you live, who you are, and what you do in the pandemic, uses the best available science to provide a ballpark estimation on the how likely someone with similar characteristics like you may contract COVID-19, and if infected, how likely is the outcome going to be severe. Please see the "Methods" tab in the app for more details on our methodology.
+
+<img src = "app/www/How_19andMe_Works.png">
 
 ## Contents
 
