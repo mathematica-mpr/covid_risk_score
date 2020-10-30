@@ -1,6 +1,8 @@
 # 19andMe
 An interactive dashboard for users to calculate their individualized risk score of contracting COVID-19 and related adverse health outcomes.
 
+![19andMe flowchart](app/www/How_19andMe_Works.png)
+
 ## Contents
 
 * app/
@@ -9,20 +11,22 @@ An interactive dashboard for users to calculate their individualized risk score 
     * CSS
     * www/
         * Mathematica logo
+        * How 19andMe works
 
 ## Authors
 * **Cindy Hu** - *product owner*
-* **Emma Pendl-Robinson** - *front-end lead* 
-* **Erin Lipman** - *back-end lead*
+* **Emma Pendl-Robinson** - *full-stack developer* 
+* **Erin Lipman** - *back-end developer and data engineer*
 * **Jennifer Starling** - *validation lead*
-* **Margaret Luo** - *data engineering lead*
-* **Max Dulieu** - *API lead*
+* **Margaret Luo** - *API support and technical consultant*
+* **Max Dulieu** - *API tech lead*
 
 ## Reviewers and Support
 * **George Luo** - *front-end developer*
 * **Arpan Bhattacharya, George Gallo** - *AWS architects*
-* **Sean Kirk, Aaron White** - *data pipeline expert*
-* **Kelsey Skvoretz, Fei Xing** - *QA reviewer*
+* **Aaron White** - *technical consultant*
+* **Sean Kirk** - *DevOps engineer*
+* **Kelsey Skvoretz, Fei Xing** - *QA reviewers*
 * **Matt Salganik** - *expert reviewer*
 
 ## Acknowledgements
