@@ -1,7 +1,7 @@
 # 19andMe
 An interactive dashboard for users to calculate their individualized risk score of contracting COVID-19 and related adverse health outcomes.
 
-![How 19andMe Works?]<img src = "app/www/How_19andMe_Works.png">
+How 19andMe Works?<img src = "app/www/How_19andMe_Works.png">
 
 ## Contents
 
