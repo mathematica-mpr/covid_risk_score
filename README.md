@@ -1,5 +1,14 @@
 # 19andMe
-An interactive dashboard for users to calculate their individualized risk score of contracting COVID-19 and related adverse health outcomes.
+
+## Introduction
+19andMe is an interactive dashboard for users to calculate their individualized risk score of contracting COVID-19 and related adverse health outcomes. https://19andme.covid19.mathematica.org/
+
+How 19andMe Works?
+
+19andMe takes user input on where you live, who you are, and what you do in the pandemic, uses the best available science to provide a ballpark estimation on the how likely someone with similar characteristics like you may contract COVID-19, and if infected, how likely is the outcome going to be severe. Please see the "Methods" tab in the app for more details on our methodology.
+
+<img src = "https://raw.githubusercontent.com/mathematica-mpr/covid_risk_score/feature/add_roles_in_readme/app/www/How_19andMe_Works.png" alt = "19andme workflow">
+
 
 ## Contents
 
@@ -9,20 +18,22 @@ An interactive dashboard for users to calculate their individualized risk score 
     * CSS
     * www/
         * Mathematica logo
+        * How 19andMe works
 
 ## Authors
 * **Cindy Hu** - *product owner*
-* **Emma Pendl-Robinson** - *front-end lead* 
-* **Erin Lipman** - *back-end lead*
+* **Emma Pendl-Robinson** - *full-stack developer* 
+* **Erin Lipman** - *back-end developer and data engineer*
 * **Jennifer Starling** - *validation lead*
-* **Margaret Luo** - *data engineering lead*
-* **Max Dulieu** - *API lead*
+* **Margaret Luo** - *API support and technical consultant*
+* **Max Dulieu** - *API tech lead*
 
 ## Reviewers and Support
 * **George Luo** - *front-end developer*
 * **Arpan Bhattacharya, George Gallo** - *AWS architects*
-* **Sean Kirk, Aaron White** - *data pipeline expert*
-* **Kelsey Skvoretz, Fei Xing** - *QA reviewer*
+* **Aaron White** - *technical consultant*
+* **Sean Kirk** - *DevOps engineer*
+* **Kelsey Skvoretz, Fei Xing** - *QA reviewers*
 * **Matt Salganik** - *expert reviewer*
 
 ## Acknowledgements
