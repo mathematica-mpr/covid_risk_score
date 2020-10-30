@@ -7,7 +7,9 @@ How 19andMe Works?
 
 19andMe takes user input on where you live, who you are, and what you do in the pandemic, uses the best available science to provide a ballpark estimation on the how likely someone with similar characteristics like you may contract COVID-19, and if infected, how likely is the outcome going to be severe. Please see the "Methods" tab in the app for more details on our methodology.
 
-<img src = "app/www/How_19andMe_Works.png">
+<p align = "center">
+    <img src = "app/www/How_19andMe_Works.png" alt = "19andme workflow">
+</p>
 
 ## Contents
 
