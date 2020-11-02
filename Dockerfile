@@ -26,7 +26,7 @@ server {\n\
 
 
 
-COPY /app /srv/shiny-server/covid_risk_score/app
+COPY /app /srv/shiny-server/covid_risk_score
 COPY .Renviron /srv/shiny-server/covid_risk_score/.Renviron
 
 
