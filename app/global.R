@@ -16,15 +16,6 @@ library(lubridate)
 
 # Global variables can go here
 
-#Flu data from CDC https://www.cdc.gov/flu/about/burden/index.html
-prob_flu<- 35520883/(329.45*10^6)/26 #assume 26 weeks of flu season
-
-#odds ratio for hand washing
-hand_or<-0.45 #https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2190272/
-#odds ratio for wearing PPE
-ppe_or<-0.32 #https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2190272/
-
-
 # urls class to store our urls
 urls  = list(
   # CCDC

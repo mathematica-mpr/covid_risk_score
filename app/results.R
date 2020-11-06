@@ -93,7 +93,7 @@ renderScoreHtml <- function(risk) {
 }
 
 renderExposureHtml <- function(risk, symptoms) {
-  prob_flu_string = formatPercent(prob_flu)
+  prob_flu_string = formatPercent(risk$prob_flu)
   risk_string = formatPercent(risk$exposure_risk)
   sympt_covid_string = formatPercent(risk$sympt_covid_risk)
   exposure_text = paste0(
@@ -129,33 +129,9 @@ renderSusceptibilityHtml <- function(risk) {
 
 renderProtectionHtml <- function(risk, hand, ppe){
   
-  risk_hand_0<-risk$exposure_risk
-  risk_hand_1<-if_else(hand == TRUE,
-                       # default is hand washing, H1 is no hand washing, divide OR
-                       odds2risk(risk2odds(risk_hand_0)/hand_or),
-                       # default is no hand washing, H1 is with hand washing, multiply OR
-                       odds2risk(risk2odds(risk_hand_0)*hand_or))
-  risk_hand_delta<-if_else(hand == TRUE,
-                           # default is hand washing, H1 is no hand washing, H0/H1
-                           abs(risk_hand_0/risk_hand_1-1),
-                           # default is no hand washing, H1 is hand washing, H1/H0
-                           abs(risk_hand_1/risk_hand_0-1))
-  prob_hand_string<- formatPercent(risk_hand_delta)
+  prob_hand_string<- formatPercent(risk$risk_hand_delta)
+  prob_ppe_string<- formatPercent(risk$risk_ppe_delta)
 
-  risk_ppe_0<-risk$exposure_risk
-  risk_ppe_1<-if_else(ppe == TRUE,
-                       # default is wearing PPE, H1 is no PPE, divide OR
-                       odds2risk(risk2odds(risk_ppe_0)/ppe_or),
-                       # default is no PPE, H1 is with PPE, multiply OR
-                       odds2risk(risk2odds(risk_ppe_0)*ppe_or))
-  risk_ppe_delta<-if_else(ppe == TRUE,
-                          # default is hand washing, H1 is no hand washing, H0/H1
-                          abs(risk_ppe_0/risk_ppe_1-1),
-                          # default is no hand washing, H1 is hand washing, H1/H0
-                          abs(risk_ppe_1/risk_ppe_0-1))
-  prob_ppe_string<- formatPercent(risk_ppe_delta)
-  
-  
   if (hand == TRUE){
     hand_html = HTML(paste0(
       "Good to know you wash your hands per ", 
