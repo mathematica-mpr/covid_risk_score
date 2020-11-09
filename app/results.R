@@ -14,9 +14,7 @@ bool2char <- function(bol){
 }
 
 calculateRisk <- function(input) {
-
-  request_url <- "api.covid19.mathematica.org/score"
-
+  
   request_body <- list(
     "zip" = input$zip,
     "age"= as.numeric(input$age),
@@ -29,7 +27,7 @@ calculateRisk <- function(input) {
     "ppe"= bool2char(input$ppe),
     "conditions" = as.list(input$conditions))
   
-  resp <- POST(request_url, add_headers("x-api-key" = Sys.getenv("X_API_KEY")), body = request_body, encode = "json")
+  resp <- POST(urls$covid_score_api, add_headers("x-api-key" = Sys.getenv("X_API_KEY")), body = request_body, encode = "json")
   api_return <- content(resp)
 
   return (api_return)
