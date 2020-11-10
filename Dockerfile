@@ -24,11 +24,11 @@ server {\n\
 }\n' > /etc/shiny-server/shiny-server.conf \
     && rm -rf /srv/shiny-server/sample-apps
 
-COPY /data /srv/shiny-server/covid_risk_score/data
-COPY /doc /srv/shiny-server/covid_risk_score/doc
-COPY /src /srv/shiny-server/covid_risk_score/src
-COPY /www /srv/shiny-server/covid_risk_score/www
-COPY app.R /srv/shiny-server/covid_risk_score/app.R
+
+
+COPY /app /srv/shiny-server/covid_risk_score
+COPY .Renviron /srv/shiny-server/covid_risk_score/.Renviron
+
 
 WORKDIR /root
 
