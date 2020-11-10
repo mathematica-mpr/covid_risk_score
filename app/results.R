@@ -14,9 +14,7 @@ bool2char <- function(bol){
 }
 
 calculateRisk <- function(input) {
-
-  request_url <- "api.covid19.mathematica.org/score"
-
+  
   request_body <- list(
     "zip" = input$zip,
     "age"= as.numeric(input$age),
@@ -29,7 +27,7 @@ calculateRisk <- function(input) {
     "ppe"= bool2char(input$ppe),
     "conditions" = as.list(input$conditions))
   
-  resp <- POST(request_url, add_headers("x-api-key" = Sys.getenv("X_API_KEY")), body = request_body, encode = "json")
+  resp <- POST(urls$covid_score_api, add_headers("x-api-key" = Sys.getenv("X_API_KEY")), body = request_body, encode = "json")
   api_return <- content(resp)
 
   return (api_return)
@@ -93,7 +91,7 @@ renderScoreHtml <- function(risk) {
 }
 
 renderExposureHtml <- function(risk, symptoms) {
-  prob_flu_string = formatPercent(prob_flu)
+  prob_flu_string = formatPercent(risk$prob_flu)
   risk_string = formatPercent(risk$exposure_risk)
   sympt_covid_string = formatPercent(risk$sympt_covid_risk)
   exposure_text = paste0(
@@ -129,58 +127,51 @@ renderSusceptibilityHtml <- function(risk) {
 
 renderProtectionHtml <- function(risk, hand, ppe){
   
-  risk_hand_0<-risk$exposure_risk
-  risk_hand_1<-if_else(hand == TRUE,
-                       # default is hand washing, H1 is no hand washing, divide OR
-                       odds2risk(risk2odds(risk_hand_0)/hand_or),
-                       # default is no hand washing, H1 is with hand washing, multiply OR
-                       odds2risk(risk2odds(risk_hand_0)*hand_or))
-  risk_hand_delta<-if_else(hand == TRUE,
-                           # default is hand washing, H1 is no hand washing, H0/H1
-                           abs(risk_hand_0/risk_hand_1-1),
-                           # default is no hand washing, H1 is hand washing, H1/H0
-                           abs(risk_hand_1/risk_hand_0-1))
-  prob_hand_string<- formatPercent(risk_hand_delta)
+  prob_hand_string<- formatPercent(risk$risk_hand_delta)
+  prob_ppe_string<- formatPercent(risk$risk_ppe_delta)
 
-  risk_ppe_0<-risk$exposure_risk
-  risk_ppe_1<-if_else(ppe == TRUE,
-                       # default is wearing PPE, H1 is no PPE, divide OR
-                       odds2risk(risk2odds(risk_ppe_0)/ppe_or),
-                       # default is no PPE, H1 is with PPE, multiply OR
-                       odds2risk(risk2odds(risk_ppe_0)*ppe_or))
-  risk_ppe_delta<-if_else(ppe == TRUE,
-                          # default is hand washing, H1 is no hand washing, H0/H1
-                          abs(risk_ppe_0/risk_ppe_1-1),
-                          # default is no hand washing, H1 is hand washing, H1/H0
-                          abs(risk_ppe_1/risk_ppe_0-1))
-  prob_ppe_string<- formatPercent(risk_ppe_delta)
-  
-  
-  if (hand == TRUE){
+  if (hand == TRUE ){
     hand_html = HTML(paste0(
       "Good to know you wash your hands per ", 
       tags$a("CDC guidance", href = urls$cdc_hand_hygiene),
-      ". In general, this lowers people's risk of being exposed to COVID-19 by ", prob_hand_string, " . "))
+      "."))
   } else{
     hand_html = HTML(paste0(
       "We recommend you wash your hands per ", 
       tags$a("CDC guidance", href = urls$cdc_hand_hygiene),
-      ". In general, this would lower people's risk of being exposed to COVID-19 by ", prob_hand_string, " . "))
+      "."))
+  }
+  if (risk$exposure_risk >0){
+    # exposure reduction hand text for users with exposure risk of over 0
+    hand_delta_html = HTML(paste0("In general, hand washing reduces people's risk of being exposed to COVID-19 by ", 
+                                  prob_hand_string, " . "))
+  } else{
+    # exposure reduction hand text for users with exposure risk less than or equal to 0
+    hand_delta_html = HTML(paste0("In general, hand washing reduces people's risk of being exposed to COVID-19, 
+                                  if they do come into close contact with others. "))
   }
   
   if (ppe == TRUE){
     ppe_html = HTML(paste0(
       "Good to know you wear personal protection equipment per ", 
-      tags$a("CDC guidelines", href = urls$cdc_ppe),
-      ". In general, this lowers people's risk of being exposed to COVID-19 by ", prob_ppe_string, " . "))
-  } else{
+      tags$a("CDC guidelines", href = urls$cdc_ppe), " . "))
+  } else {
     ppe_html = HTML(paste0(
       "We recommend you wear personal protection equipment per ", 
-      tags$a("CDC guidelines", href = urls$cdc_ppe),
-      ". In general, this would lower people's risk of being exposed to COVID-19 by ", prob_ppe_string, " . "))
+      tags$a("CDC guidelines", href = urls$cdc_ppe), " . "))
   }
   
-  return(tags$p(hand_html, ppe_html))
+  if (risk$exposure_risk >0){
+    # exposure reduction ppe text for users with exposure risk of over 0
+    ppe_delta_html = HTML(paste0("In general, wearing personal protection equipment reduces people's risk of being 
+                                 exposed to COVID-19 by ", prob_ppe_string, " . "))
+  } else {
+    # exposure reduction ppe text for users with exposure risk less than or equal to 0
+    ppe_delta_html = HTML(paste0("In general, wearing personal protection equipment reduces people's risk of being 
+                                 exposed to COVID-19, if they do come into close contact with others. "))
+  }
+  
+  return(tags$p(hand_html, hand_delta_html, ppe_html, ppe_delta_html))
 }
 
 renderResultsHtml <- function(risk, symptoms, hand, ppe) {
