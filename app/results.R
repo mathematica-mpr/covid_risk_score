@@ -67,9 +67,7 @@ renderLocationHtml <- function(risk) {
 }
 
 renderScoreHtml <- function(risk) {
-  score<- risk$score
-  score = max(score, 1)
-  score = min(score, 100)
+  score<- risk$risk_score
   
   tags$p(HTML(paste0(
     "The risk score for people with similar characteristics and behaviors as you is ",
