@@ -29,6 +29,10 @@ server <- function(input, output, session) {
       updateCheckboxGroupInput(session, "symptoms", selected = character(0))
     }
     # handle special cases (immune and other) in chronic conditions 
+    if ("immunocompromised" %in% input$conditions) {
+      # if immunocompromised chronic condition is selected, clear all additional selections
+      updateCheckboxGroupInput(session, "conditions", selected = "immunocompromised")
+    }
     if ("other" %in% input$conditions) {
       # if other chronic condition is selected, clear all additional selections
       updateCheckboxGroupInput(session, "conditions", selected = "other")
