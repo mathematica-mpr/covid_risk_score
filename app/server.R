@@ -107,9 +107,9 @@ server <- function(input, output, session) {
     if (is.null(risk$message)) {
       validate(need(!is.null(risk), ""))
       
-      gauge(case_when(risk$score<1 ~ 1,
-                      risk$score>100 ~ 100,
-                      TRUE ~round(risk$score)), 
+      gauge(case_when(risk$risk_score<1 ~ 1,
+                      risk$risk_score>100 ~ 100,
+                      TRUE ~round(risk$risk_score)), 
             min = 0, max = 100, 
             sectors = gaugeSectors(success = c(0, 30),
                                    warning = c(30, 70),
