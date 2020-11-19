@@ -1,7 +1,3 @@
-# helper functions
-source("info_html.R")
-source("functions.R ")
-
 # libraries 
 library(shiny)
 library(shinycssloaders)
@@ -12,6 +8,11 @@ library(flexdashboard)
 library(httr)
 library(tidyverse)
 library(lubridate)
+
+# helper functions
+source("info_html.R")
+source("functions.R")
+
 
 # Global variables can go here
 
