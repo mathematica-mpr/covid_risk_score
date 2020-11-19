@@ -1,6 +1,6 @@
 # helper functions
 source("info_html.R")
-source("results.R")
+source("functions.R")
 
 # libraries 
 library(shiny)
