@@ -28,10 +28,10 @@ server <- function(input, output, session) {
       # clear the conditional panel's UI when unchecked
       updateCheckboxGroupInput(session, "symptoms", selected = character(0))
     }
-    # handle special cases (immune and other) in chronic conditions 
-    if ("is_other" %in% input$conditions) {
-      # if other chronic condition is selected, clear all other selections
-      updateCheckboxGroupInput(session, "conditions", selected = "is_other")
+    # handle special cases other in chronic conditions 
+    if ("other" %in% input$conditions) {
+      # if other chronic condition is selected, clear all additional selections
+      updateCheckboxGroupInput(session, "conditions", selected = "other")
     }
     if (!input$has_preexisting) {
       # clear the conditional panel's UI when unchecked
@@ -103,9 +103,7 @@ server <- function(input, output, session) {
     if (is.null(risk$message)) {
       validate(need(!is.null(risk), ""))
       
-      gauge(case_when(risk$score<1 ~ 1,
-                      risk$score>100 ~ 100,
-                      TRUE ~round(risk$score)), 
+      gauge(round(risk$risk_score), 
             min = 0, max = 100, 
             sectors = gaugeSectors(success = c(0, 30),
                                    warning = c(30, 70),

@@ -1,14 +1,14 @@
 
 # possible input conditions
-conditions_list = c("Chronic renal disease" = "is_renal",
-                    "Cardiovascular disease" = "is_cvd",
-                    "Diabetes" = "is_diabetes",
-                    "Hypertension" = "is_hyper",
-                    "Current or former smoker" = "is_smoker",
-                    "Immunocompromised condition <sub class = 'text-info'>(the hospitalization risk for immune disease is slightly overestimated due to lack of mutually adjusted odds ratios)</sub>" = "is_immune",
-                    "Chronic lung disease" = "is_lung",
-                    "Obesity (BMI &ge; 30 kg/m&sup2;)" = "is_obesity",
-                    "My chronic condition is not listed <sub class = 'text-info'>(selecting this will unselect other conditions due to lack of mutually adjusted odds ratios)</sub>" = "is_other")
+conditions_list = c("Chronic renal disease" = "renal_disease",
+                    "Cardiovascular disease" = "cardiovascular_disease",
+                    "Diabetes" = "diabetes",
+                    "Hypertension" = "hypertension",
+                    "Current or former smoker" = "smoking",
+                    "Immunocompromised condition <sub class = 'text-info'>(the hospitalization risk for immune disease is slightly overestimated due to lack of mutually adjusted odds ratios)</sub>" = "immunocompromised",
+                    "Chronic lung disease" = "lung_disease",
+                    "Obesity (BMI &ge; 30 kg/m&sup2;)" = "obesity",
+                    "My chronic condition is not listed <sub class = 'text-info'>(selecting this will unselect other conditions due to lack of mutually adjusted odds ratios)</sub>" = "other")
 
 collapseStory <- function() {
 
@@ -49,11 +49,11 @@ collapseStory <- function() {
       conditionalPanel(
         condition = "input.is_sick == true",
         checkboxGroupInput("symptoms", "Symptoms",
-                           c("Loss of smell and taste" = "is_loss_smell_taste",
-                             "Severe or significant persistent cough" = "is_cough",
-                             "Severe fatigue" = "is_fatigue",
-                             "Loss of appetite, skipped meals" = "is_skip_meal",
-                             "My symptoms are not listed here" = "is_other" 
+                           c("Loss of smell and taste" = "loss_smell_taste",
+                             "Severe or significant persistent cough" = "severe_cough",
+                             "Severe fatigue" = "severe_fatigue",
+                             "Loss of appetite, skipped meals" = "loss_appetite",
+                             "My symptoms are not listed here" = "other" 
                              ))),
       hr(),
       
@@ -71,13 +71,13 @@ collapseStory <- function() {
     ), # bsCollapsePanel
     bsCollapsePanel(
       title = "3. Your Behavior",
-      sliderInput('nppl', 
+      sliderInput('direct_contacts', 
                   'Direct exposure: how many people (include your household members) do you come into close contact (> 10 min, < 6 feet) with in a week?', 
                   min = 0, max = 100, value = 1, step =1),
-      checkboxInput('is_roommate', "I live with other people."),
+      checkboxInput('live_w_others', "I live with other people."),
       conditionalPanel(
-        condition = "input.is_roommate == true",
-        sliderInput('nppl2', 
+        condition = "input.live_w_others == true",
+        sliderInput('indirect_contacts', 
                     'Indirect exposure: how many people in total do your other household members come into close contact with in a week? (Do not include yourself in this count.)', 
                     min = 0, max = 100, value = 0, step =1)),
       checkboxInput("hand", div("I perform hand hygiene according to ", 

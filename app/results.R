@@ -20,9 +20,9 @@ calculateRisk <- function(input) {
     "age"= as.numeric(input$age),
     "sex" = input$sex,
     "symptoms" = as.list(input$symptoms),
-    "nppl" = as.numeric(input$nppl),
-    "is_roommate"= bool2char(input$is_roommate),
-    "nppl2" = as.numeric(input$nppl2),
+    "direct_contacts" = as.numeric(input$direct_contacts),
+    "live_w_others"= bool2char(input$live_w_others),
+    "indirect_contacts" = as.numeric(input$indirect_contacts),
     "hand"= bool2char(input$hand),
     "ppe"= bool2char(input$ppe),
     "conditions" = as.list(input$conditions))
@@ -53,23 +53,21 @@ renderLocationHtml <- function(risk) {
   underreport_factor_string = formatNumber(risk$underreport_factor, "x")
   div(
     title = "Location",
-    tags$p(div('We found data from ', formatDynamicString(risk$name), ' for your zip code. As of ', 
-               formatDynamicString(risk$latest_day), ', this county had', formatDynamicString(format(round(risk$moving_casecount), big.mark =",")),
+    tags$p(div('We found data from ', formatDynamicString(risk$county), ' for your zip code. As of ', 
+               formatDynamicString(risk$latest_day), ', this county had', formatDynamicString(format(round(risk$cases_past14d), big.mark =",")),
                ' new reported cases in the last 14 days and ',
-               formatDynamicString(format(risk$n_case_today, big.mark=",")), 
+               formatDynamicString(format(risk$cumulative_cases, big.mark=",")), 
                ' total reported cases of COVID-19. Many people who contract COVID-19 are not tested, and therefore not reported. 
                We estimate that your county has an under-reporting factor of ', underreport_factor_string, 
                '. Taking into account the under-reporting factor, incubation period, and time from symptom onset to recovery, we estimate there are ',
-               formatDynamicString(format(round(risk$est_unreported_sick), big.mark =",")),
+               formatDynamicString(format(round(risk$est_current_sick), big.mark =",")),
                ' total sick people distributed throughout the county, including those who are not officially reported.'
     ))
   )
 }
 
 renderScoreHtml <- function(risk) {
-  score<- risk$score
-  score = max(score, 1)
-  score = min(score, 100)
+  score<- risk$risk_score
   
   tags$p(HTML(paste0(
     "The risk score for people with similar characteristics and behaviors as you is ",
@@ -91,7 +89,7 @@ renderScoreHtml <- function(risk) {
 }
 
 renderExposureHtml <- function(risk, symptoms) {
-  prob_flu_string = formatPercent(risk$prob_flu)
+  prob_flu_string = formatPercent(risk$flu_risk_natl_avg)
   risk_string = formatPercent(risk$exposure_risk)
   sympt_covid_string = formatPercent(risk$sympt_covid_risk)
   exposure_text = paste0(
@@ -127,8 +125,8 @@ renderSusceptibilityHtml <- function(risk) {
 
 renderProtectionHtml <- function(risk, hand, ppe){
   
-  prob_hand_string<- formatPercent(risk$risk_hand_delta)
-  prob_ppe_string<- formatPercent(risk$risk_ppe_delta)
+  prob_hand_string<- formatPercent(risk$risk_reduction_handwash)
+  prob_ppe_string<- formatPercent(risk$risk_reduction_ppe)
 
   if (hand == TRUE ){
     hand_html = HTML(paste0(
