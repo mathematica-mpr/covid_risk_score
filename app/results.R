@@ -20,9 +20,9 @@ calculateRisk <- function(input) {
     "age"= as.numeric(input$age),
     "sex" = input$sex,
     "symptoms" = as.list(input$symptoms),
-    "direct_contacts" = as.numeric(input$nppl),
-    "live_w_others"= bool2char(input$is_roommate),
-    "indirect_contacts" = as.numeric(input$nppl2),
+    "direct_contacts" = as.numeric(input$direct_contacts),
+    "live_w_others"= bool2char(input$live_w_others),
+    "indirect_contacts" = as.numeric(input$indirect_contacts),
     "hand"= bool2char(input$hand),
     "ppe"= bool2char(input$ppe),
     "conditions" = as.list(input$conditions))

@@ -71,13 +71,13 @@ collapseStory <- function() {
     ), # bsCollapsePanel
     bsCollapsePanel(
       title = "3. Your Behavior",
-      sliderInput('nppl', 
+      sliderInput('direct_contacts', 
                   'Direct exposure: how many people (include your household members) do you come into close contact (> 10 min, < 6 feet) with in a week?', 
                   min = 0, max = 100, value = 1, step =1),
-      checkboxInput('is_roommate', "I live with other people."),
+      checkboxInput('live_w_others', "I live with other people."),
       conditionalPanel(
-        condition = "input.is_roommate == true",
-        sliderInput('nppl2', 
+        condition = "input.live_w_others == true",
+        sliderInput('indirect_contacts', 
                     'Indirect exposure: how many people in total do your other household members come into close contact with in a week? (Do not include yourself in this count.)', 
                     min = 0, max = 100, value = 0, step =1)),
       checkboxInput("hand", div("I perform hand hygiene according to ", 
