@@ -1,5 +1,4 @@
 # helper functions
-source("helper_input.R")
 source("info_html.R")
 source("results.R")
 
@@ -51,3 +50,14 @@ urls  = list(
   # misc
   empirical_bayes = "https://en.wikipedia.org/wiki/Empirical_Bayes_method"
 )
+
+# possible input conditions
+conditions_list = c("Chronic renal disease" = "renal_disease",
+                    "Cardiovascular disease" = "cardiovascular_disease",
+                    "Diabetes" = "diabetes",
+                    "Hypertension" = "hypertension",
+                    "Current or former smoker" = "smoking",
+                    "Immunocompromised condition <sub class = 'text-info'>(the hospitalization risk for immune disease is slightly overestimated due to lack of mutually adjusted odds ratios)</sub>" = "immunocompromised",
+                    "Chronic lung disease" = "lung_disease",
+                    "Obesity (BMI &ge; 30 kg/m&sup2;)" = "obesity",
+                    "My chronic condition is not listed <sub class = 'text-info'>(selecting this will unselect other conditions due to lack of mutually adjusted odds ratios)</sub>" = "other")
