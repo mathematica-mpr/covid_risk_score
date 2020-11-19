@@ -1,12 +1,4 @@
 
-risk2odds<-function(prob) {
-  return (prob / (1 - prob))
-}
-
-odds2risk<-function(odds) {
-  return (odds / (1 + odds))
-}
-
 bool2char <- function(bol){
   # convert boolean to char
   # bol : boolean
