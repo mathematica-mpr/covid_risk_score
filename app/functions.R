@@ -1,18 +1,12 @@
 
-risk2odds<-function(prob) {
-  return (prob / (1 - prob))
-}
-
-odds2risk<-function(odds) {
-  return (odds / (1 + odds))
-}
-
+# converts boolean into string -------------------------------------------------
 bool2char <- function(bol){
   # convert boolean to char
   # bol : boolean
   stringr::str_to_sentence(bol)
 }
 
+# function makes API call ------------------------------------------------------
 calculateRisk <- function(input) {
   
   request_body <- list(
@@ -33,6 +27,7 @@ calculateRisk <- function(input) {
   return (api_return)
 }
 
+# formate string, numbers, or percent ------------------------------------------
 formatDynamicString <- function(string) {
   return (tags$b(tags$span(style="color:#F0AD4E",string)))
 }
@@ -49,6 +44,7 @@ renderOutputIntroHtml <- function() {
   )
 }
 
+# function to create location HTML output --------------------------------------
 renderLocationHtml <- function(risk) {
   underreport_factor_string = formatNumber(risk$underreport_factor, "x")
   div(
@@ -66,6 +62,7 @@ renderLocationHtml <- function(risk) {
   )
 }
 
+# function to create risk_score HTML output ------------------------------------
 renderScoreHtml <- function(risk) {
   score<- risk$risk_score
   
@@ -88,6 +85,7 @@ renderScoreHtml <- function(risk) {
   )))
 }
 
+# function to create exporsure risk HTML output --------------------------------
 renderExposureHtml <- function(risk, symptoms) {
   prob_flu_string = formatPercent(risk$flu_risk_natl_avg)
   risk_string = formatPercent(risk$exposure_risk)
@@ -112,6 +110,7 @@ renderExposureHtml <- function(risk, symptoms) {
   return (total_risk_html)
 }
 
+# function to create susceptibility HTML output --------------------------------------
 renderSusceptibilityHtml <- function(risk) {
   tags$p(HTML(paste0(
     "Among people who are the same age, sex, and health status as you and get sick from COVID-19, the risk of hospitalization is ", 
@@ -123,6 +122,7 @@ renderSusceptibilityHtml <- function(risk) {
   )))
 }
 
+# function to create hand and ppe HTML output ----------------------------------
 renderProtectionHtml <- function(risk, hand, ppe){
   
   prob_hand_string<- formatPercent(risk$risk_reduction_handwash)
@@ -148,7 +148,7 @@ renderProtectionHtml <- function(risk, hand, ppe){
     hand_delta_html = HTML(paste0("In general, hand washing reduces people's risk of being exposed to COVID-19, 
                                   if they do come into close contact with others. "))
   }
-  
+
   if (ppe == TRUE){
     ppe_html = HTML(paste0(
       "Good to know you wear personal protection equipment per ", 
@@ -172,6 +172,7 @@ renderProtectionHtml <- function(risk, hand, ppe){
   return(tags$p(hand_html, hand_delta_html, ppe_html, ppe_delta_html))
 }
 
+# function combines score page HTML outputs ------------------------------------
 renderResultsHtml <- function(risk, symptoms, hand, ppe) {
   
   # return
