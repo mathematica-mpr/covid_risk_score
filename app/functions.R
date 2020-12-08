@@ -47,10 +47,11 @@ renderOutputIntroHtml <- function() {
 # function to create location HTML output --------------------------------------
 renderLocationHtml <- function(risk) {
   underreport_factor_string = formatNumber(risk$underreport_factor, "x")
+  latest_day_string <- format(as.Date(risk$latest_day, "%m/%d/%Y"), "%B %d, %Y")
   div(
     title = "Location",
     tags$p(div('We found data from ', formatDynamicString(risk$county), ' for your zip code. As of ', 
-               formatDynamicString(risk$latest_day), ', this county had', formatDynamicString(format(round(risk$cases_past14d), big.mark =",")),
+               formatDynamicString(latest_day_string), ', this county had', formatDynamicString(format(round(risk$cases_past14d), big.mark =",")),
                ' new reported cases in the last 14 days and ',
                formatDynamicString(format(risk$cumulative_cases, big.mark=",")), 
                ' total reported cases of COVID-19. Many people who contract COVID-19 are not tested, and therefore not reported. 
