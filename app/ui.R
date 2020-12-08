@@ -71,10 +71,10 @@ ui <- fluidPage(
         ), # bsCollapsePanel
         bsCollapsePanel(
           title = "3. Your Behavior",
+          checkboxInput('live_w_others', "I live with other people."),
           sliderInput('direct_contacts', 
                       'Direct exposure: how many people (include your household members) do you come into close contact (> 10 min, < 6 feet) with in a week?', 
                       min = 0, max = 100, value = 1, step =1),
-          checkboxInput('live_w_others', "I live with other people."),
           conditionalPanel(
             condition = "input.live_w_others == true",
             sliderInput('indirect_contacts', 
