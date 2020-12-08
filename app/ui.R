@@ -78,7 +78,7 @@ ui <- fluidPage(
           conditionalPanel(
             condition = "input.live_w_others == true",
             sliderInput('indirect_contacts', 
-                        'Indirect exposure: how many people in total do your other household members come into close contact with in a week? (Do not include yourself in this count.)', 
+                        'Indirect exposure: how many people in total do your household members come into close contact with in a week? (Do not include contact between household members in this count.)', 
                         min = 0, max = 100, value = 0, step =1)),
           checkboxInput("hand", div("I perform hand hygiene according to ", 
                                     tags$a("CDC guidance", href = urls$cdc_hand_hygiene))),
