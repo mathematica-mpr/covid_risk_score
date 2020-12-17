@@ -37,3 +37,6 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+# A paper that I've temporarily stored for reference.
+/drafts/reference-paper.docx
