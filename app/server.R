@@ -1,15 +1,7 @@
 # Define the server code
 server <- function(input, output, session) {
 
-  disclaimer_message <- modalDialog(
-    title = "Disclaimer",
-    disclaimerpopupHTML()
-    )
-  
-  # Show the model on start up ...
-  showModal(disclaimer_message)
-  
-  # Sidebar Collapse updates
+  # Sidebar Collapse ---------------------------------------------------
   observeEvent(input$next0, {
     updateCollapse(session, id = "collapse_main", open = "1. About You", close = "Introduction")
   })
@@ -22,16 +14,11 @@ server <- function(input, output, session) {
                    close = "2. Pre-existing Conditions")
   })
   
+  ## modify symptom and condition selections -----------------------------------
   observe({
-    
     if (!input$is_sick) {
       # clear the conditional panel's UI when unchecked
       updateCheckboxGroupInput(session, "symptoms", selected = character(0))
-    }
-    # handle special cases (immune and other) in chronic conditions 
-    if ("is_other" %in% input$conditions) {
-      # if other chronic condition is selected, clear all other selections
-      updateCheckboxGroupInput(session, "conditions", selected = "is_other")
     }
     if (!input$has_preexisting) {
       # clear the conditional panel's UI when unchecked
@@ -39,14 +26,14 @@ server <- function(input, output, session) {
     }
   })
   
+  # reactive values and lists --------------------------------------------------
   get_risk_info <- reactive({
-    
     # hit the API
-    # do not procced if go was not clicked at all
+    # do not proceed if go was not clicked at all
     validate(need(input$go > 0, ""))
     validate(need(nchar(input$zip) >= 5, ""))
     api_return <- calculateRisk(input)
-
+    
     if (is.null(api_return$message)) {
       api_out <- api_return$results
       
@@ -71,21 +58,30 @@ server <- function(input, output, session) {
         
         # stop if county is not selected
         validate(need(!is.null(input$ordinal_county), ""))
-        
         which_county<- as.numeric(input$ordinal_county)
-        
       } else {
         # if there is only one output county, select the first output county
         which_county <- 1}
-      
       one_county <- api_out[[which_county]]
       
       return (one_county)
-    } else  {
+    } else {
       return(api_return)
     }   
   })
   
+  # output ---------------------------------------------------------------------
+  
+  ## disclaimer message dialogue -----------------------------------------------
+  disclaimer_message <- modalDialog(
+    title = "Disclaimer",
+    disclaimerpopupHTML()
+    )
+  
+  # Show the model on start up ...
+  showModal(disclaimer_message)
+  
+  ## score output intro --------------------------------------------------------
   output$output_intro <- renderUI({
     risk<-get_risk_info()
     
@@ -96,16 +92,13 @@ server <- function(input, output, session) {
     }
   })
   
+  ## render risk score gauge ---------------------------------------------------
   output$gauge <-renderGauge({
-    
     risk<-get_risk_info()
-    
     if (is.null(risk$message)) {
       validate(need(!is.null(risk), ""))
       
-      gauge(case_when(risk$score<1 ~ 1,
-                      risk$score>100 ~ 100,
-                      TRUE ~round(risk$score)), 
+      gauge(round(risk$risk_score), 
             min = 0, max = 100, 
             sectors = gaugeSectors(success = c(0, 30),
                                    warning = c(30, 70),
@@ -114,6 +107,7 @@ server <- function(input, output, session) {
     }
   })
   
+  ## render risk score UI ---------------------------------------------------
   output$res <-renderUI({
     risk <- get_risk_info()
     # in app/results.R
@@ -122,11 +116,13 @@ server <- function(input, output, session) {
     } 
   })
   
+  ## render methods page ---------------------------------------------------
   output$methods <-renderUI({
     # in app/info_html.R
     renderMethodsHtml()
   })
   
+  ## render FAQ page ---------------------------------------------------
   output$faq <- renderUI({
     # in app/info_html.R
     renderFaqHtml()

@@ -1,18 +1,12 @@
 
-risk2odds<-function(prob) {
-  return (prob / (1 - prob))
-}
-
-odds2risk<-function(odds) {
-  return (odds / (1 + odds))
-}
-
+# converts boolean into string -------------------------------------------------
 bool2char <- function(bol){
   # convert boolean to char
   # bol : boolean
   stringr::str_to_sentence(bol)
 }
 
+# function makes API call ------------------------------------------------------
 calculateRisk <- function(input) {
   
   request_body <- list(
@@ -20,12 +14,13 @@ calculateRisk <- function(input) {
     "age"= as.numeric(input$age),
     "sex" = input$sex,
     "symptoms" = as.list(input$symptoms),
-    "nppl" = as.numeric(input$nppl),
-    "is_roommate"= bool2char(input$is_roommate),
-    "nppl2" = as.numeric(input$nppl2),
+    "direct_contacts" = as.numeric(input$direct_contacts),
+    "live_w_others"= input$live_w_others,
+    "indirect_contacts" = as.numeric(input$indirect_contacts),
     "hand"= bool2char(input$hand),
     "ppe"= bool2char(input$ppe),
     "conditions" = as.list(input$conditions))
+  print(input$live_w_others)
   
   resp <- POST(urls$covid_score_api, add_headers("x-api-key" = Sys.getenv("X_API_KEY")), body = request_body, encode = "json")
   api_return <- content(resp)
@@ -33,6 +28,7 @@ calculateRisk <- function(input) {
   return (api_return)
 }
 
+# formate string, numbers, or percent ------------------------------------------
 formatDynamicString <- function(string) {
   return (tags$b(tags$span(style="color:#F0AD4E",string)))
 }
@@ -49,27 +45,32 @@ renderOutputIntroHtml <- function() {
   )
 }
 
+# function to create location HTML output --------------------------------------
 renderLocationHtml <- function(risk) {
   underreport_factor_string = formatNumber(risk$underreport_factor, "x")
+  latest_day_string <- format(as.Date(risk$latest_day, "%m/%d/%Y"), "%B %d, %Y")
+  cases_past14d_string <- format(round(risk$cases_past14d), big.mark =",")
+  cumulative_cases_string <- format(risk$cumulative_cases, big.mark=",")
+  est_current_sick_string <- format(round(risk$est_current_sick), big.mark =",")
+  
   div(
     title = "Location",
-    tags$p(div('We found data from ', formatDynamicString(risk$name), ' for your zip code. As of ', 
-               formatDynamicString(risk$latest_day), ', this county had', formatDynamicString(format(round(risk$moving_casecount), big.mark =",")),
+    tags$p(div('We found data from ', formatDynamicString(risk$county), ' for your zip code. As of ', 
+               formatDynamicString(latest_day_string), ', this county had', formatDynamicString(cases_past14d_string),
                ' new reported cases in the last 14 days and ',
-               formatDynamicString(format(risk$n_case_today, big.mark=",")), 
+               formatDynamicString(cumulative_cases_string), 
                ' total reported cases of COVID-19. Many people who contract COVID-19 are not tested, and therefore not reported. 
                We estimate that your county has an under-reporting factor of ', underreport_factor_string, 
                '. Taking into account the under-reporting factor, incubation period, and time from symptom onset to recovery, we estimate there are ',
-               formatDynamicString(format(round(risk$est_unreported_sick), big.mark =",")),
+               formatDynamicString(est_current_sick_string),
                ' total sick people distributed throughout the county, including those who are not officially reported.'
     ))
   )
 }
 
+# function to create risk_score HTML output ------------------------------------
 renderScoreHtml <- function(risk) {
-  score<- risk$score
-  score = max(score, 1)
-  score = min(score, 100)
+  score<- risk$risk_score
   
   tags$p(HTML(paste0(
     "The risk score for people with similar characteristics and behaviors as you is ",
@@ -90,8 +91,9 @@ renderScoreHtml <- function(risk) {
   )))
 }
 
+# function to create exporsure risk HTML output --------------------------------
 renderExposureHtml <- function(risk, symptoms) {
-  prob_flu_string = formatPercent(risk$prob_flu)
+  prob_flu_string = formatPercent(risk$flu_risk_natl_avg)
   risk_string = formatPercent(risk$exposure_risk)
   sympt_covid_string = formatPercent(risk$sympt_covid_risk)
   exposure_text = paste0(
@@ -114,6 +116,7 @@ renderExposureHtml <- function(risk, symptoms) {
   return (total_risk_html)
 }
 
+# function to create susceptibility HTML output --------------------------------------
 renderSusceptibilityHtml <- function(risk) {
   tags$p(HTML(paste0(
     "Among people who are the same age, sex, and health status as you and get sick from COVID-19, the risk of hospitalization is ", 
@@ -125,10 +128,11 @@ renderSusceptibilityHtml <- function(risk) {
   )))
 }
 
+# function to create hand and ppe HTML output ----------------------------------
 renderProtectionHtml <- function(risk, hand, ppe){
   
-  prob_hand_string<- formatPercent(risk$risk_hand_delta)
-  prob_ppe_string<- formatPercent(risk$risk_ppe_delta)
+  prob_hand_string<- formatPercent(risk$risk_reduction_handwash)
+  prob_ppe_string<- formatPercent(risk$risk_reduction_ppe)
 
   if (hand == TRUE ){
     hand_html = HTML(paste0(
@@ -150,7 +154,7 @@ renderProtectionHtml <- function(risk, hand, ppe){
     hand_delta_html = HTML(paste0("In general, hand washing reduces people's risk of being exposed to COVID-19, 
                                   if they do come into close contact with others. "))
   }
-  
+
   if (ppe == TRUE){
     ppe_html = HTML(paste0(
       "Good to know you wear personal protection equipment per ", 
@@ -174,6 +178,7 @@ renderProtectionHtml <- function(risk, hand, ppe){
   return(tags$p(hand_html, hand_delta_html, ppe_html, ppe_delta_html))
 }
 
+# function combines score page HTML outputs ------------------------------------
 renderResultsHtml <- function(risk, symptoms, hand, ppe) {
   
   # return
