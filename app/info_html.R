@@ -8,7 +8,7 @@ disclaimerpopupHTML <- function(){
     tags$p(style="color:#DF691A", "THE INFORMATION PROVIDED BY THIS TOOL IS NOT MEDICAL ADVICE AND CANNOT BE 
              USED TO DIAGNOSE OR TREAT ANY MEDICAL CONDITION.  See FAQ for more information.", class = "text-warning"),
     tags$p("COVID data behind this app is updated daily - last updated:", format(Sys.Date()-1, "%b %d, %Y"), class = "text-warning"),
-    tags$p("Our algorithm is updated periodically - last updated: Oct 30, 2020", class = "text-warning")
+    tags$p("Our algorithm is updated periodically - last updated: Dec 29, 2020", class = "text-warning")
   )
 }
 
