@@ -77,7 +77,7 @@ ui <- fluidPage(
                       'Direct exposure: how many people (include your household members) do you come into close contact (> 10 min, < 6 feet) with in a week?', 
                       min = 0, max = 100, value = 1, step =1),
           conditionalPanel(
-            condition = "input.live_w_others == 'Yes'",
+            condition = "input.live_w_others == 'True'",
             sliderInput('indirect_contacts', 
                         'Indirect exposure: how many people in total do your household members come into close contact with in a week? (Do not include contact between household members in this count.)', 
                         min = 0, max = 100, value = 0, step =1)),
