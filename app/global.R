@@ -58,12 +58,12 @@ conditions_list = c("Chronic renal disease" = "renal_disease",
                     "Diabetes" = "diabetes",
                     "Hypertension" = "hypertension",
                     "Current or former smoker" = "smoking",
-                    "Immunocompromised condition <sub class = 'text-info'>(the hospitalization risk for immune disease is slightly overestimated due to lack of mutually adjusted odds ratios)</sub>" = "immunocompromised",
+                    "Immunocompromised condition" = "immunocompromised",
                     "Chronic lung disease" = "lung_disease",
                     "Obesity (BMI &ge; 30 kg/m&sup2;)" = "obesity",
                     "Pregnancy" = "pregnancy",
                     "Cancer" = "cancer",
                     "Sickle cell disease" = "sickle_cell",
-                    "My chronic condition is not listed <sub class = 'text-info'>(selecting this will unselect other conditions due to lack of mutually adjusted odds ratios)</sub>" = "other")
+                    "Other chronic condition" = "other")
 
 
