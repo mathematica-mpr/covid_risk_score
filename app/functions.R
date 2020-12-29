@@ -50,7 +50,7 @@ renderOutputIntroHtml <- function() {
 # function to create location HTML output --------------------------------------
 renderLocationHtml <- function(risk) {
   underreport_factor_string = formatNumber(risk$underreport_factor, "x")
-  proportion_sick <- risk$est_current_sick/5150233
+  proportion_sick <- risk$est_current_sick/risk$population
   prob_group50 <- 1-((1-proportion_sick)^50)
   prob_group10 <- 1-((1-proportion_sick)^10)
   div(
