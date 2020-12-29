@@ -20,11 +20,6 @@ server <- function(input, output, session) {
       # clear the conditional panel's UI when unchecked
       updateCheckboxGroupInput(session, "symptoms", selected = character(0))
     }
-    # handle special cases other in chronic conditions 
-    if ("other" %in% input$conditions) {
-      # if other chronic condition is selected, clear all additional selections
-      updateCheckboxGroupInput(session, "conditions", selected = "other")
-    }
     if (!input$has_preexisting) {
       # clear the conditional panel's UI when unchecked
       updateCheckboxGroupInput(session, "conditions", selected = character(0))
