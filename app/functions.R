@@ -15,11 +15,12 @@ calculateRisk <- function(input) {
     "sex" = input$sex,
     "symptoms" = as.list(input$symptoms),
     "direct_contacts" = as.numeric(input$direct_contacts),
-    "live_w_others"= bool2char(input$live_w_others),
+    "live_w_others"= input$live_w_others,
     "indirect_contacts" = as.numeric(input$indirect_contacts),
     "hand"= bool2char(input$hand),
     "ppe"= bool2char(input$ppe),
     "conditions" = as.list(input$conditions))
+  print(input$live_w_others)
   
   resp <- POST(urls$covid_score_api, add_headers("x-api-key" = Sys.getenv("X_API_KEY")), body = request_body, encode = "json")
   api_return <- content(resp)

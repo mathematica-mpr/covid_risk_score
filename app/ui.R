@@ -72,7 +72,7 @@ ui <- fluidPage(
         bsCollapsePanel(
           title = "3. Your Behavior",
           radioButtons('live_w_others', "Do you live with other people?", 
-                       c("Yes", "No"), inline=TRUE, selected = "No"),
+                       list("Yes"="True", "No"="False"), inline=TRUE, selected = "False"),
           sliderInput('direct_contacts', 
                       'Direct exposure: how many people (include your household members) do you come into close contact (> 10 min, < 6 feet) with in a week?', 
                       min = 0, max = 100, value = 1, step =1),
