@@ -20,6 +20,10 @@ server <- function(input, output, session) {
       # clear the conditional panel's UI when unchecked
       updateCheckboxGroupInput(session, "symptoms", selected = character(0))
     }
+    if (!input$has_preexisting) {
+      # clear the conditional panel's UI when unchecked
+      updateCheckboxGroupInput(session, "conditions", selected = character(0))
+    }
   })
   
   # reactive values and lists --------------------------------------------------
