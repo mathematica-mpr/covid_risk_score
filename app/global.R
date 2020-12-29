@@ -1,8 +1,3 @@
-# helper functions
-source("helper_input.R")
-source("info_html.R")
-source("results.R")
-
 # libraries 
 library(shiny)
 library(shinycssloaders)
@@ -13,6 +8,11 @@ library(flexdashboard)
 library(httr)
 library(tidyverse)
 library(lubridate)
+
+# helper functions
+source("info_html.R")
+source("functions.R")
+
 
 # Global variables can go here
 
@@ -43,11 +43,32 @@ urls  = list(
   caramelo_etal_2020 = "https://www.medrxiv.org/content/10.1101/2020.02.24.20027268v1",
   russel_etal_2020 = "https://cmmid.github.io/topics/covid19/global_cfr_estimates.html",
   verity_etal_2020 = "https://www.thelancet.com/journals/laninf/article/PIIS1473-3099(20)30243-7/fulltext",
-  open_safely = "https://www.medrxiv.org/content/10.1101/2020.05.06.20092999v1",
+  open_safely = "https://www.nature.com/articles/s41586-020-2521-4:",
   wolfer_etall_2020 = "https://www.nature.com/articles/s41586-020-2196-x",
   covid_symptom_study = "https://covid19.joinzoe.com/us/about", 
   menni_etall_2020 = "https://www.nature.com/articles/s41591-020-0916-2",
   simonnet_etall_2020 = "https://onlinelibrary.wiley.com/doi/full/10.1002/oby.22831?af=R", 
   # misc
-  empirical_bayes = "https://en.wikipedia.org/wiki/Empirical_Bayes_method"
+  empirical_bayes = "https://en.wikipedia.org/wiki/Empirical_Bayes_method",
+  # Additional sources for ORs December 2020 update
+  gottlieb = "https://onlinelibrary.wiley.com/doi/full/10.1111/acem.14104",
+  fairhealth = "https://www.prnewswire.com/news-releases/new-fair-health-study-uncovers-relationship-between-covid-19-comorbidities-and-mortality-301171033.html",
+  zambrano = "https://www.cdc.gov/mmwr/volumes/69/wr/mm6944e3.htm",
+  dun = "https://www.medrxiv.org/content/10.1101/2020.10.27.20220970v2"
 )
+
+# possible input conditions
+conditions_list = c("Chronic renal disease" = "renal_disease",
+                    "Cardiovascular disease" = "cardiovascular_disease",
+                    "Diabetes" = "diabetes",
+                    "Hypertension" = "hypertension",
+                    "Current or former smoker" = "smoking",
+                    "Immunocompromised condition" = "immunocompromised",
+                    "Chronic lung disease" = "lung_disease",
+                    "Obesity (BMI &ge; 30 kg/m&sup2;)" = "obesity",
+                    "Pregnancy" = "pregnancy",
+                    "Cancer" = "cancer",
+                    "Sickle cell disease" = "sickle_cell",
+                    "Other chronic condition" = "other")
+
+
