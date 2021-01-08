@@ -20,7 +20,6 @@ calculateRisk <- function(input) {
     "hand"= bool2char(input$hand),
     "ppe"= bool2char(input$ppe),
     "conditions" = as.list(input$conditions))
-  print(input$live_w_others)
   
   resp <- POST(urls$covid_score_api, add_headers("x-api-key" = Sys.getenv("X_API_KEY")), body = request_body, encode = "json")
   api_return <- content(resp)
@@ -89,6 +88,40 @@ renderScoreHtml <- function(risk) {
         " to make sure you're well prepared in the days to come.")
     )
   )))
+}
+
+renderVaccinesHtml <- function(go, has_vaccine, vaccine, doses, days){
+  validate(need(go, ""))
+  
+  # Case where not vaccinated
+  if (!has_vaccine){
+    text <- tags$p("There are currenty two vaccines against COVID-10 authorized for use in the United States. ",
+           "Both vaccines require two doses and are safe and highly effective at preventing symptomatic COVID-19. ", 
+           tags$a("Click here ", href=urls$cdc_vaccines), "for more information and to check when you might be eligible for vaccination.")
+  } else if (doses==1){
+    text <- tags$p("Congratulations on getting your first dose of the ", vaccine_labels[vaccine], " COVID-19 vaccine!",
+           "Be sure to get your second dose of the vaccine ", vaccines[[vaccine]]$days_between_doses,
+           " days after the first. ", tags$a("Click here ", href=urls$cdc_vaccines), 
+           "for more information on about the United State's vaccination program.")
+  } else {
+    if (days<vaccines[[vaccine]]$days_after_final_dose){
+      text <- tags$p("Congratulations on getting both dose of the ", vaccine_labels[vaccine], " COVID-19 vaccine!",
+                     "This vaccine reaches its ", formatPercent(vaccines[[vaccine]]$efficacy),
+                     " efficacy at around ", vaccines[[vaccine]]$days_after_final_dose,
+                     " days after the second dose. Your immunity will build up over the next few days. ",
+                     tags$a("Click here ", href=urls$cdc_vaccines), 
+                     "for more information on about the United State's vaccination program.")
+    } else {
+      text <- tags$p("Congratulations on getting both dose of the ", vaccine_labels[vaccine], " COVID-19 vaccine!",
+                     "This vaccine reduces your risk of contracting symptomatic COVID-19 by ",
+                     formatPercent(vaccines[[vaccine]]$efficacy), ". ",
+                     tags$a("Click here ", href=urls$cdc_vaccines), 
+                     "for more information on about the United State's vaccination program.")
+    }
+  }
+  
+  div(tags$h4("Vaccine Information"), text, tags$p("It is not yet known whether or not vaccinated individuals may still be carriers of asymtomatic COVID-19. ",
+         "Even after you have been vaccinated, be sure to continue to social distance to protect your family, friends, and community."))
 }
 
 # function to create exporsure risk HTML output --------------------------------

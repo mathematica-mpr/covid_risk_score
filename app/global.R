@@ -54,7 +54,9 @@ urls  = list(
   gottlieb = "https://onlinelibrary.wiley.com/doi/full/10.1111/acem.14104",
   fairhealth = "https://www.prnewswire.com/news-releases/new-fair-health-study-uncovers-relationship-between-covid-19-comorbidities-and-mortality-301171033.html",
   zambrano = "https://www.cdc.gov/mmwr/volumes/69/wr/mm6944e3.htm",
-  dun = "https://www.medrxiv.org/content/10.1101/2020.10.27.20220970v2"
+  dun = "https://www.medrxiv.org/content/10.1101/2020.10.27.20220970v2",
+  
+  cdc_vaccines = "https://www.cdc.gov/coronavirus/2019-ncov/vaccines/index.html"
 )
 
 # possible input conditions
@@ -70,5 +72,15 @@ conditions_list = c("Chronic renal disease" = "renal_disease",
                     "Cancer" = "cancer",
                     "Sickle cell disease" = "sickle_cell",
                     "Other chronic condition" = "other")
+
+# vaccine doses
+vaccine_labels = list(pfizer = "Pfizer-BioNTech",
+                      moderna = "Moderna")
+vaccines = list(pfizer=list(efficacy=.95, doses=2, 
+                            days_between_doses=21,
+                            days_after_final_dose=7), 
+                moderna=list(efficacy=.941, doses=2, 
+                             days_between_doses=28,
+                             days_after_final_dose=14))
 
 

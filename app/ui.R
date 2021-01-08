@@ -85,6 +85,23 @@ ui <- fluidPage(
                                     tags$a("CDC guidance", href = urls$cdc_hand_hygiene))),
           checkboxInput("ppe", div("I wear personal protection equipment consistent with ",
                                    tags$a("CDC guidelines", href = urls$cdc_ppe))),
+          actionButton('next3', "Next", class = "btn btn-info btn-block")
+        ), # bsCollapsePanel
+        bsCollapsePanel(
+          title = "4. Your Vaccination Status",
+          checkboxInput('has_vaccine', div("I have recieved at least one dose of a COVID-19 vaccine")),
+          conditionalPanel(
+            condition = "input.has_vaccine == true",
+            radioButtons('vaccine', "Which of the available COVID-19 vaccines did you recieve?",
+                         choiceNames = unname(vaccine_labels), choiceValues = names(vaccine_labels),
+                         inline=TRUE),
+            selectInput('doses', "How many doses of this vaccine have you recieved?",
+                         1:2)),
+          conditionalPanel(
+            condition = "input.doses == 2",
+            sliderInput("days_since_last_dose", "How many days ago did you recieve the final dose? (If more than 14 days ago, select 14).",
+                        min=0, max=14, value=0)),
+                        
           actionButton('go', "Calculate", class = "btn btn-primary btn-block")
         ) # bsCollapsePanel
       ), # bsCollapse
@@ -100,6 +117,7 @@ ui <- fluidPage(
                  uiOutput("zipcontrol"),
                  fluidRow(column(width = 8, htmlOutput("output_intro"))),
                  fluidRow(column(width = 8, withSpinner(gaugeOutput("gauge", height = '600%'), type = 1))),
+                 fluidRow(column(width = 8,htmlOutput("vaccines"),style = "background-color:#4d3a7d;")),
                  fluidRow(column(width = 8,htmlOutput("res")))
         ),
         # tabPanel("Map"),

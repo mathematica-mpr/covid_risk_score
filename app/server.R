@@ -1,6 +1,5 @@
 # Define the server code
 server <- function(input, output, session) {
-
   # Sidebar Collapse ---------------------------------------------------
   observeEvent(input$next0, {
     updateCollapse(session, id = "collapse_main", open = "1. About You", close = "Introduction")
@@ -13,6 +12,10 @@ server <- function(input, output, session) {
     updateCollapse(session, id = "collapse_main", open = "3. Your Behavior", 
                    close = "2. Pre-existing Conditions")
   })
+  observeEvent(input$next3, {
+    updateCollapse(session, id = "collapse_main", open = "4. Your Vaccination Status", 
+                   close = "3. Your Behavior")
+  })
   
   ## modify symptom and condition selections -----------------------------------
   observe({
@@ -23,6 +26,14 @@ server <- function(input, output, session) {
     if (!input$has_preexisting) {
       # clear the conditional panel's UI when unchecked
       updateCheckboxGroupInput(session, "conditions", selected = character(0))
+    }
+    if (!input$has_vaccine) {
+      # clear vaccine conditional input when collapsed
+      updateRadioButtons(session, "vaccine", selected = "pfizer")
+      updateSelectInput(session, "doses", selected = 1)
+      if (!input$doses==2){
+        updateSliderInput(session, "days_since_last_dose", value=0)
+      }
     }
   })
   
@@ -114,6 +125,10 @@ server <- function(input, output, session) {
     if (is.null(risk$message)) {
       renderResultsHtml(risk, input$symptoms, input$hand, input$ppe)
     } 
+  })
+  output$vaccines <-renderUI({
+    # in app/results.R
+    renderVaccinesHtml(input$go, input$has_vaccine, input$vaccine, input$doses, input$days_since_last_dose)
   })
   
   ## render methods page ---------------------------------------------------
