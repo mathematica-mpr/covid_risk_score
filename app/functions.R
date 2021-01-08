@@ -15,7 +15,7 @@ calculateRisk <- function(input) {
     "sex" = input$sex,
     "symptoms" = as.list(input$symptoms),
     "direct_contacts" = as.numeric(input$direct_contacts),
-    "live_w_others"= bool2char(input$live_w_others),
+    "live_w_others"= input$live_w_others,
     "indirect_contacts" = as.numeric(input$indirect_contacts),
     "hand"= bool2char(input$hand),
     "ppe"= bool2char(input$ppe),
@@ -50,15 +50,21 @@ renderOutputIntroHtml <- function() {
 # function to create location HTML output --------------------------------------
 renderLocationHtml <- function(risk) {
   underreport_factor_string = formatNumber(risk$underreport_factor, "x")
+  latest_day_string <- format(as.Date(risk$latest_day, "%m/%d/%Y"), "%B %d, %Y")
+  cases_past14d_string <- format(round(risk$cases_past14d), big.mark =",")
+  cumulative_cases_string <- format(risk$cumulative_cases, big.mark=",")
+  est_current_sick_string <- format(round(risk$est_current_sick), big.mark =",")
+  
   proportion_sick <- risk$est_current_sick/risk$population
   prob_group50 <- 1-((1-proportion_sick)^50)
   prob_group10 <- 1-((1-proportion_sick)^10)
+  
   div(
     title = "Location",
     tags$p(div('We found data from ', formatDynamicString(risk$county), ' for your zip code. As of ', 
-               formatDynamicString(risk$latest_day), ', this county had', formatDynamicString(format(round(risk$cases_past14d), big.mark =",")),
+               formatDynamicString(latest_day_string), ', this county had', formatDynamicString(cases_past14d_string),
                ' new reported cases in the last 14 days and ',
-               formatDynamicString(format(risk$cumulative_cases, big.mark=",")), 
+               formatDynamicString(cumulative_cases_string), 
                ' total reported cases of COVID-19. Many people who contract COVID-19 are not tested, and therefore not reported. 
                We estimate that your county has an under-reporting factor of ', underreport_factor_string, 
                '. Taking into account the under-reporting factor, incubation period, and time from symptom onset to recovery, we estimate that:'
