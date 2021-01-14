@@ -28,6 +28,9 @@ calculateRisk <- function(input) {
 }
 
 # formate string, numbers, or percent ------------------------------------------
+formatResultsHeader <- function(string){
+  return (tags$h4(tags$span(style="color:#F0AD4E",string)))
+}
 formatDynamicString <- function(string) {
   return (tags$b(tags$span(style="color:#F0AD4E",string)))
 }
@@ -52,6 +55,10 @@ renderLocationHtml <- function(risk) {
   cumulative_cases_string <- format(risk$cumulative_cases, big.mark=",")
   est_current_sick_string <- format(round(risk$est_current_sick), big.mark =",")
   
+  proportion_sick <- risk$est_current_sick/risk$population
+  prob_group50 <- 1-((1-proportion_sick)^50)
+  prob_group10 <- 1-((1-proportion_sick)^10)
+  
   div(
     title = "Location",
     tags$p(div('We found data from ', formatDynamicString(risk$county), ' for your zip code. As of ', 
@@ -60,9 +67,19 @@ renderLocationHtml <- function(risk) {
                formatDynamicString(cumulative_cases_string), 
                ' total reported cases of COVID-19. Many people who contract COVID-19 are not tested, and therefore not reported. 
                We estimate that your county has an under-reporting factor of ', underreport_factor_string, 
-               '. Taking into account the under-reporting factor, incubation period, and time from symptom onset to recovery, we estimate there are ',
-               formatDynamicString(est_current_sick_string),
-               ' total sick people distributed throughout the county, including those who are not officially reported.'
+               '. Taking into account the under-reporting factor, incubation period, and time from symptom onset to recovery, we estimate that:'
+               
+    ),
+    tags$p(tags$ul(
+      tags$li(div('There are ', formatDynamicString(format(round(risk$est_current_sick), big.mark =",")),
+                  ' total sick people distributed throughout the county, including those who are not officially reported.')),
+      tags$li(div("1 in every ", 
+                  formatDynamicString(format(round(1/(proportion_sick)), big.mark =",")),
+                  " people in your county is currently infected with COVID-19.")),
+      tags$li(div("In a group of 50 people, there is a ", formatPercent(prob_group50),
+                  " chance that at least one person has COVID-19.")),
+      tags$li(div("In a group of 10 people, there is a ", formatPercent(prob_group10),
+                  " chance that at least one person has COVID-19.")))
     ))
   )
 }
@@ -216,11 +233,13 @@ renderResultsHtml <- function(risk, symptoms, hand, ppe) {
   
   # return
   tagList(
-    tags$p(""),
+    renderScoreHtml(risk),
+    formatResultsHeader("County prevalence"),
     renderLocationHtml(risk),
+    formatResultsHeader("Your risk of contracting COVID-19 in the next week"),
     renderExposureHtml(risk, symptoms),
-    renderSusceptibilityHtml(risk),
     renderProtectionHtml(risk, hand, ppe),
-    renderScoreHtml(risk)
+    formatResultsHeader("Your risk of adverse outcomes from COVID-19"),
+    renderSusceptibilityHtml(risk)
   )
 }
