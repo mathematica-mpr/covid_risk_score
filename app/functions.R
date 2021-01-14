@@ -112,24 +112,24 @@ renderVaccinesHtml <- function(go, has_vaccine, vaccine, doses, days){
   
   # Case where not vaccinated
   if (!has_vaccine){
-    text <- tags$p("There are currenty two vaccines against COVID-10 authorized for use in the United States. ",
+    text <- tags$p("There are currenty two vaccines against COVID-19 authorized for use in the United States. ",
            "Both vaccines require two doses and are safe and highly effective at preventing symptomatic COVID-19. ", 
            tags$a("Click here ", href=urls$cdc_vaccines), "for more information and to check when you might be eligible for vaccination.")
   } else if (doses==1){
-    text <- tags$p("Congratulations on getting your first dose of the ", vaccine_labels[vaccine], " COVID-19 vaccine!",
+    text <- tags$p("Congratulations on receiving your first dose of the ", vaccine_labels[vaccine], " COVID-19 vaccine!",
            "Be sure to get your second dose of the vaccine ", vaccines[[vaccine]]$days_between_doses,
            " days after the first. ", tags$a("Click here ", href=urls$cdc_vaccines), 
            "for more information on about the United State's vaccination program.")
   } else {
     if (days<vaccines[[vaccine]]$days_after_final_dose){
       text <- tags$p("Congratulations on getting both dose of the ", vaccine_labels[vaccine], " COVID-19 vaccine!",
-                     "This vaccine reaches its ", formatPercent(vaccines[[vaccine]]$efficacy),
+                     "This vaccine reaches its full ", formatPercent(vaccines[[vaccine]]$efficacy),
                      " efficacy at around ", vaccines[[vaccine]]$days_after_final_dose,
                      " days after the second dose. Your immunity will build up over the next few days. ",
                      tags$a("Click here ", href=urls$cdc_vaccines), 
                      "for more information on about the United State's vaccination program.")
     } else {
-      text <- tags$p("Congratulations on getting both dose of the ", vaccine_labels[vaccine], " COVID-19 vaccine!",
+      text <- tags$p("Congratulations on recieving both dose of the ", vaccine_labels[vaccine], " COVID-19 vaccine!",
                      "This vaccine reduces your risk of contracting symptomatic COVID-19 by ",
                      formatPercent(vaccines[[vaccine]]$efficacy), ". ",
                      tags$a("Click here ", href=urls$cdc_vaccines), 
@@ -137,7 +137,7 @@ renderVaccinesHtml <- function(go, has_vaccine, vaccine, doses, days){
     }
   }
   
-  div(tags$h4("Vaccine Information"), text, tags$p("It is not yet known whether or not vaccinated individuals may still be carriers of asymtomatic COVID-19. ",
+  div(formatResultsHeader("Vaccine Information"), text, tags$p("It is not yet known whether or not vaccinated individuals may still be carriers of asymtomatic COVID-19. ",
          "Even after you have been vaccinated, be sure to continue to social distance to protect your family, friends, and community."))
 }
 
@@ -158,7 +158,7 @@ renderExposureHtml <- function(risk, symptoms) {
     tags$a("self-checker", href = urls$cdc_chatbot), '.'))
   
   if (!is.null(symptoms)) {
-    total_risk_html = tags$p(HTML(paste0(exposure_text, "<br> <br>", sickness_text)))
+    total_risk_html = div(tags$p(HTML(exposure_text)), tags$p(HTML(sickness_text)))
   } else {
     total_risk_html = tags$p(HTML(paste0(exposure_text)))
   }
@@ -233,10 +233,9 @@ renderResultsHtml <- function(risk, symptoms, hand, ppe) {
   
   # return
   tagList(
-    renderScoreHtml(risk),
     formatResultsHeader("County prevalence"),
     renderLocationHtml(risk),
-    formatResultsHeader("Your risk of contracting COVID-19 in the next week"),
+    formatResultsHeader("Your risk of contracting COVID-19"),
     renderExposureHtml(risk, symptoms),
     renderProtectionHtml(risk, hand, ppe),
     formatResultsHeader("Your risk of adverse outcomes from COVID-19"),
