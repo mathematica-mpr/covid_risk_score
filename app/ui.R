@@ -116,6 +116,7 @@ ui <- fluidPage(
                  uiOutput("zipcontrol"),
                  fluidRow(column(width = 8, htmlOutput("output_intro"))),
                  fluidRow(column(width = 8, withSpinner(gaugeOutput("gauge", height = '600%'), type = 1))),
+                 fluidRow(column(width = 8,htmlOutput("score_info"))),
                  fluidRow(column(width = 8,htmlOutput("vaccines"),style = "background-color:#4E5D6C;")),
                  fluidRow(column(width = 8,htmlOutput("res")))
         ),

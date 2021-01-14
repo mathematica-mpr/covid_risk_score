@@ -119,16 +119,23 @@ server <- function(input, output, session) {
   })
   
   ## render risk score UI ---------------------------------------------------
+  output$score_info <-renderUI({
+    risk <- get_risk_info()
+    # in app/results.R
+    if (is.null(risk$message)) {
+      renderScoreHtml(risk)
+    } 
+  })
+  output$vaccines <-renderUI({
+    # in app/results.R
+    renderVaccinesHtml(input$go, input$has_vaccine, input$vaccine, input$doses, input$days_since_last_dose)
+  })
   output$res <-renderUI({
     risk <- get_risk_info()
     # in app/results.R
     if (is.null(risk$message)) {
       renderResultsHtml(risk, input$symptoms, input$hand, input$ppe)
     } 
-  })
-  output$vaccines <-renderUI({
-    # in app/results.R
-    renderVaccinesHtml(input$go, input$has_vaccine, input$vaccine, input$doses, input$days_since_last_dose)
   })
   
   ## render methods page ---------------------------------------------------
