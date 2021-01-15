@@ -235,10 +235,10 @@ renderResultsHtml <- function(risk, symptoms, hand, ppe) {
   tagList(
     formatResultsHeader("County prevalence"),
     renderLocationHtml(risk),
-    formatResultsHeader("Your risk of contracting COVID-19"),
+    formatResultsHeader("Risk of contracting COVID-19"),
     renderExposureHtml(risk, symptoms),
     renderProtectionHtml(risk, hand, ppe),
-    formatResultsHeader("Your risk of adverse outcomes from COVID-19"),
+    formatResultsHeader("Risk of adverse outcomes from COVID-19"),
     renderSusceptibilityHtml(risk)
   )
 }
