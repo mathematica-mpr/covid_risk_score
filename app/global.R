@@ -20,6 +20,7 @@ source("functions.R")
 urls  = list(
   # Mathematica COVID Score API
   covid_score_api =  "api.covid19.mathematica.org/score",
+  covid_score_api_dev =  "dev.api.covid19.mathematica.org/score",
   # CCDC
   ccdc_vol2_2020 = "https://www.unboundmedicine.com/medline/citation/32064853/[The_epidemiological_characteristics_of_an_outbreak_of_2019_novel_coronavirus_diseases__COVID_19__in_China]",
   # CDC

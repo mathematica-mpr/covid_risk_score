@@ -21,7 +21,14 @@ calculateRisk <- function(input) {
     "ppe"= bool2char(input$ppe),
     "conditions" = as.list(input$conditions))
   
+  if (input$has_vaccine){
+    request_body$vaccine = input$vaccine
+    request_body$doses = as.numeric(input$doses)
+    request_body$days_since_last_dose = input$days_since_last_dose
+  }
+  
   resp <- POST(urls$covid_score_api, add_headers("x-api-key" = Sys.getenv("X_API_KEY")), body = request_body, encode = "json")
+  #resp <- POST(urls$covid_score_api_dev, body = request_body, encode = "json")
   api_return <- content(resp)
 
   return (api_return)
