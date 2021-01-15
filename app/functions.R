@@ -67,9 +67,11 @@ renderLocationHtml <- function(risk) {
                formatDynamicString(cumulative_cases_string), 
                ' total reported cases of COVID-19. Many people who contract COVID-19 are not tested, and therefore not reported. 
                We estimate that your county has an under-reporting factor of ', underreport_factor_string, 
-               '. Taking into account the under-reporting factor, incubation period, and time from symptom onset to recovery, we estimate that:'
+               '.'
                
     ),
+    tags$p(),
+    tags$p("Taking into account the under-reporting factor and average time from symptom onset to recovery, we estimate that:"),
     tags$p(tags$ul(
       tags$li(div('There are ', formatDynamicString(format(round(risk$est_current_sick), big.mark =",")),
                   ' total sick people distributed throughout the county, including those who are not officially reported.')),
@@ -147,15 +149,15 @@ renderExposureHtml <- function(risk, symptoms) {
   risk_string = formatPercent(risk$exposure_risk)
   sympt_covid_string = formatPercent(risk$sympt_covid_risk)
   exposure_text = paste0(
-    "Among people who are the same health status as you and have behaviors and levels of interaction 
+    "Among people in your county who have behaviors and levels of interaction 
     with others that are similar to yours, the estimated probability of catching COVID-19 through community transmission in a week is ", 
     risk_string, '. ', "For comparison, ", prob_flu_string, ' of Americans catch the flu every week during flu season.')
   sickness_text = (paste0(
-    "Based on the symptom(s) you selected, the probability that you have symptomatic COVID-19 is ", sympt_covid_string,
-    ". If you are experiencing symptoms associated with COVID-19, please immediately consult ", 
-    tags$a("the CDC's instructions", href = urls$cdc_if_sick),
-    ", or walk through their ",
-    tags$a("self-checker", href = urls$cdc_chatbot), '.'))
+    "Based on the symptom(s) you selected, the probability that your symptoms indicate COVID-19 is ", sympt_covid_string,
+    ". If you are experiencing symptoms associated with COVID-19, please consult the ", 
+    tags$a("CDC's information on COVID-19 testing", href = urls$cdc_test_info),
+    " or visit the website for your state or local health department ",
+    "for information about getting tested for COVID-19."))
   
   if (!is.null(symptoms)) {
     total_risk_html = div(tags$p(HTML(exposure_text)), tags$p(HTML(sickness_text)))
@@ -186,12 +188,12 @@ renderProtectionHtml <- function(risk, hand, ppe){
 
   if (hand == TRUE ){
     hand_html = HTML(paste0(
-      "Good to know you wash your hands per ", 
+      "Good to know that you wash your hands per ", 
       tags$a("CDC guidance", href = urls$cdc_hand_hygiene),
       "."))
   } else{
     hand_html = HTML(paste0(
-      "We recommend you wash your hands per ", 
+      "We recommend that you wash your hands per ", 
       tags$a("CDC guidance", href = urls$cdc_hand_hygiene),
       "."))
   }
@@ -207,21 +209,21 @@ renderProtectionHtml <- function(risk, hand, ppe){
 
   if (ppe == TRUE){
     ppe_html = HTML(paste0(
-      "Good to know you wear personal protection equipment per ", 
+      "Good to know that you wear personal protective equipment per ", 
       tags$a("CDC guidelines", href = urls$cdc_ppe), " . "))
   } else {
     ppe_html = HTML(paste0(
-      "We recommend you wear personal protection equipment per ", 
+      "We recommend that you wear personal protective equipment per ", 
       tags$a("CDC guidelines", href = urls$cdc_ppe), " . "))
   }
   
   if (risk$exposure_risk >0){
     # exposure reduction ppe text for users with exposure risk of over 0
-    ppe_delta_html = HTML(paste0("In general, wearing personal protection equipment reduces people's risk of being 
+    ppe_delta_html = HTML(paste0("In general, wearing personal protective equipment reduces people's risk of being 
                                  exposed to COVID-19 by ", prob_ppe_string, " . "))
   } else {
     # exposure reduction ppe text for users with exposure risk less than or equal to 0
-    ppe_delta_html = HTML(paste0("In general, wearing personal protection equipment reduces people's risk of being 
+    ppe_delta_html = HTML(paste0("In general, wearing personal protective equipment reduces people's risk of being 
                                  exposed to COVID-19, if they do come into close contact with others. "))
   }
   

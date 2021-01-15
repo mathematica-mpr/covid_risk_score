@@ -56,6 +56,7 @@ urls  = list(
   zambrano = "https://www.cdc.gov/mmwr/volumes/69/wr/mm6944e3.htm",
   dun = "https://www.medrxiv.org/content/10.1101/2020.10.27.20220970v2",
   
+  cdc_test_info = "https://www.cdc.gov/coronavirus/2019-ncov/symptoms-testing/testing.html",
   cdc_vaccines = "https://www.cdc.gov/coronavirus/2019-ncov/vaccines/index.html"
 )
 
