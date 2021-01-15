@@ -20,15 +20,24 @@ calculateRisk <- function(input) {
     "hand"= bool2char(input$hand),
     "ppe"= bool2char(input$ppe),
     "conditions" = as.list(input$conditions))
-  print(input$live_w_others)
+  
+  if (input$has_vaccine){
+    request_body$vaccine = input$vaccine
+    request_body$doses = as.numeric(input$doses)
+    request_body$days_since_last_dose = input$days_since_last_dose
+  }
   
   resp <- POST(urls$covid_score_api, add_headers("x-api-key" = Sys.getenv("X_API_KEY")), body = request_body, encode = "json")
+  #resp <- POST(urls$covid_score_api_dev, body = request_body, encode = "json")
   api_return <- content(resp)
 
   return (api_return)
 }
 
 # formate string, numbers, or percent ------------------------------------------
+formatResultsHeader <- function(string){
+  return (tags$h4(tags$span(style="color:#F0AD4E",string)))
+}
 formatDynamicString <- function(string) {
   return (tags$b(tags$span(style="color:#F0AD4E",string)))
 }
@@ -53,6 +62,10 @@ renderLocationHtml <- function(risk) {
   cumulative_cases_string <- format(risk$cumulative_cases, big.mark=",")
   est_current_sick_string <- format(round(risk$est_current_sick), big.mark =",")
   
+  proportion_sick <- risk$est_current_sick/risk$population
+  prob_group50 <- 1-((1-proportion_sick)^50)
+  prob_group10 <- 1-((1-proportion_sick)^10)
+  
   div(
     title = "Location",
     tags$p(div('We found data from ', formatDynamicString(risk$county), ' for your zip code. As of ', 
@@ -61,9 +74,21 @@ renderLocationHtml <- function(risk) {
                formatDynamicString(cumulative_cases_string), 
                ' total reported cases of COVID-19. Many people who contract COVID-19 are not tested, and therefore not reported. 
                We estimate that your county has an under-reporting factor of ', underreport_factor_string, 
-               '. Taking into account the under-reporting factor, incubation period, and time from symptom onset to recovery, we estimate there are ',
-               formatDynamicString(est_current_sick_string),
-               ' total sick people distributed throughout the county, including those who are not officially reported.'
+               '.'
+               
+    ),
+    tags$p(),
+    tags$p("Taking into account the under-reporting factor and average time from symptom onset to recovery, we estimate that:"),
+    tags$p(tags$ul(
+      tags$li(div('There are ', formatDynamicString(format(round(risk$est_current_sick), big.mark =",")),
+                  ' total sick people distributed throughout the county, including those who are not officially reported.')),
+      tags$li(div("1 in every ", 
+                  formatDynamicString(format(round(1/(proportion_sick)), big.mark =",")),
+                  " people in your county is currently infected with COVID-19.")),
+      tags$li(div("In a group of 50 people, there is a ", formatPercent(prob_group50),
+                  " chance that at least one person has COVID-19.")),
+      tags$li(div("In a group of 10 people, there is a ", formatPercent(prob_group10),
+                  " chance that at least one person has COVID-19.")))
     ))
   )
 }
@@ -91,24 +116,58 @@ renderScoreHtml <- function(risk) {
   )))
 }
 
+renderVaccinesHtml <- function(go, has_vaccine, vaccine, doses, days){
+  validate(need(go, ""))
+  
+  # Case where not vaccinated
+  if (!has_vaccine){
+    text <- tags$p("There are currenty two vaccines against COVID-19 authorized for use in the United States. ",
+           "Both vaccines require two doses and are safe and highly effective at preventing symptomatic COVID-19. ", 
+           tags$a("Click here ", href=urls$cdc_vaccines), "for more information and to check when you might be eligible for vaccination.")
+  } else if (doses==1){
+    text <- tags$p("Congratulations on receiving your first dose of the ", vaccine_labels[vaccine], " COVID-19 vaccine!",
+           "Be sure to get your second dose of the vaccine ", vaccines[[vaccine]]$days_between_doses,
+           " days after the first. ", tags$a("Click here ", href=urls$cdc_vaccines), 
+           "for more information on about the United State's vaccination program.")
+  } else {
+    if (days<vaccines[[vaccine]]$days_after_final_dose){
+      text <- tags$p("Congratulations on getting both dose of the ", vaccine_labels[vaccine], " COVID-19 vaccine!",
+                     "This vaccine reaches its full ", formatPercent(vaccines[[vaccine]]$efficacy),
+                     " efficacy at around ", vaccines[[vaccine]]$days_after_final_dose,
+                     " days after the second dose. Your immunity will build up over the next few days. ",
+                     tags$a("Click here ", href=urls$cdc_vaccines), 
+                     "for more information on about the United State's vaccination program.")
+    } else {
+      text <- tags$p("Congratulations on recieving both dose of the ", vaccine_labels[vaccine], " COVID-19 vaccine!",
+                     "This vaccine reduces your risk of contracting symptomatic COVID-19 by ",
+                     formatPercent(vaccines[[vaccine]]$efficacy), ". ",
+                     tags$a("Click here ", href=urls$cdc_vaccines), 
+                     "for more information on about the United State's vaccination program.")
+    }
+  }
+  
+  div(formatResultsHeader("Vaccine Information"), text, tags$p("It is not yet known whether or not vaccinated individuals may still be carriers of asymtomatic COVID-19. ",
+         "Even after you have been vaccinated, be sure to continue to social distance to protect your family, friends, and community."))
+}
+
 # function to create exporsure risk HTML output --------------------------------
 renderExposureHtml <- function(risk, symptoms) {
   prob_flu_string = formatPercent(risk$flu_risk_natl_avg)
   risk_string = formatPercent(risk$exposure_risk)
   sympt_covid_string = formatPercent(risk$sympt_covid_risk)
   exposure_text = paste0(
-    "Among people who are the same health status as you and have behaviors and levels of interaction 
+    "Among people in your county who have behaviors and levels of interaction 
     with others that are similar to yours, the estimated probability of catching COVID-19 through community transmission in a week is ", 
     risk_string, '. ', "For comparison, ", prob_flu_string, ' of Americans catch the flu every week during flu season.')
   sickness_text = (paste0(
-    "Based on the symptom(s) you selected, the probability that you have symptomatic COVID-19 is ", sympt_covid_string,
-    ". If you are experiencing symptoms associated with COVID-19, please immediately consult ", 
-    tags$a("the CDC's instructions", href = urls$cdc_if_sick),
-    ", or walk through their ",
-    tags$a("self-checker", href = urls$cdc_chatbot), '.'))
+    "Based on the symptom(s) you selected, the probability that your symptoms indicate COVID-19 is ", sympt_covid_string,
+    ". If you are experiencing symptoms associated with COVID-19, please consult the ", 
+    tags$a("CDC's information on COVID-19 testing", href = urls$cdc_test_info),
+    " or visit the website for your state or local health department ",
+    "for information about getting tested for COVID-19."))
   
   if (!is.null(symptoms)) {
-    total_risk_html = tags$p(HTML(paste0(exposure_text, "<br> <br>", sickness_text)))
+    total_risk_html = div(tags$p(HTML(exposure_text)), tags$p(HTML(sickness_text)))
   } else {
     total_risk_html = tags$p(HTML(paste0(exposure_text)))
   }
@@ -136,12 +195,12 @@ renderProtectionHtml <- function(risk, hand, ppe){
 
   if (hand == TRUE ){
     hand_html = HTML(paste0(
-      "Good to know you wash your hands per ", 
+      "Good to know that you wash your hands per ", 
       tags$a("CDC guidance", href = urls$cdc_hand_hygiene),
       "."))
   } else{
     hand_html = HTML(paste0(
-      "We recommend you wash your hands per ", 
+      "We recommend that you wash your hands per ", 
       tags$a("CDC guidance", href = urls$cdc_hand_hygiene),
       "."))
   }
@@ -157,21 +216,21 @@ renderProtectionHtml <- function(risk, hand, ppe){
 
   if (ppe == TRUE){
     ppe_html = HTML(paste0(
-      "Good to know you wear personal protection equipment per ", 
+      "Good to know that you wear personal protective equipment per ", 
       tags$a("CDC guidelines", href = urls$cdc_ppe), " . "))
   } else {
     ppe_html = HTML(paste0(
-      "We recommend you wear personal protection equipment per ", 
+      "We recommend that you wear personal protective equipment per ", 
       tags$a("CDC guidelines", href = urls$cdc_ppe), " . "))
   }
   
   if (risk$exposure_risk >0){
     # exposure reduction ppe text for users with exposure risk of over 0
-    ppe_delta_html = HTML(paste0("In general, wearing personal protection equipment reduces people's risk of being 
+    ppe_delta_html = HTML(paste0("In general, wearing personal protective equipment reduces people's risk of being 
                                  exposed to COVID-19 by ", prob_ppe_string, " . "))
   } else {
     # exposure reduction ppe text for users with exposure risk less than or equal to 0
-    ppe_delta_html = HTML(paste0("In general, wearing personal protection equipment reduces people's risk of being 
+    ppe_delta_html = HTML(paste0("In general, wearing personal protective equipment reduces people's risk of being 
                                  exposed to COVID-19, if they do come into close contact with others. "))
   }
   
@@ -183,11 +242,12 @@ renderResultsHtml <- function(risk, symptoms, hand, ppe) {
   
   # return
   tagList(
-    tags$p(""),
+    formatResultsHeader("County prevalence"),
     renderLocationHtml(risk),
+    formatResultsHeader("Risk of contracting COVID-19"),
     renderExposureHtml(risk, symptoms),
-    renderSusceptibilityHtml(risk),
     renderProtectionHtml(risk, hand, ppe),
-    renderScoreHtml(risk)
+    formatResultsHeader("Risk of adverse outcomes from COVID-19"),
+    renderSusceptibilityHtml(risk)
   )
 }
