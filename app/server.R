@@ -127,8 +127,11 @@ server <- function(input, output, session) {
     } 
   })
   output$vaccines <-renderUI({
+    risk<-get_risk_info()
     # in app/results.R
-    renderVaccinesHtml(input$go, input$has_vaccine, input$vaccine, input$doses, input$days_since_last_dose)
+    if (is.null(risk$message)) {
+      renderVaccinesHtml(input$go, input$has_vaccine, input$vaccine, input$doses, input$days_since_last_dose)
+    }
   })
   output$res <-renderUI({
     risk <- get_risk_info()
