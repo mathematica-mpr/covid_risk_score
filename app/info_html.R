@@ -18,7 +18,7 @@ renderMethodsHtml <- function() {
   tagList(
     tags$p(""),
     tags$p('Our "Risk Score" visualization is the quantity {Exposure * Susceptibility}, normalized by the average disease burden of flu for the average American, logarithmically scaled.'),
-    tags$p('In 2018-2019 flu season, US had 35 million cases, 0.5 million hospitalization, and almost 35,000 deaths (',
+    tags$p('In the 2018-2019 flu season, the US had 35 million cases, 0.5 million hospitalizations, and almost 35,000 deaths (',
            tags$a('Source: CDC', href = urls$cdc_flu),
            ').'),
     tags$p("Exposure represents how likely it is that you've been infected with the virus. It's a function of the prevalence of active cases in your
@@ -31,7 +31,7 @@ renderMethodsHtml <- function() {
            "Please remember that even if your personal susceptibility is low, you can still help by preventing spread to others."
     ),
     tags$p(""),
-    tags$h4("Assumptions:"),
+    tags$h4("Exposure:"),
     tags$ol(
       tags$li(
         "To calculate exposure, we used ",
@@ -42,11 +42,11 @@ renderMethodsHtml <- function() {
       tags$li(
         "Due to rapid spread and insufficient testing during the COVID-19 pandemic, there are likely additional unreported cases beyond the 
         officially reported cases. We combined the methodology reported by ",  tags$a("Russell et al (2020)", href = urls$russel_etal_2020), 
-        " and the average length of sickenss reported by ", tags$a("Wolfel et al (2020)", href = urls$wolfer_etall_2020), " and the ",
+        " and the average length of sickness reported by ", tags$a("Wolfel et al (2020)", href = urls$wolfer_etall_2020), " and the ",
         tags$a("COVID Symptom Study", href = urls$covid_symptom_study), 
         "to calculate the percentage of cases that are currently known and presumably quarantined, versus the number of active cases in the community."),
         
-       tags$ul(tags$li("The methodoloy from ", tags$a("Russell et al (2020)", href = urls$russel_etal_2020),
+       tags$ul(tags$li("The methodology from ", tags$a("Russell et al (2020)", href = urls$russel_etal_2020),
                        " uses the county-level case fatality rate (CFR) to estimate the percentage of cases that are not reported. ",
                        "Because under-reporting has decreased since the beginning of the pandemic (in part due to increased access to testing), ",
                        " we use a 90-day moving window for cases and deaths to calculate the county-level CFR. ",
@@ -54,33 +54,74 @@ renderMethodsHtml <- function() {
                        tags$a("empirical Bayes", href = urls$empirical_bayes), " adjustment to shrink the county CFR ",
                        "towards the state CFR.",
                        "The result is that for counties with many cases, we essentially use the county-level CFR, ",
-                       "but for counties with only a few cases we use a CFR that is partway between the county and state CFRs.")),
+                       "but for counties with only a few cases we use a CFR that is partway between the county and state CFRs. ")),
   
       tags$li(
-        "Estimations of probability of having COVID-19 given symptoms is calculated using a logistic regression model developed by ",
-        tags$a("Menni et al (2020).", href = urls$menni_etall_2020)
+        "Estimations of the probability of having COVID-19 given symptoms are calculated using a logistic regression model published on Nature Medicine developed by ",
+        tags$a("Menni et al (2020).", href = urls$menni_etall_2020),
+        "This is the largest study so far using self-reported symptoms of more than 2.6 million participants to predict probable infection of COVID-19. "
       ),
-      tags$li("Other methods of becoming infected (e.g. touching an infected surface) are not accounted for by this calculator."),
+      tags$li("Other methods of becoming infected (e.g. touching an infected surface) are not accounted for by this calculator. ",
+      "We are currently working on a new feature to consider the risk associated with different activities.")
+      ), # end of ol
+    tags$h4("Susceptibility:"),
+    tags$ol(
       tags$li(
-        "Estimations of the probability of hospitalization and death among all infected cases, stratified by age groups, were obtained from a Lancet article authored by ",
+        "Estimations of the probability of hospitalization and death among all infections, stratified by age groups, were obtained from a Lancet article authored by ",
         tags$a("Verity et al (2020).", href = urls$verity_etal_2020),
-        "We chose this study over US CDC reports because this study is larger and more thorough. We do not account for differences between Chinese population and US population.",
+        "We chose this study because it reports the infection fatality ratio while most other studies report crude fatality rate among ascertained cases. ",
+        "We do not account for differences between the Chinese population and the US population. More recently, we compared our estimates with the ",
+        tags$a("FAIR Health National Private Insurance Claims (FH NPIC®) repository", href = urls$fairhealth),
+        " with approximately 100 million covered lives and 467,773 COVID-19 cases diagnosed between April - August 2020. ",
+        "The fatality rates by age groups were very similar to Verity et al. ",
         "Estimations of the probability of ICU among all infected cases, stratified by age groups, were calculated from results in",
-        tags$a("CDC MMWR (2020a).", href = urls$cdc_mm6912e2)
+        tags$a("CDC MMWR (2020a).", href = urls$cdc_mm6912e2),
+        "We chose this study because it covers all 49 US states, the District of Columbia, and three US territories. ",
+        "More recent data from ",
+        tags$a("CDC COVID-NET", href = urls$cdc_covidnet),
+        " confirms the relative risk for ICU admissions for different age groups are similar to what we use. "
       ),
-      tags$li("Estimations of risk factors associated with sex and underlying medical conditions were obtained from",
-              tags$a("CDC MMWR (2020b), ", href = urls$cdc_mm6913e2),
-              tags$a("Gottlieb et al (2020), ", href = urls$gottlieb),
-              tags$a("FAIR Health, ", href = urls$fairhealth), 
-              tags$a("OpenSAFELY, ", href = urls$open_safely), 
-              tags$a("Zambrano et al (2020). ", href = urls$zambrano), "and ",
-              tags$a("Dun et al (2020). ", href = urls$dun), 
+      tags$li("Estimations of risk factors associated with sex and underlying medical conditions were obtained from multiple studies. ", 
               "Odds ratios are adjusted for age, sex, and other underlying conditions. ", 
-              "When an oods ratio is below 1 with a confidence interval containing 1, we round up to 1 so that no chronic conditions will decrease the COVID risk score",
+              "When an odds ratio is below 1 with a confidence interval containing 1, we round up to 1 so that no chronic conditions will decrease the COVID risk score",
               "When no odds ratio is available for a given condition and outcome, ",
-              "we use the same odds ratio as for another outcome (ex. use the same odds ratio for hospitalization and ICU risk)."
+              "we use the same odds ratio as for another outcome (ex. use the same odds ratio for hospitalization and ICU risk). ",
+              "In selecting studies to include, we prioritize large, US-based studies that are peer-reviewed and published in distinguished journals like Lancet, Nature, NEJM. ",
+              "There is a temporal aspect because the earliest studies are likely selected because it was the only one available at the time. ",
+              "Later during our monthly review and update process, if the more recent studies are considerably different from the current parameter, we would update its value. ",
+              tags$a("Gottlieb et al (2020) ", href = urls$gottlieb),
+              "was selected for risk factors associated with hospitalizations and ICU admissions because it is a large Chicago-based study", 
+              " that has accounted for the coexistence of multiple risk factors. ",
+              tags$a("Zambrano et al (2020) ", href = urls$zambrano),
+              "was selected because it was the most recent CDC MMWR that reports increased risks of severe illness associated with pregnancy.",
+              tags$a("OpenSAFELY (2020)", href = urls$open_safely), " was a large UK study based on 17 million adults' primary care records. ",
+              "The risk of mortality associated with various age groups in the US follows a comparable pattern to that reported by OpenSAFELY ", 
+              tags$a("(Jin et al 2020). ", href = urls$jin_etal_2020),
+              "The risk factors of mortality were also complemented by ",
+              tags$a("FAIR Health, ", href = urls$fairhealth), 
+              "and ",
+              tags$a("CDC MMWR (2020b). ", href = urls$cdc_mm6913e2),
+              "We keep the list of comorbidities included in the app to be consistent with the CDC list of medical conditions that increase the risk of severe illness ",
+              tags$a("(CDC 2021). ", href = urls$cdc_medicalconditions)
       ),
-    ),
+    ), #end of ol
+    tags$h4("Behaviors:"),
+    tags$ol(
+       tags$li("The effects of wearing masks and hand hygiene on reducing the spread of SARS-CoV-2 and similar respiratory viruses were obtained from two systematic review and meta-analysis studies: ",
+              tags$a("Chu et al (2020) ", href = urls$chu_etal_2020),
+              "and ",
+              tags$a("Jefferson et al (2008). ", href = urls$jefferson_etal_2008),
+              "Without randomized trials, these systematic appraisals of the current best available evidence are useful to inform interim guidance. "),
+       tags$li("The efficacy of Pfizer-BioNTech and Moderna COVID-19 vaccine after two doses were obtained from FDA Emergency Use Authorization fact sheets ",
+              tags$a("FDA (2020a) ", href = urls$pfizer_eua_2020),
+              "and ",
+              tags$a("FDA (2020b). ", href = urls$moderna_eua_2020),
+              "Both vaccines provide early protection after a number of days after the first dose. ",
+              "We incorporated the efficacy data on the first dose published by ",
+              tags$a("Polack et al (2020) ", href = urls$polack_etal_2020),
+              "and ",
+              tags$a("FDA (2020c). ", href = urls$moderna_fda_2020))
+    ), # end of ol
     tags$p(""),
     tags$p("We'll be doing our best to update these assumptions as additional knowledge about the virus becomes available.")
   )
@@ -153,19 +194,17 @@ renderFaqHtml <- function() {
     faqQuestion("My hospitalization/ICU/death risk seems out of whack."),
     tags$p("A lot is still unknown about the disease, and data sets are sparse, so our susceptibility scores are",
            "good for ballpark estimates only. We'll update our tool with better numbers as they become available."),
-    faqQuestion("Why is pregnancy not listed as an underlying condition?"),
-    tags$p("COVID-19 is a new disease. Currently there are limited data and information about the impact of underlying medical conditions",
-           "and whether they increase the risk for severe illness from COVID-19. Based on what we know at this time, ",
-           "pergnant women might be at increased risk for severe illness from COVID-19, according to ",
-           tags$a("CDC (2020)", href = urls$cdc_pregnancy),
-           "but we haven't seen any quantitative evidence reported in patient-level studies"),
+    faqQuestion("Why is pregnancy added to the list of underlying conditions"),
+    tags$p("COVID-19 is a new disease. CDC recently revised its recommendations and started to suggest pregnancy increases the risks",
+           "of severe COVID-19 illness. Therefore we revised the list of medical conditions. ",
+           "Odds ratio related to pregnancy was obtained from ",
+           tags$a("Zambrano et al (2020) .", href = urls$zambrano)),
     faqQuestion("When was the most recent update to the app and what is new?"),
     tags$p("The COVID-19 data behind this app is updated daily. We periodically update the algorithm used for risk score estimation.",
-           " The most recent update to the algorithm is Sep 18, 2020. We made three major changes:",
-           " 1) Make the underreporting factor estimation more robust for counties with small case counts.",
-           " 2) Switch from New York Times COVID-19 data to USA Facts data. Check out a comparison between the two data sources by ",
-           tags$a("Lipman (2020). ", href = urls$lipman_2020),
-           " 3) Modify the method to estimate ICU risk due to lack of mutually adjusted odds ratios."),
+           " The most recent update to the algorithm is Jan 15, 2021. We made three major changes:",
+           " 1) Update the risk factors for severe COVID-19 illness based on the latest ",
+           tags$a("CDC guidance (2021). ", href = urls$cdc_medicalconditions),
+           " 2) Add the vaccine efficacy data for the two vaccine approved in the US: Pfizer-BioNTech and Moderna. "),
     faqQuestion("I have suggestion X, or know of data set Y, or want feature Z..."),
     tags$p("Let us know at", tags$a("covid.risk.score@gmail.com", href="mailto:covid.risk.score@gmail.com"), 
            "or visit us on ", tags$a("GitHub", href="https://github.com/mathematica-mpr/covid_risk_score"))
