@@ -84,6 +84,22 @@ conditions_list = c("Chronic renal disease" = "renal_disease",
                     "Sickle cell disease" = "sickle_cell",
                     "Other chronic condition" = "other")
 
+# activities list placebolder 
+l_activities_list = c("activity1" = "activity1",
+                    "activity2" = "activity2",
+                    "activity3" = "activity3",
+                    "activity4" = "activity4",
+                    "activity5" = "activity5")
+m_activities_list = c("activity1" = "activity1",
+                       "activity2" = "activity2",
+                       "activity3" = "activity3",
+                       "activity4" = "activity4",
+                       "activity5" = "activity5")
+h_activities_list = c("activity1" = "activity1",
+                      "activity2" = "activity2",
+                      "activity3" = "activity3",
+                      "activity4" = "activity4",
+                      "activity5" = "activity5")
 # vaccine doses
 vaccine_labels = list(pfizer = "Pfizer-BioNTech",
                       moderna = "Moderna")
