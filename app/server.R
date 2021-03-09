@@ -37,9 +37,6 @@ server <- function(input, output, session) {
     # And sync up two "days" inputs
     if (as.numeric(vaccines[[input$vaccine]][["doses"]])==1){  
       updateSelectInput(session, "doses", selected = 1)
-      updateSelectInput(session, "days_since_last_dose", selected = input$days_since_last_dose2)
-    } else {
-      updateSelectInput(session, "days_since_last_dose2", selected = input$days_since_last_dose)
     }
   })
   
