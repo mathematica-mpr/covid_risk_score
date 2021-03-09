@@ -77,12 +77,24 @@ conditions_list = c("Chronic renal disease" = "renal_disease",
 
 # vaccine doses
 vaccine_labels = list(pfizer = "Pfizer-BioNTech",
-                      moderna = "Moderna")
-vaccines = list(pfizer=list(efficacy=.95, doses=2, 
-                            days_between_doses=21,
-                            days_after_final_dose=7), 
-                moderna=list(efficacy=.941, doses=2, 
-                             days_between_doses=28,
-                             days_after_final_dose=14))
+                      moderna = "Moderna",
+                      johnsonandjohnson = "Johnson & Johnson")
 
+vaccines = list(pfizer=
+                  list(efficacy=.95,  
+                       doses=2,  
+                       days_between_doses=21, 
+                       days_after_final_dose=7), 
+                moderna=
+                  list(efficacy=.941,  
+                       doses=2,  
+                       days_between_doses=28, 
+                       days_after_final_dose=14),
+                johnsonandjohnson=
+                  list(efficacy=.66,  
+                       doses=1,
+                       days_between_doses=NA, 
+                       days_after_final_dose=14))
+
+total_vaccines_str = "three"
 

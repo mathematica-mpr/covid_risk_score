@@ -95,11 +95,22 @@ ui <- fluidPage(
             radioButtons('vaccine', "Which of the available COVID-19 vaccines did you recieve?",
                          choiceNames = unname(vaccine_labels), choiceValues = names(vaccine_labels),
                          inline=TRUE),
-            selectInput('doses', "How many doses of this vaccine have you recieved?",
-                         1:2),
-            sliderInput("days_since_last_dose", 
-                        HTML("How many days ago did you recieve your most recent dose? <sub class = 'text-info'>If more than 14 days ago, select 14.</sub>"),
-                        min=0, max=14, value=0)),
+            conditionalPanel(
+              condition = "input.vaccine != 'johnsonandjohnson'",
+              selectInput('doses', "How many doses of this vaccine have you recieved?",
+                           1:2),
+              sliderInput("days_since_last_dose", 
+                          HTML("How many days ago did you recieve your most recent dose? <sub class = 'text-info'>If more than 14 days ago, select 14.</sub>"),
+                          min=0, max=14, value=0),
+              ),
+            conditionalPanel(
+              condition = "input.vaccine == 'johnsonandjohnson'",
+              sliderInput("days_since_last_dose2", 
+                          HTML("How many days ago did you recieve your vaccine? <sub class = 'text-info'>If more than 14 days ago, select 14.</sub>"),
+                          min=0, max=14, value=0),
+              ),
+
+            ),
                         
           actionButton('go', "Calculate", class = "btn btn-primary btn-block")
         ) # bsCollapsePanel
