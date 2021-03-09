@@ -34,7 +34,6 @@ server <- function(input, output, session) {
       updateSelectInput(session, "days_since_last_dose", selected = 0)
     }
     # set doses to 1 for 1-dose vaccine (no ui element for doses)
-    # And sync up two "days" inputs
     if (as.numeric(vaccines[[input$vaccine]][["doses"]])==1){  
       updateSelectInput(session, "doses", selected = 1)
     }
