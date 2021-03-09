@@ -21,7 +21,7 @@ calculateRisk <- function(input) {
     "conditions" = as.list(input$conditions))
   
   if (input$has_vaccine){
-    request_body$vaccine = ifelse(input$vaccine=="johnsonandjohnson","moderna",input$vaccine)
+    request_body$vaccine = input$vaccine
     request_body$doses = as.numeric(input$doses)
     request_body$days_since_last_dose = input$days_since_last_dose
   }
