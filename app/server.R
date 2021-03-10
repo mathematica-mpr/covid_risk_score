@@ -17,7 +17,7 @@ server <- function(input, output, session) {
                    close = "3. Your Behavior")
   })
   
-  ## modify symptom and condition selections -----------------------------------
+  ## modify symptom, condition and vaccine selections --------------------------
   observe({
     if (!input$is_sick) {
       # clear the conditional panel's UI when unchecked
@@ -31,9 +31,11 @@ server <- function(input, output, session) {
       # clear vaccine conditional input when collapsed
       updateRadioButtons(session, "vaccine", selected = "pfizer")
       updateSelectInput(session, "doses", selected = 1)
-      if (!input$doses==2){
-        updateSliderInput(session, "days_since_last_dose", value=0)
-      }
+      updateSelectInput(session, "days_since_last_dose", selected = 0)
+    }
+    # set doses to 1 for 1-dose vaccine (no ui element for doses)
+    if (as.numeric(vaccines[[input$vaccine]][["doses"]])==1){  
+      updateSelectInput(session, "doses", selected = 1)
     }
   })
   
@@ -129,9 +131,8 @@ server <- function(input, output, session) {
   output$vaccines <-renderUI({
     risk<-get_risk_info()
     # in app/results.R
-    if (is.null(risk$message)) {
-      renderVaccinesHtml(input$go, input$has_vaccine, input$vaccine, input$doses, input$days_since_last_dose)
-    }
+    renderVaccinesHtml(input$go, input$has_vaccine, input$vaccine, 
+                       as.numeric(input$doses), as.numeric(input$days_since_last_dose))
   })
   output$res <-renderUI({
     risk <- get_risk_info()
