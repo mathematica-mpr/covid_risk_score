@@ -8,7 +8,6 @@ bool2char <- function(bol){
 
 # function makes API call ------------------------------------------------------
 calculateRisk <- function(input) {
-  
   request_body <- list(
     "zip" = input$zip,
     "age"= as.numeric(input$age),
@@ -121,32 +120,42 @@ renderVaccinesHtml <- function(go, has_vaccine, vaccine, doses, days){
   
   # Case where not vaccinated
   if (!has_vaccine){
-    text <- tags$p("There are currenty two vaccines against COVID-19 authorized for use in the United States. ",
-           "Both vaccines require two doses and are safe and highly effective at preventing symptomatic COVID-19. ", 
+    # no doses
+    text <- tags$p("There are currently", total_vaccines_str, "vaccines against COVID-19 authorized for use in the United States. ",
+           "All of the approved vaccines are safe and highly effective at preventing symptomatic COVID-19. ", 
            tags$a("Click here ", href=urls$cdc_vaccines), "for more information and to check when you might be eligible for vaccination.")
-  } else if (doses==1){
+  } else if (doses < vaccines[[vaccine]][["doses"]]){
+    # some but not all doses
     text <- tags$p("Congratulations on receiving your first dose of the ", vaccine_labels[vaccine], " COVID-19 vaccine!",
            "Be sure to get your second dose of the vaccine ", vaccines[[vaccine]]$days_between_doses,
            " days after the first. ", tags$a("Click here ", href=urls$cdc_vaccines), 
-           "for more information on about the United State's vaccination program.")
+           "for more information about the United States' vaccination program.")
   } else {
+    # all doses
     if (days<vaccines[[vaccine]]$days_after_final_dose){
-      text <- tags$p("Congratulations on getting both dose of the ", vaccine_labels[vaccine], " COVID-19 vaccine!",
+      # before efficacy threshold
+      text <- tags$p("Congratulations on receiving", 
+                     ifelse(vaccines[[vaccine]]$doses==1, "the ", "both doses of the "), 
+                     vaccine_labels[vaccine], " COVID-19 vaccine!",
                      "This vaccine reaches its full ", formatPercent(vaccines[[vaccine]]$efficacy),
                      " efficacy at around ", vaccines[[vaccine]]$days_after_final_dose,
-                     " days after the second dose. Your immunity will build up over the next few days. ",
+                     ifelse(vaccines[[vaccine]]$doses==1, "days after vaccination. ", "days after the second dose. "), 
+                     "Your immunity will build up over the next few days. ",
                      tags$a("Click here ", href=urls$cdc_vaccines), 
-                     "for more information on about the United State's vaccination program.")
+                     "for more information about the United States' vaccination program.")
     } else {
-      text <- tags$p("Congratulations on recieving both dose of the ", vaccine_labels[vaccine], " COVID-19 vaccine!",
+      # after efficacy threshold
+      text <- tags$p("Congratulations on receiving", 
+                     ifelse(vaccines[[vaccine]]$doses==1, "the ", "both doses of the "), 
+                     vaccine_labels[vaccine], " COVID-19 vaccine!",
                      "This vaccine reduces your risk of contracting symptomatic COVID-19 by ",
                      formatPercent(vaccines[[vaccine]]$efficacy), ". ",
                      tags$a("Click here ", href=urls$cdc_vaccines), 
-                     "for more information on about the United State's vaccination program.")
+                     "for more information about the United States' vaccination program.")
     }
   }
   
-  div(formatResultsHeader("Vaccine Information"), text, tags$p("It is not yet known whether or not vaccinated individuals may still be carriers of asymtomatic COVID-19. ",
+  div(formatResultsHeader("Vaccine Information"), text, tags$p("It is not yet known whether or not vaccinated individuals may still be carriers of asymptomatic COVID-19. ",
          "Even after you have been vaccinated, be sure to continue to social distance to protect your family, friends, and community."))
 }
 
