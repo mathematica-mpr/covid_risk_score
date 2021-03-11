@@ -1,0 +1,185 @@
+---
+title: "missing_api"
+author: "Emma Pendl-Robinson"
+date: "10/21/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+source('api_helper_functions.R')
+```
+
+Example of POST Request
+
+```{r, eval=FALSE}
+
+request_url <- "api.covid19.mathematica.org/score"
+
+request_body  <- list(
+  "zip" = "64034",
+  "age"= 29,
+  "sex" = "other", 
+  "symptoms" = as.list(list('is_other')),
+  "nppl" = 1,
+  "is_roommate"= "True",
+  "nppl2"= 10,
+  "hand"= "True",
+  "ppe"= "True",
+  "conditions" =  as.list(list('is_cvd'))
+  )
+
+jsonlite::toJSON(request_body , auto_unbox = TRUE)
+
+
+r <- POST(request_url, add_headers("x-api-key" = Sys.getenv("X_API_KEY")), body = request_body, encode = "json")
+content(r)
+```
+
+# who were the people who I could not get a score for
+
+```{r}
+# import nexoid data
+nexoid_for_api_input <- readRDS("N:/Transfer/JStarling/19andme/nexoid_data_forapi.RData")
+# get a list of all the person from the nexiod data
+input_person_names <- names(nexoid_for_api_input) 
+```
+
+
+```{r}
+# define column names
+csv_cols <- cols(
+  person = col_character(),
+  fips = col_character(),
+  name = col_character(),
+  n_case_today = col_double(),
+  latest_day = col_character(),
+  moving_casecount = col_double(),
+  underreport_factor = col_double(),
+  est_unreported_sick = col_double(),
+  exposure_risk = col_double(),
+  sympt_covid_risk = col_double(),
+  hosp_risk = col_double(),
+  icu_risk = col_double(),
+  death_risk = col_double(),
+  vulnerability_risk = col_double(),
+  score = col_double()
+)
+
+#read in the results from N:\Transfer\JStarling\19andme\api_output
+file_paths <- list.files(path = "N:/Transfer/JStarling/19andme/api_output/", pattern = "csv_part_", recursive = TRUE, full.names = TRUE)
+df <- map_dfr(file_paths, ~ read_csv(.x, col_types = csv_cols))
+  
+```
+
+```{r}
+# get a list of all the persons from the df
+df_person_names <- df$person 
+
+# find people in input nexoid but not df
+missing_people <- input_person_names[!input_person_names %in%df_person_names]
+length(missing_people)
+
+#filter nexoid data to missing people
+missing_ls <- nexoid_for_api_input[!input_person_names %in%df_person_names]
+
+```
+
+make dataframe with the missing people's information
+
+
+```{r}
+vec2str <- function(x){
+  # convert vector of conditions to a string
+
+  # x : list of person attributes
+  x$conditions <- toString(x[['conditions']])
+  return(x)
+}
+
+missing_ls_vec_conditions <- lapply(missing_ls, vec2str)
+
+#making a dataframe with the data to make it more human readable
+missing_df <- list2_df(missing_ls_vec_conditions)
+
+missing_df
+```
+
+running calc risk for the missing people and figure out where/what the erorrs are
+
+```{r}
+calculateRisk_miss <- function(input) {
+  #makes API Calls
+  request_body <- list(
+    'zip' = input[['zip']],
+    'age' = as.numeric(input[['age']]),
+    'sex' = gsub("is_", "", input[['sex']]),
+    'symptoms' = na_input(input[['symptoms']]),
+    'nppl' = as.numeric(input[['nppl']]),
+    'is_roommate' = bol2char(input[['is_roommate']]),
+    'nppl2' = as.numeric(input[['nppl2']]),
+    'hand' = bol2char(input[['hand']]),
+    'ppe' = bol2char(input[['ppe']]),
+    'conditions' = na_input(input[['conditions']])
+  )
+  #print(request_body)
+  #print(jsonlite::toJSON(request_body , auto_unbox = TRUE))
+  resp <- POST(request_url, add_headers("x-api-key" = Sys.getenv("X_API_KEY")), body = request_body, encode = "json")
+  api_return <- content(resp)
+  
+  return(api_return)
+}
+
+# calcualte risk for all the missing people with lapply
+
+plan(multiprocess) ## => parallelize on your local computer
+miss_out <- future_lapply(missing_ls, calculateRisk_miss)
+```
+
+filter to outputs with error messages
+
+```{r}
+error_message <- miss_out[lapply(miss_out, length) == 1]
+
+error_message_df <- list2_df(error_message)
+```
+
+More than one fips is returned that does not equal Jackson County, MO
+logic:
+- if one of the api results matches the nexoid fip, select this one
+- if none of the api results matches the nexoid fip and there is only one api result fips, select the one api result
+- if none of the api results matches the nexoid fip and more than one of the api return county name is Jackson County, MO then return the first api result
+- if none of the conditions are meet, return NULL
+```{r}
+# flatten to make a df
+# https://stackoverflow.com/questions/48542874/flatten-nested-list-of-lists-with-variable-numbers-of-elements-to-a-data-frame
+
+two_results <- lapply(miss_out[lapply(miss_out, length) == 2],'[[', 'results')
+
+two_results_nest_df  <- map(map_if(two_results,~class(.x)=="matrix",list),~map(.x,as.data.frame))
+
+two_results_df <- map_dfr(two_results_nest_df,~map_dfr(.x,identity),identity,.id="persons")
+
+```
+
+
+Save out error message df and the two results df
+
+add the missing_results_out two_results_df to the df of all the nexoid results and save
+```{r}
+write_csv(error_message_df, "N:/Transfer/JStarling/19andme/api_output/error_message.csv")
+write_csv(two_results_df, "N:/Transfer/JStarling/19andme/api_output/two_results_no_match.csv")
+
+```
+
+```{r}
+all_df <- bind_rows(df, two_results_df)
+
+write_csv(all_df, "N:/Transfer/JStarling/19andme/api_output/all_api_output.csv")
+
+```
+
+

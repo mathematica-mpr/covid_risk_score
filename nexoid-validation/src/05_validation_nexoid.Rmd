@@ -1,0 +1,818 @@
+---
+title: "19andMe and Nexoid Covid Risk Comparison"
+author: "Jennifer Starling @ Mathematica"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+      toc: TRUE
+      toc_depth: 3
+      toc_float: TRUE
+      theme: "cosmo"
+      code_folding: hide
+---
+
+```{r packages_functions, message = FALSE, warning=FALSE, echo = F}
+# All nexoid info availble here:
+# https://www.covid19survivalcalculator.com/en/research
+
+
+# global knitr options
+rm(list = ls())
+library(knitr)
+opts_chunk$set(fig.align = "center", warning = F, message = F, comment = NA, error = T)
+library(tidyverse)
+library(data.table)
+library(stringr)
+library(foreach)
+library(maps)     # To get all fips, even those we don't have data for.
+library(usmap)    # To create county-level map.
+library(ggthemes)
+library(ggsci)
+library(lubridate)
+library(prodlim)  # For finding matching rows.
+library(metR)     # For geom_arrow.
+library(cowplot)
+```
+
+```{r, include=F}
+# Workspace prep ===================================================================================
+
+# Set wd() to make for easy transition to Rmd file later.
+setwd("C:/Users/JStarling/repos/covid_risk_score_validation/src")
+
+# Load maps info.
+data(county.fips)
+
+# Load data.
+all_files = paste0('../data-clean/', list.files('../data-clean/'))
+all_files = all_files[!str_detect(all_files, '_all')]
+
+df <- foreach(i=1:length(all_files), .combine=rbind) %do% {
+  data.frame(fread(all_files[i]))
+}
+
+# Preview data.
+summary(df)
+dim(df)
+head(df)
+
+# Utility function for creating Nexoid labels based on quantiles.
+# Nexoid's Low and Lowest are grouped together, as are High and Highest.
+nexoid_quantiles <- function(x, probs = c(0, .075, .075+.15, .075+.15+.55, .075+.15+.55+.15, 1)){
+  
+  qu <- quantile(x, probs=probs)
+  labels=c('Low', 'Low', 'Middle', 'High', 'High')
+  risk_bands = ifelse(x<=qu[2], labels[1],
+                      ifelse(x<=qu[3], labels[2], 
+                             ifelse(x<=qu[4], labels[3],
+                                    ifelse(x<=qu[5], labels[4], labels[5]))))
+  risk_bands = factor(risk_bands, levels=c('Low','Middle','High'))
+}
+
+
+# Calculate total exposure risk for 19andMe:
+# total_covid_risk = sympt_covid_risk + exposure_risk*(1 - sympt_covid_risk)
+# Calculates total risk of covid using the risk user has symptomatic covid and the risk one could get
+# covid through exposure
+df <- df %>% mutate(api_exposure_risk = api_sympt_covid_risk + api_exposure_risk * (1-api_sympt_covid_risk))
+
+# Scale P(exposure) and P(death).
+range(df$api_exposure_risk); range(df$nexoid_risk_infection)
+range(df$api_death_risk); range(df$nexoid_risk_mortality)
+
+df <- df %>% mutate(
+  nexoid_risk_infection = nexoid_risk_infection/100,
+  nexoid_risk_mortality = nexoid_risk_mortality/100,
+  death_diff = api_death_risk - nexoid_risk_mortality,
+  exp_diff = api_exposure_risk - nexoid_risk_infection,
+  death_diff_ratio = api_death_risk / nexoid_risk_mortality)
+
+# Calculate number of weeks, since P(exposure) for Nexoid is for all time, and for 19andme is in a week.
+nex_weeks = as.double(difftime(max(df$survey_date), min(df$survey_date), unit='weeks'))
+df <- df %>% 
+  mutate(nexoid_risk_infection_wk = nexoid_risk_infection/nex_weeks) %>%
+  mutate(exp_diff_wk = api_exposure_risk - nexoid_risk_infection_wk)
+
+# Keep the last 90-day slice of data only.
+df <- df %>% 
+  mutate(survey_date = as_date(survey_date)) %>%
+  dplyr::filter(survey_date >= max(survey_date)-90)
+
+# Add indicator for whether there are any pre-existing conditions, and the number of conditions.
+df <- df %>% mutate(conditions_any = ifelse(conditions=='', 0, 1)) %>%
+  rowwise() %>% 
+  mutate(conditions_num = sum(is_renal, is_cvd, is_diabetes, is_hyper, is_immune, is_lung, is_smoker, is_other, is_obesity))
+  
+```
+
+## Goal:  Compare the risk predictions for 19andMe versus the Nexoid covid risk calculator.
+
+The NExoid Covid-19 risk calculator is available at https://www.covid19survivalcalculator.com.  
+
+## Mortality risk comparison.
+
+### Overall.
+
+```{r, include=F}
+# Compare P(death) =================================================================================
+
+# Overall comparison -------------------------------------------------------------------------------
+
+# Categorize death rates exceeding 10% in either direction.
+df <- df %>% mutate(death_check = factor(ifelse(death_diff>.1, '19andMe 10% higher', 
+                                                ifelse(-death_diff>.1, '19andMe 10% lower', 
+                                                       "within 10%")),
+                                         levels=c('within 10%', '19andMe 10% lower', '19andMe 10% higher')))
+table(df$death_check)
+my_props = round(prop.table(table(df$death_check)),4)
+my_props
+
+# Calculate proportions in each category, and spearman ranked correlation coefficient.
+spearman_cor = round(cor(df$nexoid_risk_mortality, df$api_death_risk, method='spearman'),3)
+```
+
+We first compare the risk of mortality P(death) for 19andMe versus Nexoid. We plot mortality risk for Nexoid versus 19andMe, with colour indicating observations where 
+
+- 19andMe and Nexoid reported mortality risk within 10% of each other (black)
+- 19andMe mortality risk was more than 10% higher than Nexoid (blue)
+- 19andMe mortality risk was more than 10% lower than Nexoid (orange)
+
+The Spearman ranked correlation
+coefficient for $\text{cor}[P_{19}(death), P_{nex}(death)]$ is 0.91.
+
+```{r}
+# Plot 19andMe versus Nexoid death risks.
+ggplot(df, aes(x=nexoid_risk_mortality, y=api_death_risk, colour=death_check, shape=death_check)) + 
+  geom_point(alpha=.5) + 
+  coord_cartesian(xlim=c(0,.75), ylim=c(0,.75)) + 
+  geom_abline(intercept=0, slope=1, colour='black') + 
+  geom_abline(intercept=-.1, slope=1, colour='grey50', linetype=2) + 
+  geom_abline(intercept=.1, slope=1, colour='grey50', linetype=2) + 
+  scale_colour_colorblind(name='') +
+  scale_shape_discrete(name='') + 
+  labs(x='Nexoid', y='19andme', 
+       subtitle=paste0('P(Death): Spearman ranked corr ', spearman_cor))+
+  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position='bottom')
+
+ggsave(file.path("..", "figures", "figure-mortality-01.pdf"), height=5, width=8)
+```
+
+The mortality risk reported by the two apps are largely consistent, with only 
+
+- `r table(df$death_check)[2]` observations where 19andMe's mortality risk was more than 10% lower than Nexoid's, and 
+- `r table(df$death_check)[3]` observations where
+19andMe's mortality risk was more than 10% higher than Nexoid's  
+
+where n=`r nrow(df)`. Proportions are below.
+
+```{r}
+print(my_props)
+```
+```{r, echo=F, include=F}
+### TEST OUT A NEW MAIN PLOT FOR MORTALITY, FOR PAPER
+#ggplot(df, aes(x=age, fill=death_check)) + 
+#  geom_bar(position='dodge') +
+  #facet_wrap(~death_check, ncol=1) + 
+#  theme_bw() +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+#ggsave(file.path("..", "figures", "figure-mortality-07.pdf"), height=8, width=6)
+```
+
+We focus on raw difference in mortality rate over ratios for reasons illustrated below.  
+
+- Looking at the ratio of 
+$P_{19}(death) / P_{nex}(death)$ yields large differences when probabilities are small. 
+- We are not concerned about
+differences such as $P_{19}(death)=0.8$ versus $P_{nex}(death)=0.2$, despite $P_{19}(death)$ being 2x
+as large as $P_{nex}(death)$.  
+- Considering differences outside of a 10% probability band gives a sensible
+and intuitive way to think about what kinds of differences might be large.
+
+```{r}
+# Note: The ratios really don't seem to be the way to go here.  If you look at the colour here 
+# for ratio more than two, it captures a lot of small values where the ratio is large, but practical
+# magnitude of the difference is very small.  (I.e. P(death)=.8 versus .4 - we wouldn't care about this.)
+ggplot(df, aes(x=nexoid_risk_mortality, y=api_death_risk, colour=factor(abs(death_diff_ratio)>2))) + 
+  geom_point(alpha=.1) + 
+  coord_cartesian(xlim=c(0,.75), ylim=c(0,.75)) + 
+  geom_abline(intercept=0, slope=1, colour='red') + 
+  labs(x='Nexoid', y='19andMe', title='P(Death)') + 
+  scale_colour_manual(name='Ratio of death rates >2', values=c('grey80', 'red')) +
+  labs(x='Nexoid', y='19andme', 
+       title=paste0('P(Death): Spearman ranked corr ', spearman_cor))+
+  theme_bw()
+ggsave(file.path("..", "figures", "figure-mortality-02.pdf"), height=5, width=8)
+```
+
+### Age.
+
+Now, we investigate the sources of the larger-than-10% differences highlighted in orange and blue.
+First, we examine these differences by age.  
+
+- There are no large differences in the under-60 cohort. 
+- Cases where 19andMe is more than 10% lower are isolated to the 80+ age group, while 
+- Cases where 19andMe is over 10% higher increase with age across the over-60 cohort.
+
+```{r}
+# Age
+paper_plt1_panel1 = ggplot(df %>% mutate(age_cat = factor(ifelse(age<60, 'Under age 60', 'Age 60 plus'), 
+                                                          levels=c('Under age 60', 'Age 60 plus'))), 
+       aes(x=nexoid_risk_mortality, y=api_death_risk, colour=death_check, shape=death_check)) + 
+  geom_point(alpha=.5) + 
+  coord_cartesian(xlim=c(0,.75), ylim=c(0,.75)) + 
+  geom_abline(intercept=0, slope=1, colour='red') + 
+  labs(x='Nexoid', y='19andMe', subtitle=paste0('A) Mortality risk. Spearman ranked corr ', spearman_cor))+
+  facet_wrap(~age_cat, ncol=1) + 
+  scale_colour_colorblind(name='') +
+  scale_shape_discrete(name='') + 
+  geom_abline(intercept=-.1, slope=1, colour='grey50', linetype=2) + 
+  geom_abline(intercept=.1, slope=1, colour='grey50', linetype=2) + 
+  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                     legend.position='bottom')
+ggsave(file.path("..", "figures", "figure-mortality-03.pdf"), paper_plt1_panel1, height=8, width=6)
+paper_plt1_panel1
+
+```
+
+The Nexoid app uses a mortality rate adjustment factor of 2.09 for 60-70, 4.77 for 70-80, and 12.64 for age 80+, so these findings are not surprising.
+
+### 19andMe risk more than 10% lower.
+
+The cases where 19andMe has death risk at least 10% lower than Nexoid are in the 60+ age category.  
+
+The 19andme app does not include race.  Let's see if that is a source of discrepancy in the over-60 cohort.
+```{r, echo=T}
+# The 10% diff cases show up only in the 60+ population.  Let's dig in.
+df_60plus = df %>% filter(age>=60)
+
+# Let's see if race plays a factor.
+ggplot(df_60plus, aes(x=race)) + 
+  geom_bar() + 
+  facet_wrap(~death_check,ncol=1, scales='free_y') + 
+  labs(title='Race by mortality risk difference for patients age 60 and over.') +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+ggsave(file.path("..", "figures", "figure-mortality-04.pdf"), height=5, width=6)
+```
+Below is the age distribution for black patients in the entire dataset, by magnitude of mortality risk difference.
+All 18 of the cases where 19andMe is 10% or more lower are black patients over 80.  
+
+```{r, echo=F, include=F}
+# Chi-squared test.
+
+df_60p_chisq = matrix(xtabs(~death_check+race, df_60plus), nrow=3, byrow=F)
+chisq_pv = format.pval(chisq.test(df_60p_chisq)$p.value, nsmall=3, digits=3, eps=1e-3)
+```
+The p-value for the Chi-squared test is `r chisq_pv`; we reject the null hypotehsis that the distribution of race is the same in the different mortality difference groups.
+
+```{r}
+
+xtabs(~age+death_check, df %>% filter(race=='black'))
+```
+
+These 18 cases have much higher Nexoid mortality risk than what 19andMe is estimating; let's perform a thought experiment.
+
+- We take these 18 cases and find similar patients in the dataset who are not Black, and obtain those matched Nexoid mortality risk scores.  
+- We see that this ad-hoc adjustment for the effect of Blackness in the Nexoid mortality risk calculation brings the risk scores in-line.  
+- In other words, switching a patient from Black to not-Black decreases the Nexoid mortality risk to levels comparable with other observations in the over-60 cohort.
+
+```{r, echo=F}
+# For the 'lower than 10%' patients, what happens if you find similar patients who are not black in the Nexoid dataset, and
+# see how their risk estimates change?
+
+temp <- df_60plus %>% 
+  mutate(nppl_range = cut(nppl, breaks=c(0,5,10,20,100), include.lowest=T),
+         nppl2_range = cut(nppl2, breaks=c(0,5,10,20,100), include.lowest=T)) %>%
+  select(person, age, sex, conditions_any, race, symptoms, nppl_range, is_roommate, nppl2_range, hand, ppe, api_death_risk, nexoid_risk_mortality, death_check)
+
+temp1 <- temp %>% filter(death_check=='19andMe 10% lower')
+temp2 <- temp %>% filter(death_check=='within 10%', race!='black') 
+match = row.match(temp1 %>% select(-person,  -api_death_risk, -nexoid_risk_mortality, -death_check, -race), 
+                  temp2 %>% select(-person,  -api_death_risk, -nexoid_risk_mortality, -death_check, -race))
+temp1$nexoid_death_risk_similar_person = temp2$nexoid_risk_mortality[match]
+temp1$diff_adj = temp1$api_death_risk - temp1$nexoid_death_risk_similar_person
+
+ggplot(temp1, aes(x=nexoid_risk_mortality, y=api_death_risk)) +
+  geom_point(data=df, colour='grey80', alpha=.2) + 
+  geom_point(size=2, colour='#E69F00') +
+  geom_point(aes(x=nexoid_death_risk_similar_person, colour=factor(diff_adj>.1)), size=2) + #), colour='#56B4E9', size=2) +
+  coord_cartesian(xlim=c(0,.75), ylim=c(0,.75)) +
+  geom_abline(intercept=0, slope=1, colour='red') +
+  geom_segment(aes(x=.45, xend=.3, y=.37, yend=.37), 
+               arrow = arrow(length = unit(0.25, "cm")), colour='black') +
+  labs(x='Nexoid', y='19andMe', title='P(Death)') +
+  scale_colour_manual(name='', values=c('#000000', '#56B4E9')) +
+  guides(colour=F) + 
+  labs(x='Nexoid', y='19andme',
+       title=paste0('P(Death): Spearman ranked corr ', spearman_cor),
+       subtitle=c('Nexoid P(death) for similar, non-black patients.')) +
+  theme_bw()
+ggsave(file.path("..", "figures", "figure-mortality-05.pdf"), height=5, width=8)
+
+# Check updated spearman corr coefficient if we use the matched data.
+matched <- rbind(
+  temp1 %>% select(api_death_risk, nexoid_risk_mortality),
+  df %>% filter(death_check != "19andMe 10% lower") %>% select(api_death_risk, nexoid_risk_mortality))
+
+# Calculate proportions in each category, and spearman ranked correlation coefficient.
+#spearman_cor_matched = round(cor(matched$nexoid_risk_mortality, matched$api_death_risk, method='spearman'),3)
+```
+Once we make this adjustment, 19andme is again estimating similar or slightly higher mortality risk, as we do for
+many of the over-60 patients. The adjusted patients who are now blue (difference larger than 10%) generally 
+
+- have large numbers of contacts, 
+- have pre-existing conditions, and 
+- unanimously do not follow CDC hand-washing or PPE guidelines.  
+
+Next, we will see what factors contribute to the larger positive differences.
+
+### 19andMe more than 10% higher.
+
+We will now investigate what factors contribute to 19andMe reporting higher mortality rates.  These cases are again in the over-60 cohort.
+
+Pre-existing conditions look to matter; the distribution of number of pre-existing conditions is higher for patients where
+19andMe is estimating at least 10% higher mortality risk than Nexoid.
+```{r, echo=F}
+# Number of pre-existing conditions looks to matter - higher for patients where there are 10% differences.
+ggplot(df_60plus, aes(x=factor(conditions_num))) + 
+  geom_bar(position='dodge') + 
+  facet_wrap(~death_check, ncol=1, scales='free_y') +
+  labs(x='Number of pre-existing conditions', y='Count', subtitle='B) Pre-existing conditions for age 60 plus.') + 
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+ggsave(file.path("..", "figures", "figure-mortality-06.pdf"), height=5, width=6)
+
+paper_plt1_panel2 = ggplot(rbind(df_60plus %>% select(race, conditions_num, death_check),
+                                 data.frame(race=NA, conditions_num=3:8, death_check='19andMe 10% lower')),
+                           aes(x=factor(conditions_num), 
+                                          fill=factor(ifelse(race=='black','Black','Not Black')))) + 
+  geom_histogram(position='dodge', binwidth=.5, stat='count') + 
+  facet_wrap(~death_check, ncol=1, scales='free_y') +
+  labs(x='Number of pre-existing conditions', y='Count', 
+       subtitle='B) Pre-existing conditions and race for age 60 plus.') + 
+  scale_fill_manual(name='Race', values=c('grey70','grey30'), na.value=NA, labels=c('Black', 'Not Black', '')) + 
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),  legend.position='bottom')
+```
+
+```{r, echo=F, include=F}
+# ASSEMBLE MORTALITY PANEL
+panel1 = plot_grid(paper_plt1_panel1, paper_plt1_panel2, ncol=2)
+ggsave(file.path("..", "figures", "_paper-val-fig1.jpg"), plot(panel1), height=5, width=9.5)
+ggsave(file.path("..", "figures", "_paper-val-fig1.pdf"), plot(panel1), height=5, width=9.5)
+```
+
+```{r, echo=F}
+# Wilcoxon test to compare mean number of pre-existing conditions 
+x = df_60plus %>% filter(death_check=="within 10%") %>% pull(conditions_num)
+y = df_60plus %>% filter(death_check=="19andMe 10% higher") %>% pull(conditions_num)
+pval = format.pval(wilcox.test(x,y)$p.value, nsmall=3, ndigits=3, eps=1e-3)
+```
+
+We use a Wilcoxon test to compare the mean number of pre-existing conditions in within-10% verus over-10% difference groups, for the over-60 cohort.  The p-value is `r pval`; we reject the null hypotehsis that the mean number of pre-existing conditions in the within-10% and the over-10% difference groups are the same.
+
+Let's inspect proportions of conditions in each mortality risk difference group, for each condition.  All conditions
+look to have higher rates of occurrence in the over-60 group where the 19andme estimate is at least 10% higher. The following conditions look to have more marked differences:
+
+- Diabetes
+- Heart disease
+- Immune disease
+- Lung disease
+
+In the Nexoid mortality calculations, heart disease (1.27), kidney disease (1.72), immune disease (1.67), and diabetes (1.87) have higher adjustment factors, while the hypertension (0.95) adjustment factor is lower. 
+
+Note:  These are the "The below table shows the factors used in the mortality calculation", but not exactly sure how that adjustment is being made.
+```{r, echo=F, fig.width=12, fig.height=10}
+
+# Process data to get counts for each condition.
+temp <- df_60plus %>% 
+  filter(death_check!="19andMe 10% lower") %>%
+  select(death_check, is_cvd, is_diabetes, is_hyper, is_renal, is_immune, is_lung, is_obesity, is_smoker) %>%
+  pivot_longer(is_cvd:is_smoker, names_to='condition', values_to='present') %>%
+  group_by(death_check, condition) %>%
+  summarize(x=sum(present), n=n()) %>%
+  mutate(p = x/n) %>%
+  arrange(condition)
+
+# Calculate p-values and adjust for multiple comparisons (Bonferroni).
+pvals = p.adjust(c(
+    prop.test(x =  temp %>% filter(condition=='is_cvd') %>% pull(x), 
+            n = temp %>% filter(condition=='is_cvd') %>% pull(n))$p.value,
+    prop.test(x =  temp %>% filter(condition=='is_diabetes') %>% pull(x), 
+            n = temp %>% filter(condition=='is_diabetes') %>% pull(n))$p.value,
+    prop.test(x =  temp %>% filter(condition=='is_hyper') %>% pull(x), 
+            n = temp %>% filter(condition=='is_hyper') %>% pull(n))$p.value,
+    prop.test(x =  temp %>% filter(condition=='is_renal') %>% pull(x), 
+            n = temp %>% filter(condition=='is_renal') %>% pull(n))$p.value,
+    prop.test(x =  temp %>% filter(condition=='is_immune') %>% pull(x), 
+            n = temp %>% filter(condition=='is_immune') %>% pull(n))$p.value,
+    prop.test(x =  temp %>% filter(condition=='is_lung') %>% pull(x), 
+            n = temp %>% filter(condition=='is_lung') %>% pull(n))$p.value,
+    prop.test(x =  temp %>% filter(condition=='is_obesity') %>% pull(x), 
+            n = temp %>% filter(condition=='is_obesity') %>% pull(n))$p.value,
+    prop.test(x =  temp %>% filter(condition=='is_smoker') %>% pull(x), 
+            n = temp %>% filter(condition=='is_smoker') %>% pull(n))$p.value
+  ))
+temp$pvals = format.pval(rep(pvals, each=2), eps=1e-3)
+rm(pvals)
+
+# Add labels for conditions.
+temp$facets = rep(c(
+  'Heart disease', 'Diabetes', 'Hypertension', 'Kidney disease', 'Immune disease',
+  'Lung disease', 'Obesity', 'Smoker'), each=2)
+
+
+ggplot(temp, aes(x=death_check, y=p, label=format(round(p,2), nsmall=2, digits=2))) + 
+  geom_bar(stat='identity') + 
+  geom_text(aes(y=p+.1)) + 
+  coord_cartesian(ylim=c(0,1)) +
+  facet_wrap(~paste0(facets, " (p ", pvals, ')'), ncol=2) + 
+  labs(x='Mortality risk difference', y = 'Proportion') +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+ggsave(file.path("..", "figures", "figure-mortality-07.pdf"), height=8, width=6)
+```
+
+Employment status does not look meaningfully different in the risk-difference groups.
+```{r, echo=F}
+# Working does not look impactful.
+ggplot(df_60plus, aes(x=working)) + 
+  geom_bar() + 
+  facet_wrap(~death_check, ncol=1, scales='free_y') +
+  labs(x='Employment status', y='Count', title='Employment status for patients age 60 or older.') + 
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+ggsave(file.path("..", "figures", "figure-mortality-08.pdf"), height=5, width=6)
+```
+
+```{r, echo=F, include=F}
+# Chi-squared test.
+
+df_60p_chisq = matrix(xtabs(~death_check+working, df_60plus), nrow=3, byrow=F)
+chisq_pv = format.pval(chisq.test(df_60p_chisq)$p.value, nsmall=3, digits=3, eps=1e-3)
+```
+The p-value for the Chi-squared test is `r chisq_pv`; we do not find evidence of difference in distribution of employment conditions across in the different mortality difference groups.
+
+
+
+Presence of Covid symptoms is also higher for the cohort where 19andMe estimates at least 10% higher risk.  This is a tricky category to truly assess: 
+
+- 19andMe provides a list of symptoms which can be selected in combination, while 
+- Nexoid has a single checkbox to indicate presence of Covid symptoms (dry cough and fever).  
+
+Since 19andMe's symptom list does not include fever, we a Nexoid symptoms selection to "is_other" in the API.
+
+```{r, echo=F}
+# Covid symptoms.  Test for different proportions of symptoms.
+x = c(sum(df_60plus$death_check=='within 10%' & df_60plus$symptoms=="is_other"), sum(df_60plus$death_check=='19andMe 10% higher' & df_60plus$symptoms=="is_other"))
+n = c(sum(df_60plus$death_check=='within 10%'), sum(df_60plus$death_check=='19andMe 10% higher'))
+pval = format.pval(prop.test(x=x, n=n)$p.value, digits=3, eps=1e-3)
+
+temp = df_60plus %>% 
+  dplyr::select(death_check, symptoms) %>%
+  dplyr::group_by(death_check) %>%
+  summarize(x=sum(symptoms=="is_other"), n=n()) %>%
+  mutate(p = x/n)
+
+ggplot(temp, aes(x=death_check, y=p, label=format(round(p,2), nsmall=2, digits=2))) + 
+  geom_bar(stat='identity') + 
+  geom_text(aes(y=p+.1)) + 
+  coord_cartesian(ylim=c(0,1)) +
+  labs(x='Mortality risk difference', y = 'Proportion', 
+       title='Covid-19 Symptoms', subtitle=paste0('(p', pval, ' for differences)')) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+ggsave(file.path("..", "figures", "figure-mortality-09.pdf"), height=5, width=6)
+
+```
+
+### Mortality risk conclusions.
+
+
+1. For patients under 60, all estimated death risks are within 10% for 19andMe vs Nexoid.
+2. For patients over 60, 19andMe is giving lower estimates for Black patients, as we do not consider race.
+3. For patients over 60, 19andMe is estimating higher death risks when there are multiple pre-existing conditions or when there are symptoms.  (is_other is only symptom we are able to check against.)
+
+## Exposure risk comparison.
+
+### Overall.
+
+We now compare the risk of exposure P(exposure) for 19andMe versus Nexoid.
+
+- Nexoid calculates P(exposure) for all time, while 19andMe calculates risk of exposure in a week.
+- We calculate a per-week P(exposure) for Nexoid as 
+    - $P_{nex}(exposure)/nweeks$, where 
+    - $nweeks=33$ is the number of weeks in the dataset.
+
+
+```{r, include=F}
+# Overall comparison -------------------------------------------------------------------------------
+
+# Nexoid is looking at cumulative risk over all time, whereas 19andMe is looking at risk in a week.
+# Try comparing adjusted Nexoid risk.
+
+# Categorize death rates exceeding 10% in either direction.
+df <- df %>% mutate(exp_check = factor(ifelse(exp_diff_wk>.01, '19andMe 1% higher', 
+                                                ifelse(-exp_diff_wk>.01, '19andMe 1% lower', 
+                                                       "within 1%")),
+                                         levels=c('within 1%', '19andMe 1% lower', '19andMe 1% higher')))
+table(df$exp_check)
+my_props = round(prop.table(table(df$exp_check)),4)
+my_props
+
+# Calculate proportions in each category, and spearman ranked correlation coefficient.
+spearman_cor = round(cor(df$nexoid_risk_infection_wk, df$api_exposure_risk, method='spearman'),3)
+```
+
+We plot weekly exposure risk for Nexoid versus 19andMe, with colour indicating observations where with colour indicating observations where 
+
+- 19andMe and Nexoid reported exposure risk within 1% of each other (black)
+- 19andMe exposure risk was more than 1% higher than Nexoid (blue)
+- 19andMe exposure risk was more than 1% lower than Nexoid (orange)
+
+We are using 1% instead of 10% for a comparison threshold due to the narrower range of P(exposure).  
+
+The Spearman ranked correlation
+coefficient for $corr[P_{19}(exposure), P_{nex}(exposure)]$ is `r spearman_cor`.
+
+```{r}
+# Plot 19andMe versus Nexoid exposure risks.
+paper_plt2_panel1 = ggplot(df, aes(x=nexoid_risk_infection_wk, y=api_exposure_risk, colour=exp_check)) + 
+  geom_point(alpha=.5) + 
+  coord_cartesian(xlim=c(0,.15), ylim=c(0,.15)) + 
+  geom_abline(intercept=0, slope=1, colour='black') +
+  geom_abline(intercept=-.01, slope=1, colour='grey50', linetype=2) + 
+  geom_abline(intercept=.01, slope=1, colour='grey50', linetype=2) + 
+  scale_colour_colorblind(name='') +
+  labs(x='Nexoid', y='19andme', 
+       subtitle=paste0('A) Exposure risk. Spearman ranked corr ', spearman_cor))+
+  theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                     legend.position='bottom')
+ggsave(file.path("..", "figures", "figure-exposure-01.pdf"), paper_plt2_panel1, height=5, width=8)
+paper_plt2_panel1
+```
+
+We find that the exposure risks are generally aligned between 19andMe and Nexoid: 
+
+- `r round(my_props[1]*100,2)`% of the exposure risks are within 1%
+- `r round(sum(abs(df$exp_diff_wk)<.025)/nrow(df)*100,2)`% are within 2.5% 
+- `r round(sum(abs(df$exp_diff_wk)<.05)/nrow(df)*100,2)`% are within 5%
+
+Proportions for the 1% threshold are below.
+
+```{r}
+print(my_props)
+```
+
+### 19andMe more than 1% higher.
+
+Let's first investigate the 1% of the cases where 19andMe is at least 1% higher.  This is `r round(my_props[3]*100,2)`% (n=`r table(df$exp_check[3])`) of the total cases (n=`r nrow(df)`).
+
+- We see that the number of primary contacts is consistently high in the group where 19andMe exposure risk is more than 1% higher than in Nexoid.  
+- Secondary contacts do not seem to be driving this difference. 
+
+Nexoid adjusts for >9 primary contacts by increasing risk 9%, and for >17 contacts by increasing risk 14% (red lines).  Secondary contacts >10 increase Nexoid risk by 38%.
+```{r}
+# Number of primary contacts 
+ggplot(df %>% filter(exp_check!='19andMe 1% lower'), aes(x=nppl)) + 
+  geom_histogram() + 
+  geom_vline(aes(xintercept=9), colour='red') +
+  geom_vline(aes(xintercept=17), colour='red') +
+  facet_wrap(~exp_check, ncol=1, scales="free_y") + 
+  labs(y='Count', x='Primary contacts') + 
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+ggsave(file.path("..", "figures", "figure-exposure-02a.pdf"), height=5, width=6)
+
+# Number of secondary contacts.
+ggplot(df %>% filter(exp_check!='19andMe 1% lower'), aes(x=nppl2)) + 
+  geom_histogram() + 
+    geom_vline(aes(xintercept=10), colour='red') +
+  facet_wrap(~exp_check, ncol=1, scales="free_y") + 
+  labs(x='Secondary contacts', y='Count') + 
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+ggsave(file.path("..", "figures", "figure-exposure-02b.pdf"), height=5, width=6)
+
+# ADD FIGURE FOR PAPER
+paper_plt2_panel2 = 
+  # Rbind together each table of proportions for within vs higher, for primary and secondary.
+  rbind(
+    data.frame(prop.table(xtabs(~nppl+exp_check, data=df %>% 
+      filter(exp_check!='19andMe 1% lower') %>%
+      select(nppl, exp_check), drop.unused.levels=T), margin=2)) %>%
+      rename(contacts=nppl, prop=Freq) %>%
+      mutate(contact_type = 'Primary contacts'),
+    data.frame(prop.table(xtabs(~nppl2+exp_check, data=df %>% 
+      filter(exp_check!='19andMe 1% lower') %>%
+      select(nppl2, exp_check), drop.unused.levels=T), margin=2)) %>%
+      rename(contacts=nppl2, prop=Freq) %>%
+      mutate(contact_type = 'Secondary contacts')
+  ) %>%
+  ggplot(aes(x=contacts, y=prop, fill=exp_check)) + 
+  geom_bar(position='dodge', stat='identity') + 
+  facet_wrap(~contact_type, ncol=1, scale='free_y') +
+  labs(x='Number of contacts', y='Proportion',
+       subtitle='B) Distributions of contacts by exposure risk difference.') +
+  scale_fill_manual(name='', values=c('grey30', 'grey70')) + 
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position='bottom')
+
+# ASSEMBLE EXPOSURE PANEL
+panel2 = plot_grid(paper_plt2_panel1, paper_plt2_panel2, ncol=2)
+ggsave(file.path("..", "figures", "_paper-val-fig2.jpg"), plot(panel2), height=5, width=9.5)
+ggsave(file.path("..", "figures", "_paper-val-fig2.pdf"), plot(panel2), height=5, width=9.5)
+
+```
+
+```{r, echo=F}
+
+nppl_pvals = c(0,0)
+
+# Wilcoxon test to compare mean number of primary contacts.
+x = df %>% filter(exp_check=="within 1%") %>% pull(nppl)
+y = df %>% filter(exp_check=="19andMe 1% higher") %>% pull(nppl)
+nppl_pvals[1] = wilcox.test(x,y)$p.value
+
+# Wilcoxon test to compare secondary number of primary contacts.
+x = df %>% filter(exp_check=="within 1%") %>% pull(nppl2)
+y = df %>% filter(exp_check=="19andMe 1% higher") %>% pull(nppl2)
+nppl_pvals[2] = wilcox.test(x,y)$p.value
+
+# Format and adjust for multiple comparisons.
+nppl_pvals = format.pval(p.adjust(nppl_pvals), nsmall=3, ndigits=3, eps=1e-3)
+```
+
+We use Wilcoxon tests to compare the mean number of primary and secondary contacts in within-1% verus over-1% difference groups.  The p-values (Bonferroni-adjusted) are `r nppl_pvals[1]` for primary contacts, and `r nppl_pvals[2]` for secondary contacts; we reject the null hypotheses that the mean number of primary contacts and the mean number of seconary contacts are the same in the within-1% and the over-1% difference groups.
+
+Additionally, both hand-washing and PPE are under-represented in the group where 19andMe exposure risk is more than 1% higher.  
+
+- 19andme is adjusting odds ratios by .45 for hand-washing and .32 for PPE, while 
+- Nexoid is not making adjustments for either.  
+
+The plot below shows the proportions of hand-washer and mask-wearers in the 1% higher group versus other groups.
+```{r}
+# Handwashing and PPE proportions.
+
+# Process data to get counts for each condition.
+temp <- df %>% 
+  filter(exp_check!="19andMe 1% lower") %>%
+  group_by(exp_check) %>% 
+  dplyr::summarise(hand = sum(hand),
+                   ppe = sum(ppe), n=n()) %>%
+  pivot_longer(hand:ppe, names_to='condition', values_to='x') %>%
+  mutate(p = x/n) %>% 
+  arrange(condition)
+
+# Calculate p-values and adjust for multiple comparisons (Bonferroni).
+pvals = p.adjust(c(
+    prop.test(x =  temp %>% filter(condition=='hand') %>% pull(x), 
+            n = temp %>% filter(condition=='hand') %>% pull(n))$p.value,
+    prop.test(x =  temp %>% filter(condition=='ppe') %>% pull(x), 
+            n = temp %>% filter(condition=='ppe') %>% pull(n))$p.value
+  ))
+temp$pvals = format.pval(rep(pvals, each=2), digits=3, eps=1e-3)
+rm(pvals)
+
+# Add labels for conditions.
+temp$facets = rep(c('Hand washing', 'PPE'), each=2)
+
+ggplot(temp, aes(x=exp_check, y=p, label=format(round(p,2), nsmall=2, digits=2))) + 
+  geom_bar(stat='identity') + 
+  geom_text(aes(y=p+.1)) + 
+  coord_cartesian(ylim=c(0,1)) +
+  facet_wrap(~paste0(facets, " (p ", pvals, ')'), ncol=2) + 
+  labs(x='Exposure risk difference', y = 'Proportion') +
+  theme_bw()+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) 
+ggsave(file.path("..", "figures", "figure-exposure-03.pdf"), height=5, width=6)
+```
+
+```{r, echo=F}
+temp <- xtabs(~exp_check + hand, df)
+pval_hand = format.pval(chisq.test(temp)$p.value, eps=1e-3)
+temp <- xtabs(~exp_check + ppe, df)
+pval_ppe = format.pval(chisq.test(temp)$p.value, eps=1e-3)
+```
+
+The p-values for a chi-squared tests are `r pval_hand` for hand-washing, and `r pval_ppe` for PPE, giving significant evidence of different proportions of hand-washers and PPE-wearers across the groups. 
+
+### 19andMe is more than 1% lower
+
+19andMe calulates risk of exposure based on geography, and modifies based on number of direct and indirect contacts, hand-washing, and mask-wearing.
+
+Nexoid accounts for some factors which 19andMe does not:
+
+- Contact with someone known to be infected
+- Being a health-care worker
+- Living in a nursing home
+- Conditions:  heart disease, lung disease, liver disease, diabetes, kidney disease
+- Use of public transport
+- Working outside the home
+
+We can investigate which of these factors are over-represented in the group where 19andMe is estimating exposure risk more than 1% lower than Nexoid's.
+
+```{r}
+# Process data to get counts for each condition.
+temp <- df %>% 
+  filter(exp_check!="19andMe 1% higher") %>%
+  group_by(exp_check) %>% 
+  dplyr::summarise(#covid_symptoms = sum(is_other), 
+                   health_worker=sum(health_worker),
+                   nursing_home=sum(nursing_home),
+                   public_transit=sum(public_transport_count>0),
+                   working_outside_home=sum(working %in% c('travel critical', 'travel non critical')),
+                   conditions = sum(is_diabetes | is_renal | is_lung | is_cvd),
+                   n=n()) %>%
+  pivot_longer(health_worker:conditions, names_to='condition', values_to='x') %>%
+  mutate(p = x/n) %>% 
+  arrange(condition)
+
+
+# Calculate p-values and adjust for multiple comparisons (Bonferroni).
+pvals = p.adjust(c(
+    prop.test(x =  temp %>% filter(condition=='conditions') %>% pull(x), 
+            n = temp %>% filter(condition=='conditions') %>% pull(n))$p.value,
+    #prop.test(x =  temp %>% filter(condition=='covid_symptoms') %>% pull(x), 
+    #        n = temp %>% filter(condition=='covid_symptoms') %>% pull(n))$p.value,
+    prop.test(x =  temp %>% filter(condition=='health_worker') %>% pull(x), 
+            n = temp %>% filter(condition=='health_worker') %>% pull(n))$p.value,
+    prop.test(x =  temp %>% filter(condition=='nursing_home') %>% pull(x), 
+            n = temp %>% filter(condition=='nursing_home') %>% pull(n))$p.value,
+    prop.test(x =  temp %>% filter(condition=='public_transit') %>% pull(x), 
+            n = temp %>% filter(condition=='public_transit') %>% pull(n))$p.value,
+    prop.test(x =  temp %>% filter(condition=='working_outside_home') %>% pull(x), 
+            n = temp %>% filter(condition=='working_outside_home') %>% pull(n))$p.value
+  ))
+temp$pvals = format.pval(rep(pvals, each=2), digits=3, eps=1e-3)
+rm(pvals)
+
+# Add labels for conditions.
+temp$facets = rep(c(
+  'Conditions', 'Healthcare worker', 'Nursing home', 'Public transit', 'Working outside home'), each=2)
+
+
+ggplot(temp, aes(x=exp_check, y=p, label=format(round(p,2), nsmall=2, digits=2))) + 
+  geom_bar(stat='identity') + 
+  geom_text(aes(y=p+.1)) + 
+  coord_cartesian(ylim=c(0,1)) +
+  facet_wrap(~paste0(facets, " (p ", pvals, ')'), ncol=2) + 
+  labs(x='Exposure risk difference', y = 'Proportion') +
+  theme_bw()+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())  
+ggsave(file.path("..", "figures", "figure-exposure-04.pdf"), height=8, width=8)
+
+```
+  
+The following factors appear to be contributing to higher Nexoid exposure risks:
+
+- Working outside the home
+- Use of public transit
+- Being a healthcare worker
+- Having one of the conditions which Nexoid adjusts for
+
+These are not factors that 19andMe considers currently.
+
+### Exposure risk conclusions.
+
+Some thoughts:
+
+- Covid-19 symptoms and pre-existing medical conditions do not look significantly different between groups. 
+  - This seems sensible, as we do not believe that presence of symptoms should modify risk of exposure, nor should pre-existing medical conditions.
+- We note that working outside the home should be captured in number of direct contacts.  
+  - Worth discussing whether we feel Nexoid is double-dipping by accounting for contacts plus working.  
+  
+## Overall conclusions.
+
+For mortality risk, 19andMe and Nexoid's calculations are very aligned, and yield largely similar results.
+
+- **98.5%** of cases have a difference of less than 10% for mortality risk.
+- **1.46%** of cases have 19andMe mortality risk 10% or more higher than Nexoid's mortality risk.
+    + These cases are all in the 60+ age group,
+    + Focused on patients with multiple pre-existing conditions
+    + Possibly focused on patients with Covid-19 symptoms, but comparison is difficult.
+- **0.03%** of cases, or only 18 observations, have 19andMe mortality risk that is at least 10% lower than Nexoid.
+    + These cases are all Black and in the 80+ age group;
+    + Matching these cases to similar cases of another race explains these differences.
+
+For exposure risk, 19andMe and Nexoid's calculations differ, but overall mortality risks are generally similar.
+
+- **78.75%** of cases have difference in exposure risk of less than 1%.
+- **1.71%** of cases have 19andMe exposure risk more than 1% higher than Nexoid.
+    + These cases tend to be ones with high numbers of primary contacts,
+    + Who are less likely to follow CDC protocols for hand-washing and mask-wearing.
+- **19.54%** of cases have 19andMe exposure risk more than 1% lower than Nexoid.
+    + This difference looks to be driven my Nexoid's accounting for pre-existing medical conditions, working outside the home, use of public transit, and being a healthcare worker.
+
+
+This analysis has focused on similarity of P(exposure) and P(death), as the way that 19andMe and Nexoid present risk scores and labels is fundamentally different.  There are benefits to each method.
+
+1. 19andMe presents a single risk score and label (low/middle/high), normalized against risk of the flu.
+    + A single combined score gives users one level to interpret.
+    + Users have mentioned that our scores seem high - normalization to 50 = same risk of flu may not be intuitive.
+    + Score captures risks of exposure, hospitalization, ICU admittance, and death.
+    
+2. Nexoid presents two labels; one for risk of infection and one for risk of mortality.
+    + More complex for user to interpret.
+    + Able to capture more nuanced risk; scenarios where you are very likely to catch Covid, but unlikely to die, and vice versa.
+    + Does not capture risk of hospitalization or ICU admittance.

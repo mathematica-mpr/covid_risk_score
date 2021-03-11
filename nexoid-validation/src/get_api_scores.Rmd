@@ -1,0 +1,67 @@
+---
+title: "get_api_scores"
+author: "Emma Pendl-Robinson"
+date: "10/14/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+source('api_helper_functions.R')
+```
+
+# Goal:
+- get covid-risk-score for half a million people 
+https://mathematicampr.atlassian.net/browse/C19ANDME-49
+
+# How:
+- input information into API, filter output by fips
+- parallelize api calls to run faster
+
+# note from Jennifer: 
+Emma – I re-ran the mapping file with Cindy’s updated zips, and saved it to my transfer folder: `N:\Transfer\JStarling\19andme`
+
+```{r}
+#read in data
+nexoid_for_api_input <- readRDS("N:/Transfer/JStarling/19andme/nexoid_data_forapi.RData")
+```
+
+
+# checking the data
+```{r, eval=FALSE}
+#check what output looks like
+nexoid_for_api_input%>% head(3)
+
+# check conditions is a list
+test <- nexoid_for_api_input%>% head(20)
+
+lapply(test, '[[', 'conditions')
+
+```
+
+```{r}
+plan(multiprocess) ## => parallelize on your local computer
+
+#split into smaller chunks and then run
+split_nexoid <- split(nexoid_for_api_input, ceiling(seq_along(nexoid_for_api_input)/30000))
+
+for (i in 1:length(split_nexoid)) {
+  print(i)
+  # get api results
+  list_out <- future_lapply(split_nexoid[[i]], calculateRisk)
+  
+  # convert to to df
+  df_out <- list2_df(list_out)
+  
+  # save out df
+  write_csv(df_out, paste0("N:/Transfer/JStarling/19andme/api_output/csv_part_",i,".csv"))
+}
+
+```
+
+
+
+

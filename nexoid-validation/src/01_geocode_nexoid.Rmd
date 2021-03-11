@@ -1,0 +1,131 @@
+---
+title: "Geocode Nexoid Data to US counties"
+author: "Cindy Hu @ Mathematica"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+      toc: TRUE
+      toc_depth: 2
+      toc_float: TRUE
+      theme: "cosmo"
+      code_folding: hide
+---
+
+```{r packages_functions, message = FALSE, warning=FALSE, echo = F}
+# global knitr options
+rm(list = ls())
+library(knitr)
+opts_chunk$set(fig.align = "center", warning = F, message = F, comment = NA, error = T)
+options(tigris_use_cache = TRUE)
+library(tidyverse)
+library(sf)
+library(tmap)
+library(maps)
+library(jsonlite)
+library(data.table)
+```
+
+## Goal
+The Nexoid app has made their data publically available. We plan to use their individual-level data to develop a validation study of 19andMe app. Nexoid app captures the lat/long of users' IP address, while 19andMe uses zipcode to look up users' county information. This script will assign a zipcode and a FIPS code to each user in the Nexoid app adta.
+
+## Step 1. Read in Nexoid data and filter to US entries
+```{r}
+url <- "https://www.covid19survivalcalculator.com/data/master_dataset.csv"
+res <- httr::GET(url)
+assertthat::assert_that(res$status_code == "200")
+df_nexoid <- rawToChar(res$content)%>%
+    read_csv()%>%
+    filter(country == "US")
+```
+
+## Step 2. Read in shapefile for ZCTA and county, read in zip to county crosswalk
+
+```{r}
+# download zip code tabulation area shapefile
+zcta <- tigris::zctas(cb = TRUE)%>%
+    st_as_sf() %>%
+    st_transform(crs = 5070)
+
+
+# shapefile downloaded from https://www2.census.gov/geo/tiger/TIGER2019/COUNTY/
+counties <- st_read(file.path("C:/Users/JStarling/Projects","19andMe","validation_data","tl_2019_us_county.shp"))%>%
+  st_transform(st_crs(zcta)) %>%#reproject to align with ZCTA
+  select("fips" = "GEOID", geometry) 
+
+```
+```{r}
+# read in crosswalk for zip code to county
+zip_county_crosswalk <- jsonlite::fromJSON(file.path("../data-wrangling-nexoid","validation-data","zip_to_fips_xwalk.json"))%>%
+#zip_county_crosswalk <- jsonlite::fromJSON(file.path("C:/Users/CHu/Projects","19andMe","validation_data","zip_to_fips_xwalk.json"))%>%
+  unlist()%>%
+  enframe(name = "zipcode", value = "fips") %>%
+  mutate(zipcode = substr(zipcode, 1, 5)) %>%
+  group_by(fips)%>%
+  slice(1)
+```
+
+## Step 3. Geocode IP address and spatial join to ZCTA and counties
+
+```{r}
+sf_nexoid <- df_nexoid %>%
+    rownames_to_column("ID") %>%
+    select("ID", "ip_longitude", "ip_latitude") %>%
+    st_as_sf(coords = c("ip_longitude", "ip_latitude"), crs = "WGS84")%>%
+    st_transform(st_crs(zcta))
+
+# spatial join lat/long to zipcode and county shapefile
+sf_nexoid <- sf_nexoid %>%
+    st_join(zcta) %>%
+    select("ID", "geometry", "zip5" = "ZCTA5CE10") %>%
+    st_join(counties) 
+
+df_nexoid %>%
+  rownames_to_column("ID") %>%
+  left_join(sf_nexoid %>%st_drop_geometry(), by = "ID") %>%
+  #for entries missing zipcode but have county fips code, impute using the first element of the xwalk
+  left_join(zip_county_crosswalk, by = "fips") %>%
+  mutate(zip5 = if_else(is.na(zip5), zipcode, zip5)) %>%
+  select(-zipcode)%>%
+  write_csv(file.path("../data-wrangling-nexoid/nexoid_data_spatial.csv"))
+  #write_csv(file.path("N:", "Transfer", "CHu", "19andMe Validation", "nexoid_data_spatial.csv"))
+```
+
+## Step 4. Summarize sample size by counties and states
+
+```{r}
+# by_zip5 <- sf_nexoid %>%
+#     group_by(zip5) %>%
+#     summarise (n = n())
+
+by_county <- sf_nexoid %>%
+    st_drop_geometry()%>%
+    group_by(fips) %>%
+    summarise (n = n())
+
+# tmap_mode("view")
+# counties %>%
+#     left_join(by_county, by = "fips") %>%
+#     tm_shape() +
+#     tm_polygons("n", 
+#                 breaks = c(0, 50, 200, 1000, 5000, 25000),
+#                 popup.vars=c("FIPS" = "fips", "Numbers of response" = "n")) +
+#     tm_view(set.view = c(lon = -98, lat = 39, zoom = 4))
+
+```
+
+```{r}
+data(state.fips)
+
+by_state <- sf_nexoid %>%
+    st_drop_geometry()%>%
+    mutate(state = as.numeric(substr(fips, 1, 2))) %>%
+    left_join(state.fips, by = c("state" = "fips")) %>%
+    group_by(abb) %>%
+    summarise(n = n())
+
+by_state %>%
+    arrange(desc(n)) %>%
+    kable()
+
+```
+
