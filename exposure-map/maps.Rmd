@@ -35,7 +35,7 @@ library(magrittr)
 ```
 
 ```{r}
-covid_df <- read_rds(here::here("exposure/data/covid_transformed.rds"))
+covid_df <- read_rds(here::here("exposure-map/data/covid_transformed.rds"))
 ```
 
 
