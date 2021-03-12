@@ -1,0 +1,202 @@
+---
+title: "Compare exposure risk with prevalence rate"
+author: "Emma Pendl-Robinson"
+date: "1/4/2021"
+output: 
+  html_document:
+    toc: true
+    number_sections: true 
+    toc_float: 
+      collapsed: false
+      smooth_scroll: false
+    css: style.css
+    code_folding: hide 
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Compare exposure risk with prevalence rate {-}
+
+Exposure risk and how it changes overtime
+
+Looking at prevalence and make a map
+
+See if the exposure risk we should in different places vs the exposure map
+
+Doing this in map form
+
+
+```{r libraries, warning=FALSE, message=FALSE}
+source(here::here("exposure-map/functions_n_packages.R"))
+library(magrittr)
+```
+
+
+
+# Data Processing
+
+## make data set:
+
+```{r, eval = FALSE}
+usafacts_df <- get_data()
+
+write_csv(usafacts_df, here::here("exposure/data/usafacts.csv"))
+```
+
+
+read in USA facts data
+
+```{r}
+usafacts_df <- read_csv(here::here("exposure/data/usafacts.csv"))
+
+# filter to date less than 2020/12/15
+usafacts_df %<>% filter(date <= ymd("2020-12-15"))
+
+```
+
+## Calc CFR 
+
+Use the EB adjusted state CFR priors
+
+```{r}
+# Priors downloaded from  https://github.com/mathematica-mpr/math-api-covid-risk-calculator-etl/blob/7574f08ccac1c345b1ce54a2f2f15f4306734773/risk_score_etl/risk_score_etl/resources/state_CFR_priors.csv 
+
+state_CFR_priors <- read.csv(here::here("exposure/data/state_CFR_priors.csv"))
+
+```
+
+Adjust CFR
+
+TODO: 
+
+    - fix fips with negativee deaths and CFR values
+        - for 6 fips the total number of deaths was higher 90 days ago and have a negative number of deaths
+        - for now, I will set these CFRs and deaths to zero
+    - what priors should I use? 
+        - Erin just redid the priors
+```{r}
+
+update_prior_shape_df <- shape_data(usafacts_df) %>%
+  mutate(CFR = ifelse(CFR < 0, 0 , CFR),
+         deaths = ifelse(deaths < 0, 0 , deaths))
+
+update_prior_shape_df$CFR_adj <- calc_adjusted_CFR(update_prior_shape_df)
+
+fips_priors <- left_join(update_prior_shape_df, state_CFR_priors, by = "state") %>%
+    mutate(CFR_adj_EB = (deaths+shape1)/(cases+shape1+shape2),
+           case_cat = case_when(cases>=1000~"1000+",
+                                cases>=100~"100-999",
+                                cases<100~"0-99"),
+           CFR = ifelse(cases==0, 0, CFR)) %>%
+    filter(state!="DC")
+
+```
+
+Calc Underreporting Factor
+
+- Use the adjusted CFR from above to caculate the underreporting factor when IFR is set to 0.006).
+
+```{r}
+# deaths is deaths in the last 90 days
+# cases from day 90 last 90 days with 13 day lag
+covid_underreporting_df <- fips_priors %>% 
+  mutate(underreport_fac = CFR_adj_EB/0.006) %>%
+  mutate(underreport_fac = case_when(underreport_fac < 1 ~ 1,
+                                     underreport_fac > 10 ~ 1,
+                                     TRUE ~ underreport_fac)) %>%
+  dplyr::select(fips, deaths, cases, underreport_fac) %>%
+  rename("deaths_last90" = "deaths", "cases_last90" = "cases")
+
+```
+
+## current Cases
+
+Find number of: 
+
+- reported cases in last 14 days 
+- reported deaths in last 14 days
+- reported cases in last 7 days (1 week)
+
+```{r}
+covid_recent_days <- usafacts_df %>% 
+  gather(var,count,c("cases","deaths")) %>%
+  mutate(d_label = case_when(var=="deaths" & date == max(date) ~ "deaths_today",
+                             var=="deaths" & date == max(date)-14 ~ "deaths_14",
+                             var=="cases" & date == max(date) ~ "cases_today",
+                             var=="cases" & date == max(date)-14 ~ "cases_14",
+                             var=="cases" & date == max(date)-07 ~ "cases_07")) %>%
+  filter(!is.na(d_label)) %>% dplyr::select(fips,state,count,d_label) %>%
+  spread(d_label, count) %>%
+  mutate(cases_last14 = cases_today - cases_14, 
+         deaths_last14 = deaths_today-deaths_14,
+         cases_last07 = cases_today - cases_07) %>%
+  mutate(cases_last14 = ifelse(cases_last14 < 0, 0 , cases_last14),
+         deaths_last14 = ifelse(deaths_last14 < 0, 0 , deaths_last14),
+         cases_last07 = ifelse(cases_last07 < 0, 0 , cases_last07)) %>%
+  dplyr::select(fips, cases_last14, deaths_last14, cases_last07)
+
+```
+
+calculate:
+
+- `active casecount` (number of covid infections in the last 14 days) by the number cases in the last 14 days and the underreporting factor
+
+```{r}
+covid_df <- left_join(covid_underreporting_df, covid_recent_days, by = "fips") %>%
+  mutate(active_casecount = underreport_fac*cases_last14)
+  
+```
+
+calculate prevalance of covid infections in each county (fips code area)
+```{r}
+library(tidycensus)
+
+census_api_key(Sys.getenv("census_api_key"))
+v19 <- load_variables(2019, "acs5", cache = TRUE)
+
+# find population in the fips area
+fips_pop <- tidycensus::get_acs(geography = "county", variables = "B01003_001", year = 2019) %>%
+  rename("population" = "estimate",
+         "fips" = "GEOID") %>%
+  dplyr::select(fips, population)
+
+# calc infection and deaths per person people in the county
+covid_df %<>%
+  left_join(fips_pop, by = "fips") %>%
+  mutate(prev_active = active_casecount/population)
+```
+
+caclulate risk of contracting COVID thorugh community if someone comes in contact with 10 people as percent
+
+```
+https://github.com/mathematica-mpr/covid_risk_score/blob/62ebd0a51dd126df8068a3d52a058881a7eeb45a/src/results.R 
+exposure_risk <- 1-(1-prev_active*transmissibility_household)^(input$nppl+input$nppl2*transmissibility_household)
+
+```
+
+```{r}
+# TODO : why uyse transmissibility_household vs the standard transmissibility
+transmissibility_household <-0.105 
+
+covid_df %<>%
+  mutate(exposure_risk = 1-(1-prev_active*transmissibility_household)^(10)) %>%
+  mutate(exposure_risk_pct = exposure_risk*100)
+```
+
+Calculate
+`cases_daily_100k` Average daily cases per 100,000 people in past week
+
+```{r}
+covid_df %<>%
+  mutate(cases_av_daily = cases_last07/7,
+         cases_daily_100k = (cases_av_daily/population)*100000)
+```
+
+
+save data
+```{r}
+write_rds(covid_df, here::here("exposure/data/covid_transformed.rds"))
+```
+

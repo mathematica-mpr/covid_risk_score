@@ -1,0 +1,161 @@
+---
+title: "Compare exposure risk with prevalence rate"
+author: "Emma Pendl-Robinson"
+date: "1/4/2021"
+output: 
+  html_document:
+    toc: true
+    number_sections: true 
+    toc_float: 
+      collapsed: false
+      smooth_scroll: false
+    css: style.css
+    code_folding: hide 
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Compare exposure risk with prevalence rate {-}
+
+Exposure risk and how it changes overtime
+
+Looking at prevalence and make a map
+
+See if the exposure risk we should in different places vs the exposure map
+
+Doing this in map form
+
+
+```{r libraries, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(tidycensus)
+library(magrittr)
+```
+
+```{r}
+covid_df <- read_rds(here::here("exposure/data/covid_transformed.rds"))
+```
+
+
+# map data
+
+
+## urban instutute mapping
+
+https://urban-institute.medium.com/how-to-create-state-and-county-maps-easily-in-r-577d29300bb2
+
+```{r}
+library(urbnmapr)
+
+# lat long codinates of counties in the uS
+county_geo <- get_urbn_map("counties")
+
+```
+
+```{r}
+# colors used by the NYTimes average daily cases per 100,000 people in the past week 
+nyt_cols <- c("#f2df91", "#f9c467", "#ffa83e", "#ff8b24", "#fd6a0b", "#f04f09", "#d8382e", "#c62833", "#AF1C43", "#8A1739", "#701547", "#4C0D3E")
+
+covid_map_style <- function(gplot){
+  # styles ggplot
+  gplot + 
+  geom_polygon(color = NA) +
+  geom_polygon(data = urbnmapr::states, mapping = aes(long, lat, group = group),
+               fill = NA, color = "#ffffff") +
+  coord_map(projection = "albers", lat0 = 39, lat1 = 45) +
+  scale_fill_manual(values = nyt_cols[c(1, seq(0, 12, 2))]) + 
+  theme(plot.title = element_text(hjust = 0.5,
+                                  size = 20),
+        axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        panel.background = element_rect(fill = NA),
+        legend.position= "top",
+        legend.title = element_text(size = 10), 
+        legend.key.size = unit(.8,"line"),
+        legend.text = element_text(family = "mono",
+                                   face = "bold",
+                                   size = 7) ,
+        plot.background = element_rect(color = "black")) + 
+  guides(fill = guide_legend(nrow = 1,
+                             title.position = "top", 
+                             title.hjust = 0.5,
+                             label.position = "bottom"))
+}
+```
+
+## Daily Active cases
+
+- `cases_dailyav` Average daily cases per 100,000 people in past week
+
+NYTimes shows average daily cases per 100,000 people in the past week with intervals of: 10, 30, 50, 70, 100, and 250
+
+- https://www.nytimes.com/interactive/2020/us/coronavirus-us-cases.html
+
+
+```{r}
+# breakpoints for interval
+covid_df$cases_nytbreaks  <- cut(covid_df$cases_daily_100k, breaks = c(0, 10, 30, 50, 70, 100, 250, 700), include.lowest = TRUE)
+
+# string pad to make lables even length and relevel http://www.cookbook-r.com/Manipulating_data/Renaming_levels_of_a_factor/
+levels(covid_df$cases_nytbreaks) <- str_pad(levels(covid_df$cases_nytbreaks), 9, side = "both")
+
+cases_plot <- left_join(covid_df, county_geo, by = c("fips" = "county_fips"))  %>%
+  ggplot(aes(long, lat, group = group, fill = cases_nytbreaks)) +
+  labs(title = "\nA) Reported Cases",
+       fill = "Average daily cases per 100,000 people in past week")
+
+cases_plot_styled <- covid_map_style(cases_plot)
+
+
+```
+
+## Exposure Risk
+
+map of exposure risk (active cases/population)
+
+```{r}
+# breakpoints for interval
+covid_df$expo_nytbreaks <-  cut(covid_df$exposure_risk_pct, breaks = c(0, 0.6, 1.2, 1.8, 2.4, 3, 4, 25), include.lowest = TRUE)
+
+# string pad to make lables even length and relevel http://www.cookbook-r.com/Manipulating_data/Renaming_levels_of_a_factor/
+levels(covid_df$expo_nytbreaks) <- str_pad(levels(covid_df$expo_nytbreaks), 9, side = "both")
+
+exposure_plot <- left_join(covid_df, county_geo, by = c("fips" = "county_fips"))  %>%
+  ggplot(aes(long, lat, group = group, fill = expo_nytbreaks)) +
+  labs(title = "\nB) Exposure Risk",
+       fill = "Exposure risk (%) for 10 direct contacts in next week")
+
+
+exposure_plot_styled <- covid_map_style(exposure_plot)
+
+
+```
+
+
+## combine plots
+
+
+http://www.sthda.com/english/articles/32-r-graphics-essentials/126-combine-multiple-ggplots-in-one-graph/
+
+```{r}
+# combine plots
+combined_map <- ggpubr::ggarrange(cases_plot_styled, exposure_plot_styled,
+                    labels = c("", ""),
+                    ncol = 1, nrow = 2)
+
+figures_filer <- "N:/Project/11123_19andMe/CA1/covid_risk_score_paper/figures/_paper-val-fig4.png"
+#save plot
+ggsave(combined_map,
+       filename = figures_filer,
+       width = 7, height = 10)
+
+```
+
+
+
