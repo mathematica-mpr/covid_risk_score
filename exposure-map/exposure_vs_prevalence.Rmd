@@ -197,6 +197,6 @@ covid_df %<>%
 
 save data
 ```{r}
-write_rds(covid_df, here::here("exposure/data/covid_transformed.rds"))
+write_rds(covid_df, here::here("exposure-map/data/covid_transformed.rds"))
 ```
 
