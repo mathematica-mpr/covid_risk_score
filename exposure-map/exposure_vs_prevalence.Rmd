@@ -42,14 +42,14 @@ library(magrittr)
 ```{r, eval = FALSE}
 usafacts_df <- get_data()
 
-write_csv(usafacts_df, here::here("exposure/data/usafacts.csv"))
+write_csv(usafacts_df, here::here("exposure-map/data/usafacts.csv"))
 ```
 
 
 read in USA facts data
 
 ```{r}
-usafacts_df <- read_csv(here::here("exposure/data/usafacts.csv"))
+usafacts_df <- read_csv(here::here("exposure-map/data/usafacts.csv"))
 
 # filter to date less than 2020/12/15
 usafacts_df %<>% filter(date <= ymd("2020-12-15"))
@@ -63,7 +63,7 @@ Use the EB adjusted state CFR priors
 ```{r}
 # Priors downloaded from  https://github.com/mathematica-mpr/math-api-covid-risk-calculator-etl/blob/7574f08ccac1c345b1ce54a2f2f15f4306734773/risk_score_etl/risk_score_etl/resources/state_CFR_priors.csv 
 
-state_CFR_priors <- read.csv(here::here("exposure/data/state_CFR_priors.csv"))
+state_CFR_priors <- read.csv(here::here("exposure-map/data/state_CFR_priors.csv"))
 
 ```
 
