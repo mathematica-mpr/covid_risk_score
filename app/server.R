@@ -32,10 +32,17 @@ server <- function(input, output, session) {
       updateRadioButtons(session, "vaccine", selected = "pfizer")
       updateSelectInput(session, "doses", selected = 1)
       updateSelectInput(session, "days_since_last_dose", selected = 0)
-    }
-    # set doses to 1 for 1-dose vaccine (no ui element for doses)
-    if (as.numeric(vaccines[[input$vaccine]][["doses"]])==1){  
-      updateSelectInput(session, "doses", selected = 1)
+    } else {
+      if (as.numeric(vaccines[[input$vaccine]][["doses"]])==1){  
+        # set doses to 1 for 1-dose vaccine (no ui element for doses)
+        updateSelectInput(session, "doses", selected = 1)
+      }
+      # Change label for days input depending on number of doses
+      session$sendCustomMessage(
+        'update_label',
+        list(
+          id = 'days_since_last_dose',
+          html = doses_days_labels[as.numeric(vaccines[[input$vaccine]][["doses"]])]))
     }
   })
   
@@ -131,8 +138,9 @@ server <- function(input, output, session) {
   output$vaccines <-renderUI({
     risk<-get_risk_info()
     # in app/results.R
-    renderVaccinesHtml(input$go, input$has_vaccine, input$vaccine, 
-                       as.numeric(input$doses), as.numeric(input$days_since_last_dose))
+    if (is.null(risk$message)) {
+      renderVaccinesHtml(input$go, input$has_vaccine, input$vaccine, input$doses, input$days_since_last_dose)
+    }
   })
   output$res <-renderUI({
     risk <- get_risk_info()
