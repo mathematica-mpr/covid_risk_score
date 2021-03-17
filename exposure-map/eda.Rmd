@@ -1,0 +1,89 @@
+---
+title: "Compare exposure risk with prevalence rate EDA"
+author: "Emma Pendl-Robinson"
+date: "1/4/2021"
+output: 
+  html_document:
+    toc: true
+    number_sections: true 
+    toc_float: 
+      collapsed: false
+      smooth_scroll: false
+    css: style.css
+    code_folding: hide 
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Compare exposure risk with prevalence rate {-}
+
+
+```{r libraries, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(tidycensus)
+library(magrittr)
+```
+
+```{r}
+# read in covid_df data
+covid_df <- read_rds(here::here("exposure-map/data/covid_transformed.rds"))
+
+# read in fips codes
+fips_state_xwalk <- read_csv(here::here("exposure-map/data/usafacts.csv")) %>%
+  distinct(fips, state)
+
+# add fips code
+covid_df %<>% left_join(fips_state_xwalk, by = "fips")
+```
+
+
+# EDA
+
+Finding similarities and and differences counties
+
+```{r}
+# add cases break points 
+covid_df$cases_nytbreaks  <- cut(covid_df$cases_daily_100k, breaks = c(0, 10, 30, 50, 70, 100, 250, 700), include.lowest = TRUE)
+covid_df$cases_cat <- as.numeric(covid_df$cases_nytbreaks)
+# add exposure break points 
+covid_df$expo_nytbreaks <-  cut(covid_df$exposure_risk_pct, breaks = c(0, 0.6, 1.2, 1.8, 2.4, 3, 4, 25), include.lowest = TRUE)
+covid_df$expo_cat <- as.numeric(covid_df$expo_nytbreaks)
+
+# check if similar
+covid_df$cases_expo_cat <- covid_df$expo_cat - covid_df$cases_cat
+```
+
+```{r}
+# average means and variances per state
+states <- covid_df %>%
+  group_by(state) %>%
+  summarise(mean_underreporting = mean(underreport_fac),
+            mean_cases_cat = mean(cases_cat),
+            mean_expo_cat = mean(expo_cat),
+            mean_diff = mean(cases_expo_cat),
+            mean_absolute_diff = abs(mean_diff),
+            var_cases_cat = var(cases_cat),
+            var_expo_cat = var(expo_cat),
+            var_diff = var(cases_expo_cat),
+            .groups = "drop") 
+
+# finding the ordinal values of the mean color categories
+states %<>%
+  arrange(desc(mean_cases_cat)) %>%
+  mutate(cases_order = 1:50) %>%
+  arrange(desc(mean_expo_cat)) %>%
+  mutate(expo_order = 1:50) %>%
+  mutate(diff_order = expo_order - cases_order) # different in orders
+
+View(states)
+
+```
+
+```{r}
+table(states$diff_order)
+summary(states$mean_diff)
+
+```
+
