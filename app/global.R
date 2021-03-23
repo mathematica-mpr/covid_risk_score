@@ -42,6 +42,7 @@ urls  = list(
   cdc_medicalconditions = "https://www.cdc.gov/coronavirus/2019-ncov/need-extra-precautions/people-with-medical-conditions.html",
   cdc_test_info = "https://www.cdc.gov/coronavirus/2019-ncov/symptoms-testing/testing.html",
   cdc_vaccines = "https://www.cdc.gov/coronavirus/2019-ncov/vaccines/index.html",
+  cdc_vaccinated_guidance = "https://www.cdc.gov/coronavirus/2019-ncov/vaccines/fully-vaccinated-guidance.html",
   # USA Facts
   usafacts_data = "https://usafacts.org/visualizations/coronavirus-covid-19-spread-map/",
   # papers
