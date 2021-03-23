@@ -42,6 +42,7 @@ urls  = list(
   cdc_medicalconditions = "https://www.cdc.gov/coronavirus/2019-ncov/need-extra-precautions/people-with-medical-conditions.html",
   cdc_test_info = "https://www.cdc.gov/coronavirus/2019-ncov/symptoms-testing/testing.html",
   cdc_vaccines = "https://www.cdc.gov/coronavirus/2019-ncov/vaccines/index.html",
+  cdc_vaccinated_guidance = "https://www.cdc.gov/coronavirus/2019-ncov/vaccines/fully-vaccinated-guidance.html",
   # USA Facts
   usafacts_data = "https://usafacts.org/visualizations/coronavirus-covid-19-spread-map/",
   # papers
@@ -86,8 +87,8 @@ conditions_list = c("Chronic renal disease" = "renal_disease",
 
 # vaccine doses
 vaccine_labels = list(pfizer = "Pfizer-BioNTech",
-                      moderna = "Moderna")
-                      #johnsonandjohnson = "Johnson & Johnson")
+                      moderna = "Moderna",
+                      johnsonandjohnson = "Johnson & Johnson")
 
 vaccines = list(pfizer=
                   list(efficacy=.95,  
@@ -105,5 +106,8 @@ vaccines = list(pfizer=
                        days_between_doses=NA, 
                        days_after_final_dose=14))
 
-total_vaccines_str = "two"
+total_vaccines_str = "three"
+
+doses_days_labels <- c("How many days ago did you receive your vaccine? <sub class = 'text-info'>If more than 14 days ago, select 14.</sub>", 
+                       "How many days ago did you receive your most recent dose? <sub class = 'text-info'>If more than 14 days ago, select 14.</sub>")
 

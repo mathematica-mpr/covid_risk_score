@@ -8,6 +8,7 @@ ui <- fluidPage(
   tags$head(includeHTML("google-analytics.html")),
   
   includeCSS("style.css"),
+  includeScript('app.js'),
   
   #INPUT --------------------------------------------------------------------------------------------------
   sidebarLayout(
@@ -100,8 +101,7 @@ ui <- fluidPage(
               selectInput('doses', "How many doses of this vaccine have you received?",
                            1:2),
               ),
-            sliderInput("days_since_last_dose", 
-                        HTML("How many days ago did you receive your most recent dose? <sub class = 'text-info'>If more than 14 days ago, select 14.</sub>"),
+            sliderInput("days_since_last_dose",  doses_days_labels[2],
                         min=0, max=14, value=0),
             ),
                         
