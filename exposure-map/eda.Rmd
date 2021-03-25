@@ -38,7 +38,6 @@ fips_state_xwalk <- read_csv(here::here("exposure-map/data/usafacts.csv")) %>%
 covid_df %<>% left_join(fips_state_xwalk, by = "fips")
 ```
 
-
 # EDA
 
 Finding similarities and and differences counties
@@ -54,6 +53,24 @@ covid_df$expo_cat <- as.numeric(covid_df$expo_nytbreaks)
 # check if similar
 covid_df$cases_expo_cat <- covid_df$expo_cat - covid_df$cases_cat
 ```
+
+
+# Example County Data
+
+
+-	Alameda county, CA (fips 06001) 
+
+```{r}
+covid_df %>% filter(fips == "06001")
+
+```
+-	Alleghany County, VA (fips 51005)
+
+```{r}
+covid_df %>% filter(fips == "51005")
+```
+
+# table
 
 ```{r}
 # average means and variances per state
@@ -86,4 +103,9 @@ table(states$diff_order)
 summary(states$mean_diff)
 
 ```
+
+
+
+
+
 
