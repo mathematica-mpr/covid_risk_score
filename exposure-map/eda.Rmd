@@ -106,6 +106,21 @@ summary(states$mean_diff)
 
 
 
+# spearman correlation
+spearman correlation between states
+```{r}
+states_means <- covid_df %>%
+  group_by(state) %>%
+  summarise(mean_cases = mean(cases_daily_100k),
+            mean_expo = mean(exposure_risk_pct),
+            mean_cases_cat = mean(cases_cat),
+            mean_expo_cat = mean(expo_cat),
+            .groups = "drop")  
 
+# comparing mean bins
+cor.test(states_means$mean_cases_cat, states_means$mean_expo_cat, method = "spearman", exact = FALSE)
 
+# comparing mean number
+cor.test(states_means$mean_cases, states_means$mean_expo, method = "spearman", exact = FALSE)
 
+```
