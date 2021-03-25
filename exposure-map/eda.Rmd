@@ -70,44 +70,8 @@ covid_df %>% filter(fips == "06001")
 covid_df %>% filter(fips == "51005")
 ```
 
-# table
-
-```{r}
-# average means and variances per state
-states <- covid_df %>%
-  group_by(state) %>%
-  summarise(mean_underreporting = mean(underreport_fac),
-            mean_cases_cat = mean(cases_cat),
-            mean_expo_cat = mean(expo_cat),
-            mean_diff = mean(cases_expo_cat),
-            mean_absolute_diff = abs(mean_diff),
-            var_cases_cat = var(cases_cat),
-            var_expo_cat = var(expo_cat),
-            var_diff = var(cases_expo_cat),
-            .groups = "drop") 
-
-# finding the ordinal values of the mean color categories
-states %<>%
-  arrange(desc(mean_cases_cat)) %>%
-  mutate(cases_order = 1:50) %>%
-  arrange(desc(mean_expo_cat)) %>%
-  mutate(expo_order = 1:50) %>%
-  mutate(diff_order = expo_order - cases_order) # different in orders
-
-View(states)
-
-```
-
-```{r}
-table(states$diff_order)
-summary(states$mean_diff)
-
-```
-
-
-
-# spearman correlation
-spearman correlation between states
+# Inter-state Varriance: spearman correlation
+spearman correlation of the mean pervalance and exposure between states
 ```{r}
 states_means <- covid_df %>%
   group_by(state) %>%
@@ -124,3 +88,29 @@ cor.test(states_means$mean_cases_cat, states_means$mean_expo_cat, method = "spea
 cor.test(states_means$mean_cases, states_means$mean_expo, method = "spearman", exact = FALSE)
 
 ```
+
+# Intra-State 
+
+This seems a bit repetitive of the Utah vs Texas example. Are you trying to say something about the intra-state variability here? Can you add to this by citing quantitative numbers? For example, county A and county B in North Carolina have similar case count per 100k population, XXX and XXX. However, their underreporting factor vary, and therefore the estimated exposure risk in county A and county B are XXX and XXX.
+
+```{r}
+nc_df <- covid_df %>% 
+  filter(state == "NC") %>%
+  select(fips, state, underreport_fac, cases_daily_100k, exposure_risk_pct, cases_cat, expo_cat) %>%
+  mutate(mean_cases = mean(cases_daily_100k),
+         mean_expo = mean(exposure_risk_pct)) 
+```
+
+
+Foundes with about average cases in North Carolina
+Bertie County, NC (fips 37015)
+
+Mecklenburg County, NC (fips 37119)
+```{r}
+nc_df %>% filter(fips %in% c("37015", "37119"))
+
+```
+
+
+
+
