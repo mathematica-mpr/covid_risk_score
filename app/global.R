@@ -85,9 +85,29 @@ conditions_list = c("Chronic renal disease" = "renal_disease",
                     "Other chronic condition" = "other")
 
 # activities list placebolder 
-l_activities_list = c("activity1", "activity2", "activity3", "activity4", "activity5")
-m_activities_list = c("activity1", "activity2", "activity3", "activity4", "activity5")
-h_activities_list = c("activity1", "activity2", "activity3", "activity4", "activity5")
+l_activities_list = c("outdoor socially distanced exercise (e.g. tennis, golf, bike riding)", 
+                      "outdoor visit with friends", 
+                      "grocery shopping", 
+                      "library or museum", 
+                      "activity5")
+m_activities_list = c("children’s playdate and playgrounds", 
+                      "see doctor or dentist", 
+                      "overnight stay at a hotel", 
+                      "outdoor dinning",
+                      "working outside of home",
+                      "indoor public spaces (e.g. salon, casino, bowling, shopping mall)",
+                      "public beach or pool",
+                      "shared travel (e.g. public transportation or airplane)",
+                      "school, camp, or daycare"
+                      )
+h_activities_list = c("indoor restaurant or bar", 
+                      "religious services (including weddings and funerals)", 
+                      "team sports (basket ball, football)", 
+                      "visiting nursing home or hospital", 
+                      "nightclub/music concert/movie theater/gym",
+                      "sports stadium"
+                      )
+
 # vaccine doses
 vaccine_labels = list(pfizer = "Pfizer-BioNTech",
                       moderna = "Moderna")
