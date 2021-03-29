@@ -81,7 +81,8 @@ ui <- fluidPage(
             sliderInput('indirect_contacts', 
                         'Indirect exposure: how many people in total do your household members come into close contact with in a week? (Do not include contact between household members in this count.)', 
                         min = 0, max = 100, value = 0, step =1)),
-          # add a placeholder for activity levels
+          # activities risk
+          hr(),
           div(class = "questiontext", "In the previous week, I participated in the following activities:"),
           checkboxGroupInput("l_activities", "Low-risk activities:",
                              choices = l_activities_list,
@@ -95,6 +96,7 @@ ui <- fluidPage(
                              choices = h_activities_list,
                              inline = TRUE,
                              selected = NULL),
+          hr(),
           checkboxInput("hand", div("I perform hand hygiene according to ", 
                                     tags$a("CDC guidance", href = urls$cdc_hand_hygiene))),
           checkboxInput("ppe", div("I wear personal protection equipment consistent with ",
