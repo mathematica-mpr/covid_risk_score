@@ -67,7 +67,9 @@ urls  = list(
   polack_etal_2020 = "https://www.nejm.org/doi/full/10.1056/NEJMoa2034577?query=RP", #pfizer vaccine 1st dose
   moderna_fda_2020 = "https://www.fda.gov/media/144452/download", #moderna vaccine efficacy report
   moderna_eua_2020 = "https://www.fda.gov/media/144637/download", #moderna vaccine factsheet for hcp
-  pfizer_eua_2020 = "https://www.fda.gov/media/144413/download" #pfizer vaccine factsheet for hcp
+  pfizer_eua_2020 = "https://www.fda.gov/media/144413/download", #pfizer vaccine factsheet for hcp
+  # Activity risk level
+  bellage_activity_chart = "https://bellage.org/wp-content/uploads/2020/09/BellAge-COVID19-Activity-Risk-Chart.pdf"
 )
 
 # possible input conditions

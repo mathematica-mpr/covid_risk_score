@@ -120,7 +120,14 @@ renderMethodsHtml <- function() {
               "We incorporated the efficacy data on the first dose published by ",
               tags$a("Polack et al (2020) ", href = urls$polack_etal_2020),
               "and ",
-              tags$a("FDA (2020c). ", href = urls$moderna_fda_2020))
+              tags$a("FDA (2020c). ", href = urls$moderna_fda_2020)),
+       tags$li("Activity risk levels for COVID-19 are based on a professional review pannel completed by ", 
+               tags$a("BellAge", href = urls$bellage_activity_chart), 
+               ". We grouped the activities into three categories - high, medium, and low risk activities -- and equivalent
+               number of dirrect contacts. Activities in the low risk category have a value of 0.5 dirrect contacts, medium is
+               1.5 dirrect contacts and high is 2 dirrect contacts. For each activity checked, the equivalent number of direct 
+               contacts is added to the risk score. For example, if 2 low risk activites were selected, the 19 and Me calculator
+               added 1 direct contact to the person's risk level." )
     ), # end of ol
     tags$p(""),
     tags$p("We'll be doing our best to update these assumptions as additional knowledge about the virus becomes available.")
