@@ -87,28 +87,25 @@ conditions_list = c("Chronic renal disease" = "renal_disease",
                     "Other chronic condition" = "other")
 
 # activities list placebolder 
-l_activities_list = c("outdoor socially distanced exercise (e.g. tennis, golf, bike riding)", 
-                      "outdoor visit with friends", 
-                      "grocery shopping", 
-                      "library or museum", 
-                      "activity5")
-m_activities_list = c("children’s playdate and playgrounds", 
-                      "see doctor or dentist", 
-                      "overnight stay at a hotel", 
-                      "outdoor dinning",
-                      "working outside of home",
+l_activities_list = c("grocery shopping", 
+                      "library or museum",
+                      "outdoor socially distanced exercise (e.g. tennis, golf, bike riding)", 
+                      "outdoor visit with friends")
+m_activities_list = c("children’s playdate and playgrounds",
                       "indoor public spaces (e.g. salon, casino, bowling, shopping mall)",
                       "public beach or pool",
-                      "shared travel (e.g. public transportation or airplane)",
-                      "school, camp, or daycare"
-                      )
+                      "public transportation/airplane)",
+                      "overnight stay at a hotel", 
+                      "outdoor dinning",
+                      "see doctor or dentist", 
+                      "school, camp, or daycare",
+                      "working outside of home")
 h_activities_list = c("indoor restaurant or bar", 
+                      "nightclub/music concert/movie theater/gym",
+                      "sports stadium",
                       "religious services (including weddings and funerals)", 
                       "team sports (basket ball, football)", 
-                      "visiting nursing home or hospital", 
-                      "nightclub/music concert/movie theater/gym",
-                      "sports stadium"
-                      )
+                      "visiting nursing home or hospital")
 
 # vaccine doses
 vaccine_labels = list(pfizer = "Pfizer-BioNTech",
