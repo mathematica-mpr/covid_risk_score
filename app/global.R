@@ -68,7 +68,9 @@ urls  = list(
   polack_etal_2020 = "https://www.nejm.org/doi/full/10.1056/NEJMoa2034577?query=RP", #pfizer vaccine 1st dose
   moderna_fda_2020 = "https://www.fda.gov/media/144452/download", #moderna vaccine efficacy report
   moderna_eua_2020 = "https://www.fda.gov/media/144637/download", #moderna vaccine factsheet for hcp
-  pfizer_eua_2020 = "https://www.fda.gov/media/144413/download" #pfizer vaccine factsheet for hcp
+  pfizer_eua_2020 = "https://www.fda.gov/media/144413/download", #pfizer vaccine factsheet for hcp
+  # Activity risk level
+  bellage_activity_chart = "https://bellage.org/wp-content/uploads/2020/09/BellAge-COVID19-Activity-Risk-Chart.pdf"
 )
 
 # possible input conditions
@@ -84,6 +86,27 @@ conditions_list = c("Chronic renal disease" = "renal_disease",
                     "Cancer" = "cancer",
                     "Sickle cell disease" = "sickle_cell",
                     "Other chronic condition" = "other")
+
+# activities list placebolder 
+l_activities_list = c("grocery shopping", 
+                      "library or museum",
+                      "outdoor socially distanced exercise (e.g. tennis, golf, bike riding)", 
+                      "outdoor visit with friends")
+m_activities_list = c("children’s playdate and playgrounds",
+                      "indoor public spaces (e.g. salon, casino, bowling, shopping mall)",
+                      "public beach or pool",
+                      "public transportation/airplane",
+                      "overnight stay at a hotel", 
+                      "outdoor dinning",
+                      "see doctor or dentist", 
+                      "school, camp, or daycare",
+                      "working outside of home")
+h_activities_list = c("indoor restaurant or bar", 
+                      "nightclub/music concert/movie theater/gym",
+                      "sports stadium",
+                      "religious services (including weddings and funerals)", 
+                      "team sports (basket ball, football)", 
+                      "visiting nursing home or hospital")
 
 # vaccine doses
 vaccine_labels = list(pfizer = "Pfizer-BioNTech",

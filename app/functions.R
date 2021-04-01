@@ -18,7 +18,10 @@ calculateRisk <- function(input) {
     "indirect_contacts" = as.numeric(input$indirect_contacts),
     "hand"= bool2char(input$hand),
     "ppe"= bool2char(input$ppe),
-    "conditions" = as.list(input$conditions))
+    "conditions" = as.list(input$conditions),
+    "activities_high" = length(input$h_activities),
+    "activities_medium" = length(input$m_activities),
+    "activities_low" = length(input$l_activities))
   
   if (input$has_vaccine){
     request_body$vaccine = input$vaccine
