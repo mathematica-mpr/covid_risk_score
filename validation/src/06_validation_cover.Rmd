@@ -1,0 +1,407 @@
+---
+title: "Validation of 19andMe against COVER"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning=FALSE, cache=F)
+library(tidyverse)
+library(pander)
+library(ggthemes)
+
+dat <- read_csv(file.path("..", "output-cover", "res-cover.csv"))
+
+alg <- read_csv(file.path("..","input-cover","cover_algorithm.csv"))
+COND_VARS_COVER <- pull(na.omit(filter(alg, risk_factor=="conditions"), "var"), "var")
+
+COND_VARS_ALL <- c("is_renal", "is_cvd", "is_diabetes", "is_hyper", "is_immune",  
+                   "is_lung", "is_smoker", "is_other", "is_obesity")
+```
+
+```{r}
+# process results
+COVER_VARS <- c("COVER_H","COVER_I","COVER_F")
+APP_VARS <- c("api_hosp_risk", "api_icu_risk", "api_death_risk")
+
+dat <- dat %>%
+  rowwise() %>% 
+  mutate(conditions_num = sum(is_renal, is_cvd, is_diabetes, is_hyper, is_immune, 
+                              is_lung, is_smoker, is_other, is_obesity)) %>%
+  ungroup()
+
+res <- dat %>% 
+  select(c(COVER_VARS, APP_VARS)) %>%
+  set_names( c(paste0(c("hosp","icu","death"), "_cover"),
+               paste0(c("hosp","icu","death"), "_MPR") )) %>%
+  mutate(has_condition = !is.na(dat$conditions)) %>%
+  bind_cols(select(dat, conditions_num, age, sex, COND_VARS_ALL))
+
+res_long <- res %>%
+  mutate(rownum = row_number()) %>%
+  gather("key","score",c(-rownum, -has_condition, -conditions_num, 
+                         -age, -sex, -is_other, -COND_VARS_ALL)) %>%
+  separate(key, c("outcome", "app"), "_") %>%
+  spread(app, score) %>%
+  mutate(outcome = fct_relevel(outcome, c("hosp","icu","death")),
+         outcome = case_when(outcome=="hosp"~"Hospitalization",
+                             outcome=="icu"~"ICU",
+                             outcome=="death"~"Mortality"),
+         diff_cat = factor(case_when(MPR-cover>.1 ~ '19andMe 10% higher',   
+                                     cover-MPR>.1 ~ '19andMe 10% lower',   
+                                     TRUE ~ "within 10%"),
+                              levels=c('within 10%', '19andMe 10% lower', '19andMe 10% higher'))) %>%
+  group_by(outcome) %>%
+  mutate(scorr = round(cor(MPR, cover, method="spearman"),2))
+```
+
+## Summarise validation dataset (subset)
+
+### Age and sex
+```{r}
+ggplot(dat, aes(x=as.character(age), fill=sex)) +
+  geom_bar(position = "dodge") +
+  theme_bw()
+```
+
+### Count of conditions
+```{r}
+dat %>%
+  ggplot(aes(x=conditions_num)) +
+  geom_bar() +
+  xlab("Number of conditions for COVER app") +
+  theme_bw()
+```
+
+### Individual condition counts
+```{r}
+select(dat, COND_VARS_ALL) %>%
+  gather("condition", ind) %>%
+  filter(ind==1) %>%
+  
+  ggplot(aes(x=condition)) +
+  geom_bar() +
+  theme_bw()
+```
+
+
+## Compare COVER and 19andMe suseptability scores
+
+### Spearman correlations
+```{r}
+res %>% select(matches("MPR|cover")) %>%
+  cor(method="spearman") %>%
+  as.data.frame() %>%
+  rownames_to_column("var1") %>%
+  gather("var2","cor",-var1) %>%
+  mutate_at(c("var1", "var2"), fct_relevel, levels = names(res)) %>%
+  
+  ggplot(aes(x=var1, y=var2, fill=cor)) +
+  geom_tile() +
+  geom_text(aes(label = round(cor, 2))) +
+  geom_vline(xintercept = 3.5) +
+  geom_hline(yintercept = 3.5) +
+  xlab("") + ylab("") +
+  theme_bw()
+```
+
+### Correlation with p values
+```{r, results="asis}
+hosp_corrp <- cor.test(res$hosp_cover, res$hosp_MPR, method="spearman") %>%
+  .$p.value %>% format.pval()
+icu_corrp <- cor.test(res$icu_cover, res$icu_MPR, method="spearman") %>%
+  .$p.value %>% format.pval()
+death_corrp <- cor.test(res$death_cover, res$death_MPR, method="spearman") %>%
+  .$p.value %>% format.pval()
+
+tibble(outcome = c("hosp","icu","death"),
+       corr_pval = c(hosp_corrp, icu_corrp, death_corrp)) %>% pandoc.table()
+```
+
+### Scatterplots
+```{r}
+res_long %>%
+  ggplot(aes(y=MPR, x=cover)) +
+  geom_point(size=.5) +
+  geom_abline() +
+  geom_abline(intercept = -.1, linetype="dotted") +
+  geom_abline(intercept = .1, linetype="dotted") +
+  
+  facet_grid(.~outcome) +
+  coord_fixed() +
+  
+  scale_y_continuous(lim=c(0,1), "19andMe probability", labels = scales::percent) +
+  scale_x_continuous(lim=c(0,1), "COVER probability", labels = scales::percent) +
+  theme_bw()
+```
+
+### Scatterplots - no conditions
+```{r}
+filter(res_long, !has_condition) %>%
+  ggplot(aes(y=MPR, x=cover)) +
+  geom_point(size=.5) +
+  
+  geom_abline() +
+  geom_abline(intercept = -.1, linetype="dotted") +
+  geom_abline(intercept = .1, linetype="dotted") +
+  
+  facet_grid(.~outcome) +
+  coord_equal() +
+  
+  scale_y_continuous(lim=c(0,.3), "19andMe probability", labels = scales::percent) +
+  scale_x_continuous(lim=c(0,.3), "COVER probability", labels = scales::percent) +
+  theme_bw()
+```
+
+### Base score by age and sex
+```{r, fig.width=8, fig.height=3}
+filter(res_long, !has_condition) %>%
+  gather("app","score", c(MPR, cover)) %>%
+  filter(app!="MPR" | age%%10==0 & age<=80) %>%
+  
+  ggplot(aes(x=age, y=score, color=app, shape=sex)) +
+  geom_point() +
+  
+  facet_grid(.~outcome) +
+  scale_y_continuous(labels = scales::percent) +
+  scale_color_discrete(labels = c("COVER","19andMe")) +
+  theme_bw()
+```
+
+### Percent within each difference category
+```{r, results="asis"}
+res_long %>%
+  count(outcome, diff_cat) %>%
+  group_by(outcome) %>%
+  mutate(p=n/sum(n)) %>% select(-n) %>%
+  spread(diff_cat, p) %>%
+  select(c(1,3,2,4)) %>%
+  mutate_at(2:4, ~ifelse(is.na(.), 0, .)) %>%
+  pandoc.table()
+```
+
+### Number within each difference category
+```{r, results="asis"}
+res_long %>%
+  count(outcome, diff_cat) %>%
+  spread(diff_cat, n) %>%
+  select(c(1,3,2,4)) %>%
+  mutate_at(2:4, ~ifelse(is.na(.), 0, .)) %>%
+  pandoc.table()
+```
+
+### Percent within each difference category by age group
+```{r, results="asis"}
+res_long %>%
+  mutate(age_cat = factor(case_when(age>=80 ~ "80+",
+                             age>=60 ~ "60-79",
+                             TRUE ~ "Under 60"),
+                          levels = c("Under 60","60-79","80+")),
+         age_cat_bin = if_else(age>=60, "60+", "Under 60")) %>%
+  count(outcome, age_cat_bin, diff_cat) %>%
+  group_by(outcome, age_cat_bin) %>%
+  mutate(p=scales::percent(n/sum(n))) %>% select(-n) %>%
+  spread(diff_cat, p) %>%
+  select(c(1,2,4,3,5)) %>%
+  mutate_at(3:5, ~ifelse(is.na(.), scales::percent(0), .)) %>%
+  pandoc.table(split.table=Inf)
+```
+
+### Percent within each difference category by number of conditions
+```{r, results="asis"}
+res_long %>%
+  mutate(cond_cat = case_when(conditions_num==0 ~ "0 conditions",
+                              conditions_num==1 ~ "1 condition",
+                              conditions_num==2 ~ "2 conditions",
+                              TRUE ~ "3+ conditions")) %>%
+  count(outcome, cond_cat, diff_cat) %>%
+  group_by(outcome, cond_cat) %>%
+  mutate(p=scales::percent(n/sum(n))) %>% select(-n) %>%
+  spread(diff_cat, p) %>%
+  select(c(1,2,4,3,5)) %>%
+  mutate_at(3:5, ~ifelse(is.na(.), scales::percent(0), .)) %>%
+  pandoc.table(split.table=Inf)
+```
+
+### Percent within each difference category by number of conditions - 60+ only
+```{r, results="asis"}
+res_long %>%
+  filter(age>=60) %>%
+  mutate(cond_cat = case_when(conditions_num==0 ~ "0 conditions",
+                              conditions_num==1 ~ "1 condition",
+                              conditions_num==2 ~ "2 conditions",
+                              TRUE ~ "3+ conditions")) %>%
+  count(outcome, cond_cat, diff_cat) %>%
+  group_by(outcome, cond_cat) %>%
+  mutate(p=scales::percent(n/sum(n))) %>% select(-n) %>%
+  spread(diff_cat, p) %>%
+  select(c(1,2,4,3,5)) %>%
+  mutate_at(3:5, ~ifelse(is.na(.), scales::percent(0), .)) %>%
+  pandoc.table(split.table=Inf)
+```
+
+
+## For paper
+
+### Plot 19andMe versus cover risks
+```{r}
+res_long %>%
+  mutate(label = paste0(outcome, " (ranked cor ", scorr,")")) %>%
+  
+  ggplot(aes(x=cover, y=MPR, colour=diff_cat, shape=diff_cat)) + 
+  geom_point(alpha=.5) + 
+  geom_abline(intercept=0, slope=1, colour='black') + 
+  geom_abline(intercept=-.1, slope=1, colour='grey50', linetype=2) + 
+  geom_abline(intercept=.1, slope=1, colour='grey50', linetype=2) + 
+  
+  facet_grid(.~label) +
+  coord_fixed() +
+  
+  scale_colour_colorblind(name='') +
+  scale_shape_discrete(name='') + 
+  scale_y_continuous(lim=c(0,1), "19andMe") +
+  scale_x_continuous(lim=c(0,1), "COVER") +
+  
+  theme_bw(base_size=10) + 
+  theme(panel.grid.major = element_blank(),  
+        panel.grid.minor = element_blank(),  
+        legend.position='bottom')
+
+ggsave(file.path("..", "figures", "figure-cover-01.jpeg"), height=3, width=6)
+```
+
+### Plot 19andMe versus cover risks - no conditions
+```{r}
+filter(res_long, !has_condition) %>%
+  
+  ggplot(aes(x=cover, y=MPR, colour=diff_cat, shape=diff_cat)) + 
+  geom_point(alpha=.5) + 
+  geom_abline(intercept=0, slope=1, colour='black') + 
+  geom_abline(intercept=-.1, slope=1, colour='grey50', linetype=2) + 
+  geom_abline(intercept=.1, slope=1, colour='grey50', linetype=2) + 
+  
+  geom_point(data = res_long, alpha=0) + # ghost points for legend (boo!)
+  
+  facet_grid(.~outcome) +
+  coord_fixed() +
+  
+  scale_colour_colorblind(name='') +
+  scale_shape_discrete(name='') + 
+  scale_y_continuous(lim=c(0,.3), "19andMe", labels = scales::percent) +
+  scale_x_continuous(lim=c(0,.3), "COVER", labels = scales::percent) +
+  
+  theme_bw() + 
+  theme(panel.grid.major = element_blank(),  
+        panel.grid.minor = element_blank(),  
+        legend.position='bottom')
+
+#ggsave(file.path("..", "figures", "figure-cover-02.pdf"), height=5, width=8)
+```
+
+## Base rates by age and sex
+```{r}
+filter(res_long, !has_condition) %>%
+  mutate(sex = str_to_sentence(sex)) %>%
+  gather("app","score", c(MPR, cover)) %>%
+  filter(app!="MPR" | age%%10==0 & age<=80) %>%
+  
+  ggplot(aes(x=age, y=score, color=app, shape=sex)) +
+  geom_point(alpha=.5) +
+  geom_line(alpha=.5) +
+  
+  facet_grid(.~outcome) +
+  scale_y_continuous("Probability of adverse outcome") +
+  scale_color_discrete("",labels = c("COVER","19andMe")) +
+  scale_shape_discrete("") +
+  
+  theme_bw(base_size = 10) +
+  theme(panel.grid.major = element_blank(),  
+        panel.grid.minor = element_blank(),  
+        legend.position='bottom')
+
+ggsave(file.path("..", "figures", "figure-cover-02.jpeg"), height=3, width=6)
+```
+
+## Number of conditions
+```{r}
+filter(res_long, diff_cat!="19andMe 10% lower") %>%
+  mutate(age_cat = ifelse(age>=60, "Age 60+", "Under age 60")) %>%
+  ggplot(aes(x=conditions_num, fill = diff_cat)) +
+  geom_bar(position = position_dodge2(preserve="single")) +
+  facet_grid(age_cat~outcome) +
+    
+  scale_fill_manual(name='', values=c('grey30', 'grey70')) + 
+  xlab("Number of conditions") +
+  scale_y_continuous("", labels = scales::comma) +
+  
+  theme_bw(base_size=10) +
+  theme(panel.grid.major = element_blank(),  
+        panel.grid.minor = element_blank(),  
+        legend.position='bottom')
+
+ggsave(file.path("..", "figures", "figure-cover-03.jpeg"), height=3, width=6)
+```
+
+## Specific conditions
+```{r}
+filter(res_long, diff_cat!="19andMe 10% lower") %>%
+  pivot_longer(COND_VARS_ALL, names_to = "condition",values_to = "present")  %>% 
+  filter(condition!="is_other") %>%
+  mutate(in_cover = ifelse(condition %in% COND_VARS_COVER, "In COVER", "Not in COVER")) %>%
+  group_by(outcome, diff_cat, condition, in_cover) %>%
+  summarise(p = mean(present)) %>%
+  
+  ggplot(aes(x=condition, y=p, fill=diff_cat)) +
+  geom_col(position = "dodge") +
+  facet_grid(outcome~in_cover, scales = "free_x") +
+  theme_bw() + 
+  theme(legend.position = "bottom")
+```
+
+
+
+## Statistical tests
+
+### Wilcoxen test for number of preexisting conditions
+```{r, results="asis"}
+wilcox_test_fmt <- function(x,y, bonf_n = 1){
+  #print(wilcox.test(unlist(x),unlist(y)))
+  format.pval(wilcox.test(unlist(x),unlist(y))$p.value*bonf_n, nsmall=3, ndigits=3, eps=1e-3)
+}
+
+# Wilcoxon test to compare mean number of pre-existing conditions 
+res_long %>%
+  mutate(age_cat = ifelse(age>=60, "60+", "Under 60")) %>%
+  select(outcome, age_cat, diff_cat, conditions_num) %>%
+  mutate(diff_cat = gsub(" |\\%|\\d","",diff_cat)) %>%
+  nest(conditions_num = conditions_num) %>%
+  pivot_wider(names_from = diff_cat, values_from = conditions_num) %>%
+  mutate(pval = map2(within, andMehigher, wilcox_test_fmt)) %>%
+  
+  select(outcome, age_cat, pval) %>%
+  unnest(pval) %>%
+  pandoc.table()
+```
+
+## Specific conditions
+```{r}
+prop_test_fmt <- function(df, bonf_n = 1){
+  #print(prop.test(x=df$x, n=df$n))
+  format.pval(prop.test(x=df$x, n=df$n)$p.value*bonf_n, nsmall=3, ndigits=3, eps=1e-3)
+}
+
+res_long %>%
+  mutate(age_cat = ifelse(age>=60, "60+", "Under 60")) %>%
+  select(outcome, age_cat, diff_cat, COND_VARS_ALL) %>% 
+  filter(diff_cat!="19andMe 10% lower") %>%
+  pivot_longer(COND_VARS_ALL, names_to = "condition", values_to = "present") %>%
+  filter(condition!="is_other") %>%
+  group_by(outcome, age_cat, diff_cat, condition) %>%
+  summarise(x=sum(present), n=n()) %>%
+  nest(props = c(diff_cat, x, n)) %>%
+  mutate(pval = map(props, prop_test_fmt, bonf_n = 8)) %>%
+  
+  select(outcome, condition, pval) %>%
+  unnest(pval) %>%
+  pivot_wider(names_from = outcome, values_from = pval) %>%
+  pandoc.table(split.table=Inf)
+```
