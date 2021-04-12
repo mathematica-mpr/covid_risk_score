@@ -67,7 +67,8 @@ covid_map_style <- function(gplot){
   coord_map(projection = "albers", lat0 = 39, lat1 = 45) +
   scale_fill_manual(values = nyt_cols[c(1, seq(0, 12, 2))]) + 
   theme(plot.title = element_text(hjust = 0.5,
-                                  size = 20),
+                                  size = 20,
+                                  face = "bold"),
         axis.title.x=element_blank(),
         axis.text.x=element_blank(),
         axis.ticks.x=element_blank(),
@@ -107,7 +108,7 @@ levels(covid_df$cases_nytbreaks) <- str_pad(levels(covid_df$cases_nytbreaks), 9,
 
 cases_plot <- left_join(covid_df, county_geo, by = c("fips" = "county_fips"))  %>%
   ggplot(aes(long, lat, group = group, fill = cases_nytbreaks)) +
-  labs(title = "\nA) Reported Cases",
+  labs(title = "\na) Reported cases",
        fill = "Average daily cases per 100,000 people in past week")
 
 cases_plot_styled <- covid_map_style(cases_plot)
@@ -128,7 +129,7 @@ levels(covid_df$expo_nytbreaks) <- str_pad(levels(covid_df$expo_nytbreaks), 9, s
 
 exposure_plot <- left_join(covid_df, county_geo, by = c("fips" = "county_fips"))  %>%
   ggplot(aes(long, lat, group = group, fill = expo_nytbreaks)) +
-  labs(title = "\nB) Exposure Risk",
+  labs(title = "\nb) Exposure risk",
        fill = "Exposure risk (%) for 10 direct contacts in next week")
 
 
@@ -147,13 +148,13 @@ http://www.sthda.com/english/articles/32-r-graphics-essentials/126-combine-multi
 # combine plots
 combined_map <- ggpubr::ggarrange(cases_plot_styled, exposure_plot_styled,
                     labels = c("", ""),
-                    ncol = 1, nrow = 2)
+                    ncol = 2, nrow = 1)
 
 figures_filer <- "N:/Project/11123_19andMe/CA1/covid_risk_score_paper/figures/_paper-val-fig4.png"
 #save plot
 ggsave(combined_map,
        filename = figures_filer,
-       width = 7, height = 10)
+       width = 12, height = 5)
 
 ```
 
