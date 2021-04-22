@@ -9,6 +9,7 @@ knitr::opts_chunk$set(echo = FALSE)
 library(tidyverse)
 library(lubridate)
 library(cowplot)
+library(latex2exp)
 extrafont::loadfonts(device = "win",  quiet = TRUE)
 
 dat <- read_csv(file.path("Data","usafacts.csv"))
@@ -59,10 +60,10 @@ p1 <- d_plot %>%
   geom_segment(y = 0.006, yend = 0.006, 
                xend = max(d_plot$date), x = ymd("2020-10-01"),
                color="blue", linetype="dotted") +
-  geom_text(label = "Russell et al. IFR estimate: 1.38%",
+  geom_text(label = TeX("March 2020 IFR estimate: $1.38%^{17}$"),
             data = lab_pos[1,], aes(x = date),  y = 0.0138, color = "red",
             hjust=0, vjust = 1.5, size=2) +
-  geom_text(label = "Updated (IHME) IFR estimate: 0.6%",
+  geom_text(label = TeX("November 2020 IFR estimate: $0.6%^{33}$"),
             data = lab_pos[1,], aes(x = max(d_plot$date)),  y = 0.006, color = "blue",
             hjust=1, vjust = 1.5, size=2) +
   
@@ -77,7 +78,7 @@ p1 <- d_plot %>%
         legend.position = "bottom",
         legend.margin=margin(t=-20)) +
   guides(color=guide_legend(ncol=6)) +
-  ggtitle("A) Case fatality rate over time")
+  ggtitle("a) Case fatality rate over time")
 
 p1
 ```
@@ -130,13 +131,13 @@ p2 <- filter(d_plot, date>=ymd("2020-03-15")) %>%
         plot.title = element_text(size=12),
         legend.margin=margin(t=-20, l=-50)) +
   guides(color=guide_legend(ncol=2)) +
-  ggtitle("B) 14-day average national case count")
+  ggtitle("b) 14-day average national case count")
 
 p2
 ```
 
 ## Combine plots
-```{r, fig.height=6,fig.width=6}
+```{r, fig.height=7,fig.width=6}
 plot_grid(p1,p2,ncol=1, rel_heights = c(3,3))
 ggsave("combinned_plot.jpeg", height = 6, width = 6)
 ```
