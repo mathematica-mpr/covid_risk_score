@@ -4,7 +4,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, warning=FALSE, cache=F)
+knitr::opts_chunk$set(echo = FALSE, message=FALSE, warning=FALSE, cache=F)
 library(tidyverse)
 library(pander)
 library(ggthemes)
@@ -105,7 +105,7 @@ res %>% select(matches("MPR|cover")) %>%
 ```
 
 ### Correlation with p values
-```{r, results="asis}
+```{r, results="asis"}
 hosp_corrp <- cor.test(res$hosp_cover, res$hosp_MPR, method="spearman") %>%
   .$p.value %>% format.pval()
 icu_corrp <- cor.test(res$icu_cover, res$icu_MPR, method="spearman") %>%
@@ -309,6 +309,7 @@ filter(res_long, !has_condition) %>%
   geom_line(alpha=.5) +
   
   facet_grid(.~outcome) +
+  scale_x_continuous("Age") +
   scale_y_continuous("Probability of adverse outcome") +
   scale_color_discrete("",labels = c("COVER","19andMe")) +
   scale_shape_discrete("") +
@@ -324,12 +325,13 @@ ggsave(file.path("..", "figures", "figure-cover-02.jpeg"), height=3, width=6)
 ## Number of conditions
 ```{r}
 filter(res_long, diff_cat!="19andMe 10% lower") %>%
-  mutate(age_cat = ifelse(age>=60, "Age 60+", "Under age 60")) %>%
+  mutate(age_cat = ifelse(age>=60, "Age 60+", "Under age 60"),
+         diff_cat = gsub("^within", "Within", diff_cat)) %>% 
   ggplot(aes(x=conditions_num, fill = diff_cat)) +
   geom_bar(position = position_dodge2(preserve="single")) +
   facet_grid(age_cat~outcome) +
     
-  scale_fill_manual(name='', values=c('grey30', 'grey70')) + 
+  scale_fill_manual(name='', values=c('grey70', 'grey30')) + 
   xlab("Number of conditions") +
   scale_y_continuous("", labels = scales::comma) +
   
@@ -383,7 +385,7 @@ res_long %>%
 ```
 
 ## Specific conditions
-```{r}
+```{r, results="asis"}
 prop_test_fmt <- function(df, bonf_n = 1){
   #print(prop.test(x=df$x, n=df$n))
   format.pval(prop.test(x=df$x, n=df$n)$p.value*bonf_n, nsmall=3, ndigits=3, eps=1e-3)
