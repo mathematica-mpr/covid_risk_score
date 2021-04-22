@@ -12,7 +12,7 @@ library(cowplot)
 library(latex2exp)
 extrafont::loadfonts(device = "win",  quiet = TRUE)
 
-dat <- read_csv(file.path("Data","usafacts.csv"))
+dat <- read_csv(file.path("..","Data","usafacts_021921.csv"))
 
 gg_color_hue <- function(n) {
   hues = seq(15, 375, length = n + 1)
@@ -70,8 +70,9 @@ p1 <- d_plot %>%
   scale_x_date("",date_breaks = "1 month", date_labels =  "%b %Y") +
   scale_y_continuous("90-day case fatality rate",
                      lim = c(0,.1), labels=scales::percent) +
-  scale_color_manual("", values = c("black", ggplot_cols)) +
+  ggthemes::scale_color_colorblind() +
   scale_linetype_manual("", values = c("dashed", rep("solid", 5))) +
+  labs(color="") +
   theme_bw() +
   theme(axis.text.x=element_text(angle=45, hjust=1),
         plot.title = element_text(size=12),
