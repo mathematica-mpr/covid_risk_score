@@ -8,6 +8,9 @@ Developing and validating an individual-level risk calculator for COVID-19 in th
 ### Data
 This folder contains publicly available data on COVID-19 cases and deaths from USA facts as well as individual-level anonymous data from Nexoid's COVID-19 risk calculator.
 
+### exposure-map
+This folder contains code to compare the prevalence estimates fromm 19andMe against case counts reported by USAFacts.
+
 ### underreporting-over-time
 This folder contains code to produce estiamtes for underreporting factor over time.
 
