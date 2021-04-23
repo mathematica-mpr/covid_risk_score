@@ -1,5 +1,5 @@
 ---
-title: "Plots for 19andMe blogpost"
+title: "Plots for 19andMe paper"
 output: html_document
 ---
 
