@@ -1,0 +1,116 @@
+---
+title: "Compare exposure risk with prevalence rate EDA"
+author: "Emma Pendl-Robinson"
+date: "1/4/2021"
+output: 
+  html_document:
+    toc: true
+    number_sections: true 
+    toc_float: 
+      collapsed: false
+      smooth_scroll: false
+    css: style.css
+    code_folding: hide 
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Compare exposure risk with prevalence rate {-}
+
+
+```{r libraries, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(tidycensus)
+library(magrittr)
+```
+
+```{r}
+# read in covid_df data
+covid_df <- read_rds(here::here("exposure-map/data/covid_transformed.rds"))
+
+# read in fips codes
+fips_state_xwalk <- read_csv(here::here("exposure-map/data/usafacts.csv")) %>%
+  distinct(fips, state)
+
+# add fips code
+covid_df %<>% left_join(fips_state_xwalk, by = "fips")
+```
+
+# EDA
+
+Finding similarities and and differences counties
+
+```{r}
+# add cases break points 
+covid_df$cases_nytbreaks  <- cut(covid_df$cases_daily_100k, breaks = c(0, 10, 30, 50, 70, 100, 250, 700), include.lowest = TRUE)
+covid_df$cases_cat <- as.numeric(covid_df$cases_nytbreaks)
+# add exposure break points 
+covid_df$expo_nytbreaks <-  cut(covid_df$exposure_risk_pct, breaks = c(0, 0.6, 1.2, 1.8, 2.4, 3, 4, 25), include.lowest = TRUE)
+covid_df$expo_cat <- as.numeric(covid_df$expo_nytbreaks)
+
+# check if similar
+covid_df$cases_expo_cat <- covid_df$expo_cat - covid_df$cases_cat
+```
+
+
+# Example County Data
+
+
+-	Alameda county, CA (fips 06001) 
+
+```{r}
+covid_df %>% filter(fips == "06001")
+
+```
+-	Alleghany County, VA (fips 51005)
+
+```{r}
+covid_df %>% filter(fips == "51005")
+```
+
+# Inter-state Varriance: spearman correlation
+spearman correlation of the mean pervalance and exposure between states
+```{r}
+states_means <- covid_df %>%
+  group_by(state) %>%
+  summarise(mean_cases = mean(cases_daily_100k),
+            mean_expo = mean(exposure_risk_pct),
+            mean_cases_cat = mean(cases_cat),
+            mean_expo_cat = mean(expo_cat),
+            .groups = "drop")  
+
+# comparing mean bins
+cor.test(states_means$mean_cases_cat, states_means$mean_expo_cat, method = "spearman", exact = FALSE)
+
+# comparing mean number
+cor.test(states_means$mean_cases, states_means$mean_expo, method = "spearman", exact = FALSE)
+
+```
+
+# Intra-State 
+
+This seems a bit repetitive of the Utah vs Texas example. Are you trying to say something about the intra-state variability here? Can you add to this by citing quantitative numbers? For example, county A and county B in North Carolina have similar case count per 100k population, XXX and XXX. However, their underreporting factor vary, and therefore the estimated exposure risk in county A and county B are XXX and XXX.
+
+```{r}
+nc_df <- covid_df %>% 
+  filter(state == "NC") %>%
+  select(fips, state, underreport_fac, cases_daily_100k, exposure_risk_pct, cases_cat, expo_cat) %>%
+  mutate(mean_cases = mean(cases_daily_100k),
+         mean_expo = mean(exposure_risk_pct)) 
+```
+
+
+Foundes with about average cases in North Carolina
+Bertie County, NC (fips 37015)
+
+Mecklenburg County, NC (fips 37119)
+```{r}
+nc_df %>% filter(fips %in% c("37015", "37119"))
+
+```
+
+
+
+
