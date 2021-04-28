@@ -90,7 +90,7 @@ conditions_list = c("Chronic renal disease" = "renal_disease",
 l_activities_list = c("Grocery shopping", 
                       "Visiting library or museum",
                       "Outdoor socially distanced activities")
-m_activities_list = c("Go to indoor public spaces (e.g. salon, casino, bowling, shopping mall)",
+m_activities_list = c("Indoor public spaces (e.g. salon, casino, bowling, shopping mall)",
                       "Public transportation/airplane",
                       "Overnight stay at a hotel", 
                       "Outdoor dining",
