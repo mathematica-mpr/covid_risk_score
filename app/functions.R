@@ -159,8 +159,7 @@ renderVaccinesHtml <- function(go, has_vaccine, vaccine, doses, days){
   }
   
   div(formatResultsHeader("Vaccine information"), text, 
-      tags$p("It is not yet known whether or not vaccinated individuals may still be carriers of asymptomatic COVID-19. ", 
-             "After you have been vaccinated, be sure to follow the ",
+      tags$p("After you have been vaccinated, be sure to follow the ",
              tags$a("CDC guidance for fully vaccinated individuals ", href=urls$cdc_vaccinated_guidance),
              "to protect your family, friends, and community.",  
              "Early evidence from vaccine trials suggests that some or all of the vaccines may provide additional protection against hospitalization and death, ", 

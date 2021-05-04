@@ -69,6 +69,7 @@ urls  = list(
   moderna_fda_2020 = "https://www.fda.gov/media/144452/download", #moderna vaccine efficacy report
   moderna_eua_2020 = "https://www.fda.gov/media/144637/download", #moderna vaccine factsheet for hcp
   pfizer_eua_2020 = "https://www.fda.gov/media/144413/download", #pfizer vaccine factsheet for hcp
+  jandj_eua_2021 = "https://www.fda.gov/media/146217/download",
   # Activity risk level
   bellage_activity_chart = "https://bellage.org/wp-content/uploads/2020/09/BellAge-COVID19-Activity-Risk-Chart.pdf"
 )
