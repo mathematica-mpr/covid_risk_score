@@ -32,7 +32,7 @@ urls  = list(
   cdc_mm6909e1 = "https://www.cdc.gov/mmwr/volumes/69/wr/pdfs/mm6909e1-H.pdf",
   cdc_mm6912e2 = "https://www.cdc.gov/mmwr/volumes/69/wr/mm6912e2.htm",
   cdc_mm6913e2 = "https://www.cdc.gov/mmwr/volumes/69/wr/mm6913e2.htm",
-  cdc_ppe = "https://www.cdc.gov/coronavirus/2019-ncov/prevent-getting-sick/diy-cloth-face-coverings.html",
+  cdc_ppe = "https://www.cdc.gov/coronavirus/2019-ncov/prevent-getting-sick/cloth-face-cover-guidance.html",
   cdc_prevention = "https://www.cdc.gov/coronavirus/2019-ncov/prevent-getting-sick/prevention.html",
   cdc_symptoms = "https://www.cdc.gov/coronavirus/2019-ncov/symptoms-testing/symptoms.html",
   cdc_flu = "https://www.cdc.gov/flu/about/burden/index.html",
@@ -68,7 +68,10 @@ urls  = list(
   polack_etal_2020 = "https://www.nejm.org/doi/full/10.1056/NEJMoa2034577?query=RP", #pfizer vaccine 1st dose
   moderna_fda_2020 = "https://www.fda.gov/media/144452/download", #moderna vaccine efficacy report
   moderna_eua_2020 = "https://www.fda.gov/media/144637/download", #moderna vaccine factsheet for hcp
-  pfizer_eua_2020 = "https://www.fda.gov/media/144413/download" #pfizer vaccine factsheet for hcp
+  pfizer_eua_2020 = "https://www.fda.gov/media/144413/download", #pfizer vaccine factsheet for hcp
+  jandj_eua_2021 = "https://www.fda.gov/media/146217/download",
+  # Activity risk level
+  bellage_activity_chart = "https://bellage.org/wp-content/uploads/2020/09/BellAge-COVID19-Activity-Risk-Chart.pdf"
 )
 
 # possible input conditions
@@ -84,6 +87,22 @@ conditions_list = c("Chronic renal disease" = "renal_disease",
                     "Cancer" = "cancer",
                     "Sickle cell disease" = "sickle_cell",
                     "Other chronic condition" = "other")
+
+# activities list placebolder 
+l_activities_list = c("Indoor socially distanced activities (e.g. grocery store, library, museum)",
+                      "Outdoor socially distanced activities")
+m_activities_list = c("In person work or school",
+                      "Indoor busy or crowed activities (e.g. casino, shopping mall, salon)",
+                      "Public transportation/airplane",
+                      "Overnight stay at a hotel", 
+                      "Outdoor dining",
+                      "Seeing doctor or dentist")
+h_activities_list = c("Indoor restaurant or bar", 
+                      "Nightclub/music concert/movie theater/gym",
+                      "Sports stadium",
+                      "Religious services (including weddings and funerals)", 
+                      "Team sports (e.g. basketball, football)", 
+                      "Visiting nursing home or hospital")
 
 # vaccine doses
 vaccine_labels = list(pfizer = "Pfizer-BioNTech",

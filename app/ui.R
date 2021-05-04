@@ -82,10 +82,26 @@ ui <- fluidPage(
             sliderInput('indirect_contacts', 
                         'Indirect exposure: how many people in total do your household members come into close contact with in a week? (Do not include contact between household members in this count.)', 
                         min = 0, max = 100, value = 0, step =1)),
+          hr(),
           checkboxInput("hand", div("I perform hand hygiene according to ", 
                                     tags$a("CDC guidance", href = urls$cdc_hand_hygiene))),
           checkboxInput("ppe", div("I wear personal protection equipment consistent with ",
                                    tags$a("CDC guidelines", href = urls$cdc_ppe))),
+          # activities risk
+          hr(),
+          div(class = "questiontext", "In the previous week, I participated in the following activities:"),
+          checkboxGroupInput("l_activities", "Low-risk activities:",
+                             choices = l_activities_list,
+                             inline = TRUE,
+                             selected = NULL),
+          checkboxGroupInput("m_activities", "Medium-risk activities:",
+                             choices = m_activities_list,
+                             inline = TRUE,
+                             selected = NULL),
+          checkboxGroupInput("h_activities", "High-risk activities:",
+                             choices = h_activities_list,
+                             inline = TRUE,
+                             selected = NULL),
           actionButton('next3', "Next", class = "btn btn-info btn-block")
         ), # bsCollapsePanel
         bsCollapsePanel(

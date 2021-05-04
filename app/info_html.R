@@ -112,15 +112,26 @@ renderMethodsHtml <- function() {
               "and ",
               tags$a("Jefferson et al (2008). ", href = urls$jefferson_etal_2008),
               "Without randomized trials, these systematic appraisals of the current best available evidence are useful to inform interim guidance. "),
-       tags$li("The efficacy of Pfizer-BioNTech and Moderna COVID-19 vaccine after two doses were obtained from FDA Emergency Use Authorization fact sheets ",
+       tags$li("The efficacy rates of the Pfizer-BioNTech, Moderna, and Johnson and Johnson COVID-19 vaccines were obtained from FDA Emergency Use Authorization fact sheets ",
               tags$a("FDA (2020a) ", href = urls$pfizer_eua_2020),
-              "and ",
-              tags$a("FDA (2020b). ", href = urls$moderna_eua_2020),
-              "Both vaccines provide early protection after a number of days after the first dose. ",
+              ", ",
+              tags$a("FDA (2020b) ", href = urls$moderna_eua_2020),
+              ", and",
+              tags$a("FDA (2021). ", href = urls$jandj_eua_2021),
+              "Each of the two-dose vaccines provide early protection after a number of days after the first dose. ",
               "We incorporated the efficacy data on the first dose published by ",
               tags$a("Polack et al (2020) ", href = urls$polack_etal_2020),
               "and ",
-              tags$a("FDA (2020c). ", href = urls$moderna_fda_2020))
+              tags$a("FDA (2020c). ", href = urls$moderna_fda_2020)),
+       tags$li("Activity risk levels for COVID-19 are based on a professional review panel completed by ", 
+               tags$a("BellAge", href = urls$bellage_activity_chart), 
+               ". To provide 19 and Me users with a general idea of how different activities affect risk of COVID-19 through community exposure,
+               we grouped the activities into three categories -- high, medium, and low risk -- and assigned an equivalent
+               number of direct contacts for each activity risk categories. 
+               Activities in the low risk category have a value of 0.5 direct contacts, medium is
+               1.5 direct contacts and high is 3 direct contacts. For each activity checked, the equivalent number of direct contacts is added to the number of direct 
+               contacts used to compute the risk score. For example, if two low risk activities are selected, the 19 and Me calculator 
+               adds 1 direct contact to the person's risk level." )
     ), # end of ol
     tags$p(""),
     tags$p("We'll be doing our best to update these assumptions as additional knowledge about the virus becomes available.")

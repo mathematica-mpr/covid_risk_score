@@ -18,7 +18,10 @@ calculateRisk <- function(input) {
     "indirect_contacts" = as.numeric(input$indirect_contacts),
     "hand"= bool2char(input$hand),
     "ppe"= bool2char(input$ppe),
-    "conditions" = as.list(input$conditions))
+    "conditions" = as.list(input$conditions),
+    "activities_high" = length(input$h_activities),
+    "activities_medium" = length(input$m_activities),
+    "activities_low" = length(input$l_activities))
   
   if (input$has_vaccine){
     request_body$vaccine = input$vaccine
@@ -155,9 +158,8 @@ renderVaccinesHtml <- function(go, has_vaccine, vaccine, doses, days){
     }
   }
   
-  div(formatResultsHeader("Vaccine Information"), text, 
-      tags$p("It is not yet known whether or not vaccinated individuals may still be carriers of asymptomatic COVID-19. ", 
-             "After you have been vaccinated, be sure to follow the ",
+  div(formatResultsHeader("Vaccine information"), text, 
+      tags$p("After you have been vaccinated, be sure to follow the ",
              tags$a("CDC guidance for fully vaccinated individuals ", href=urls$cdc_vaccinated_guidance),
              "to protect your family, friends, and community.",  
              "Early evidence from vaccine trials suggests that some or all of the vaccines may provide additional protection against hospitalization and death, ", 
@@ -221,11 +223,11 @@ renderProtectionHtml <- function(risk, hand, ppe){
   }
   if (risk$exposure_risk >0){
     # exposure reduction hand text for users with exposure risk of over 0
-    hand_delta_html = HTML(paste0("In general, hand washing reduces people's risk of being exposed to COVID-19 by ", 
+    hand_delta_html = HTML(paste0("In general, handwashing reduces people's risk of being exposed to COVID-19 by ", 
                                   prob_hand_string, " . "))
   } else{
     # exposure reduction hand text for users with exposure risk less than or equal to 0
-    hand_delta_html = HTML(paste0("In general, hand washing reduces people's risk of being exposed to COVID-19, 
+    hand_delta_html = HTML(paste0("In general, handwashing reduces people's risk of being exposed to COVID-19, 
                                   if they do come into close contact with others. "))
   }
 
