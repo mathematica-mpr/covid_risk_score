@@ -89,7 +89,7 @@ conditions_list = c("Chronic renal disease" = "renal_disease",
                     "Sickle cell disease" = "sickle_cell",
                     "Other chronic condition" = "other")
 
-# activities list placebolder 
+# activities list  
 l_activities_list = c("Indoor socially distanced activities (e.g. grocery store, library, museum)",
                       "Outdoor socially distanced activities")
 m_activities_list = c("In person work or school",
@@ -105,6 +105,10 @@ h_activities_list = c("Indoor restaurant or bar",
                       "Team sports (e.g. basketball, football)", 
                       "Visiting nursing home or hospital")
 
+# possible exercise_levels
+exercise_level_list = c("Less than 10" = "consistently_inactive",
+                    "Between 11 and 149 miuntes" = "inconsistently_active",
+                    "More than 150 minutes" = "consistently_active")
 # vaccine doses
 vaccine_labels = list(pfizer = "Pfizer-BioNTech",
                       moderna = "Moderna",
