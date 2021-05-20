@@ -134,7 +134,16 @@ renderMethodsHtml <- function() {
                adds 1 direct contact to the person's risk level." )
     ), # end of ol
     tags$p(""),
-    tags$p("We'll be doing our best to update these assumptions as additional knowledge about the virus becomes available.")
+    #tags$p("We'll be doing our best to update these assumptions as additional knowledge about the virus becomes available."),
+    tags$h4("In the Works:"),
+    tags$ul(
+      tags$p("We are continuously working to update these assumptions as additional knowledge about the virus becomes available."),
+      tags$p("Below are some COVID-19 developments we are monitoring closely and are looking to incoporate into the methodology as data become available."),
+      tags$ul(
+        tags$li("Efficacy of vaccines at preventing severe COVID-19 outcomes including hospitalization, ICU admission, and death."),
+        tags$li("Risk of ", tags$a("post-COVID conditions", href = urls$cdc_post_covid_conditions), "for people with similar characteristics and behaviors as you")
+        ) # end of ul 
+      )# end of ul
   )
 }
 
