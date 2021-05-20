@@ -135,7 +135,7 @@ renderMethodsHtml <- function() {
     ), # end of ol
     tags$p(""),
     #tags$p("We'll be doing our best to update these assumptions as additional knowledge about the virus becomes available."),
-    tags$h4("In the Works [or Features/Updates to Come]"),
+    tags$h4("In the Works:"),
     tags$ul(
       tags$p("We are continuously working to update these assumptions as additional knowledge about the virus becomes available."),
       tags$p("Below are some COVID-19 developments we are monitoring closely and are looking to incoporate into the methodology as data become available."),
