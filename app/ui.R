@@ -44,7 +44,7 @@ ui <- fluidPage(
           actionButton('next1', "Next", class = "btn btn-info btn-block")
         ), # bsCollapsePanel
         bsCollapsePanel(
-          title = "2. Pre-existing Conditions",
+          title = "2. Your Health Status",
           checkboxInput('is_sick', div("I have ", tags$a("potential symptoms of COVID-19", href = urls$cdc_symptoms))),
           
           conditionalPanel(
