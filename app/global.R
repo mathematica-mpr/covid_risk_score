@@ -106,9 +106,9 @@ h_activities_list = c("Indoor restaurant or bar",
                       "Visiting nursing home or hospital")
 
 # possible exercise_levels
-exercise_level_list = c("Less than 10" = "consistently_inactive",
-                    "Between 11 and 149 miuntes" = "inconsistently_active",
-                    "More than 150 minutes" = "consistently_active")
+exercise_level_list = c("10 minutes or less" = "consistently_inactive",
+                    "11-149 miuntes" = "inconsistently_active",
+                    "150 minutes or more " = "consistently_active")
 # vaccine doses
 vaccine_labels = list(pfizer = "Pfizer-BioNTech",
                       moderna = "Moderna",
