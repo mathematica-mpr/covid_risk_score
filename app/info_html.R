@@ -104,6 +104,9 @@ renderMethodsHtml <- function() {
               "We keep the list of comorbidities included in the app to be consistent with the CDC list of medical conditions that increase the risk of severe illness ",
               tags$a("(CDC 2021). ", href = urls$cdc_medicalconditions)
       ),
+      tags$li("Odds ratios for hospitalization, ICU admission, and death associated with exercise level were obtained from ",
+              tags$a("Sallis et al (2021)", href = urls$sallis_etal_2021), "."
+      ),
     ), #end of ol
     tags$h4("Behaviors:"),
     tags$ol(

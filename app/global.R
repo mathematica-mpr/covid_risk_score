@@ -72,7 +72,9 @@ urls  = list(
   pfizer_eua_2020 = "https://www.fda.gov/media/144413/download", #pfizer vaccine factsheet for hcp
   jandj_eua_2021 = "https://www.fda.gov/media/146217/download",
   # Activity risk level
-  bellage_activity_chart = "https://bellage.org/wp-content/uploads/2020/09/BellAge-COVID19-Activity-Risk-Chart.pdf"
+  bellage_activity_chart = "https://bellage.org/wp-content/uploads/2020/09/BellAge-COVID19-Activity-Risk-Chart.pdf",
+  # excerise level and severe covid
+  sallis_etal_2021 = "https://www.bmj.com/company/newsroom/physical-inactivity-linked-to-more-severe-covid-19-infection-and-death"
 )
 
 # possible input conditions
