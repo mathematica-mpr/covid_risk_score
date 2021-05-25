@@ -87,6 +87,7 @@ conditions_list = c("Chronic renal disease" = "renal_disease",
                     "Pregnancy" = "pregnancy",
                     "Cancer" = "cancer",
                     "Sickle cell disease" = "sickle_cell",
+                    "Down syndrome" = "downsyndrome",
                     "Other chronic condition" = "other")
 
 # activities list placebolder 
