@@ -8,7 +8,7 @@ disclaimerpopupHTML <- function(){
     tags$p(style="color:#DF691A", "THE INFORMATION PROVIDED BY THIS TOOL IS NOT MEDICAL ADVICE AND CANNOT BE 
              USED TO DIAGNOSE OR TREAT ANY MEDICAL CONDITION.  See FAQ for more information.", class = "text-warning"),
     tags$p("COVID data behind this app is updated daily - last updated:", format(Sys.Date()-2, "%b %d, %Y"), class = "text-warning"),
-    tags$p("Our algorithm is updated periodically - last updated: May 3, 2021", class = "text-warning")
+    tags$p("Our algorithm is updated periodically - last updated: May 24, 2021", class = "text-warning")
   )
 }
 
@@ -34,18 +34,20 @@ renderMethodsHtml <- function() {
     tags$h4("Exposure:"),
     tags$ol(
       tags$li(
-        "To calculate exposure, we used ",
-        tags$a("the USAFacts published data on COVID-19 cases & deaths", href = urls$usafacts_data),
-        "to estimate the prevalence of infected people within your county. 
-        USAFacts reports all Kansas city cases under Jackson County, MO even though three other counties overlap Kansas City,", 
+        "To estimate the number of people in your county currently infected with COVID-19, we use the county-level daily case counts reported by ",
+        tags$a("the USAFacts published data on COVID-19 cases & deaths ", href = urls$usafacts_data),
+        " and the average length of sickness reported by ", 
+        tags$a("Wolfel et al (2020)", href = urls$wolfer_etall_2020), " and the ",
+        tags$a("COVID Symptom Study. ", href = urls$covid_symptom_study), 
+        "USAFacts reports all Kansas city cases under Jackson County, MO even though three other counties overlap Kansas City, ", 
         "so we report cases for all four of these counties aggregated together into 'Kansas City and surrounding counties'."),
       tags$li(
         "Due to rapid spread and insufficient testing during the COVID-19 pandemic, there are likely additional unreported cases beyond the 
-        officially reported cases. We combined the methodology reported by ",  tags$a("Russell et al (2020)", href = urls$russel_etal_2020), 
-        " and the average length of sickness reported by ", tags$a("Wolfel et al (2020)", href = urls$wolfer_etall_2020), " and the ",
-        tags$a("COVID Symptom Study", href = urls$covid_symptom_study), 
-        "to calculate the percentage of cases that are currently known and presumably quarantined, versus the number of active cases in the community."),
-        
+        officially reported cases. We use the methodology reported by ",  tags$a("Russell et al (2020)", href = urls$russel_etal_2020), 
+        "and the infection fatality rate reported by ",
+        tags$a("IHME ", href=urls$ihme_ifr),
+        "to estimate the number of cases in your county that were not reported."),
+      
        tags$ul(tags$li("The methodology from ", tags$a("Russell et al (2020)", href = urls$russel_etal_2020),
                        " uses the county-level case fatality rate (CFR) to estimate the percentage of cases that are not reported. ",
                        "Because under-reporting has decreased since the beginning of the pandemic (in part due to increased access to testing), ",
@@ -67,19 +69,11 @@ renderMethodsHtml <- function() {
     tags$h4("Susceptibility:"),
     tags$ol(
       tags$li(
-        "Estimations of the probability of hospitalization and death among all infections, stratified by age groups, were obtained from a Lancet article authored by ",
-        tags$a("Verity et al (2020).", href = urls$verity_etal_2020),
-        "We chose this study because it reports the infection fatality ratio while most other studies report crude fatality rate among ascertained cases. ",
-        "We do not account for differences between the Chinese population and the US population. More recently, we compared our estimates with the ",
-        tags$a("FAIR Health National Private Insurance Claims (FH NPIC®) repository", href = urls$fairhealth),
-        " with approximately 100 million covered lives and 467,773 COVID-19 cases diagnosed between April - August 2020. ",
-        "The fatality rates by age groups were very similar to Verity et al. ",
-        "Estimations of the probability of ICU among all infected cases, stratified by age groups, were calculated from results in",
-        tags$a("CDC MMWR (2020a).", href = urls$cdc_mm6912e2),
-        "We chose this study because it covers all 49 US states, the District of Columbia, and three US territories. ",
-        "More recent data from ",
-        tags$a("CDC COVID-NET", href = urls$cdc_covidnet),
-        " confirms the relative risk for ICU admissions for different age groups are similar to what we use. "
+        "Estimates of the probability of hospitalization, ICU admission, and death among all infections, stratified by age groups, were calculated using the ",
+        tags$a("CDC's COVID-19 Case Surveillance Public Use Data. ", href = urls$cdc_case_surv), 
+        "The calculation includes data from a recent 6-month period and ",
+        "rates are adjusted downward to account for under-reporting of cases (the national estimate of the percentage of cases that go unreported ", 
+        "for this time period was calculated using the same methodology describe in 'Exposure')."
       ),
       tags$li("Estimations of risk factors associated with sex and underlying medical conditions were obtained from multiple studies. ", 
               "Odds ratios are adjusted for age, sex, and other underlying conditions. ", 
@@ -134,7 +128,16 @@ renderMethodsHtml <- function() {
                adds 1 direct contact to the person's risk level." )
     ), # end of ol
     tags$p(""),
-    tags$p("We'll be doing our best to update these assumptions as additional knowledge about the virus becomes available.")
+    #tags$p("We'll be doing our best to update these assumptions as additional knowledge about the virus becomes available."),
+    tags$h4("In the Works:"),
+    tags$ul(
+      tags$p("We are continuously working to update these assumptions as additional knowledge about the virus becomes available."),
+      tags$p("Below are some COVID-19 developments we are monitoring closely and are looking to incoporate into the methodology as data become available."),
+      tags$ul(
+        tags$li("Efficacy of vaccines at preventing severe COVID-19 outcomes including hospitalization, ICU admission, and death."),
+        tags$li("Risk of ", tags$a("post-COVID conditions", href = urls$cdc_post_covid_conditions), "for people with similar characteristics and behaviors as you")
+        ) # end of ul 
+      )# end of ul
   )
 }
 
