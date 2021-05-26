@@ -8,7 +8,7 @@ disclaimerpopupHTML <- function(){
     tags$p(style="color:#DF691A", "THE INFORMATION PROVIDED BY THIS TOOL IS NOT MEDICAL ADVICE AND CANNOT BE 
              USED TO DIAGNOSE OR TREAT ANY MEDICAL CONDITION.  See FAQ for more information.", class = "text-warning"),
     tags$p("COVID data behind this app is updated daily - last updated:", format(Sys.Date()-2, "%b %d, %Y"), class = "text-warning"),
-    tags$p("Our algorithm is updated periodically - last updated: May 24, 2021", class = "text-warning")
+    tags$p("Our algorithm is updated periodically - last updated: May 26, 2021", class = "text-warning")
   )
 }
 
@@ -215,11 +215,12 @@ renderFaqHtml <- function() {
            tags$a("Zambrano et al (2020) .", href = urls$zambrano)),
     faqQuestion("When was the most recent update to the app and what is new?"),
     tags$p("The COVID-19 data behind this app is updated daily. We periodically update the algorithm used for risk score estimation.",
-           " The most recent update to the algorithm was on May 24, 2021. We made the following major changes:"),
+           " The most recent update to the algorithm was on May 26, 2021. We made the following major changes:"),
     tags$ol(
       tags$li("Update the risk factors for severe COVID-19 illness based on the latest ", tags$a("CDC guidance (2021). ", href = urls$cdc_medicalconditions)),
       tags$li("Add the vaccine efficacy data for the three vaccine approved in the US: Pfizer-BioNTech, Moderna, and Johnson & Johnson."),
-      tags$li("Add risk of COVID-19 explosure from activities")
+      tags$li("Add risk of COVID-19 explosure from activities"),
+      tags$li("Modify risk of severe COVID-19 illness based on exercises level")
     ) # end of ul
   )
 }
