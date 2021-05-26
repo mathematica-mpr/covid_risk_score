@@ -44,9 +44,9 @@ ui <- fluidPage(
           actionButton('next1', "Next", class = "btn btn-info btn-block")
         ), # bsCollapsePanel
         bsCollapsePanel(
-          title = "2. Your Health Status",
+          title = "2. Pre-existing Conditions",
           checkboxInput('is_sick', div("I have ", tags$a("potential symptoms of COVID-19", href = urls$cdc_symptoms))),
-          # COVID-19 symptoms input
+          
           conditionalPanel(
             condition = "input.is_sick == true",
             checkboxGroupInput("symptoms", "Symptoms",
@@ -57,9 +57,10 @@ ui <- fluidPage(
                                  "My symptoms are not listed here" = "other" 
                                ))),
           hr(),
-          # Pre-Existing conditions inputs
+          
           checkboxInput('has_preexisting', div("I have ", tags$a("underlying medical complications", 
                                                                  href = urls$cdc_high_risk))),
+          
           conditionalPanel(
             condition = "input.has_preexisting == true",
             checkboxGroupInput("conditions", "Conditions", # this is written this way to allow html math in obesity test
@@ -67,11 +68,6 @@ ui <- fluidPage(
                                choiceValues = unname(conditions_list)
             ),
           ),
-          hr(),
-          # Excerise Level
-          radioButtons('exercise_level', "On average how many minutes per week do you engage in moderate to strenuous exercises (like brisk walking)?", 
-                       exercise_level_list, inline=TRUE, selected = "inconsistently_active"), 
-          # Next Buttion
           actionButton('next2', "Next", class = "btn btn-info btn-block")
         ), # bsCollapsePanel
         bsCollapsePanel(

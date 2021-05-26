@@ -74,9 +74,7 @@ urls  = list(
   pfizer_eua_2020 = "https://www.fda.gov/media/144413/download", #pfizer vaccine factsheet for hcp
   jandj_eua_2021 = "https://www.fda.gov/media/146217/download",
   # Activity risk level
-  bellage_activity_chart = "https://bellage.org/wp-content/uploads/2020/09/BellAge-COVID19-Activity-Risk-Chart.pdf",
-  # excerise level and severe covid
-  sallis_etal_2021 = "https://www.bmj.com/company/newsroom/physical-inactivity-linked-to-more-severe-covid-19-infection-and-death"
+  bellage_activity_chart = "https://bellage.org/wp-content/uploads/2020/09/BellAge-COVID19-Activity-Risk-Chart.pdf"
 )
 
 # possible input conditions
@@ -93,7 +91,7 @@ conditions_list = c("Chronic renal disease" = "renal_disease",
                     "Sickle cell disease" = "sickle_cell",
                     "Other chronic condition" = "other")
 
-# activities list  
+# activities list placebolder 
 l_activities_list = c("Indoor socially distanced activities (e.g. grocery store, library, museum)",
                       "Outdoor socially distanced activities")
 m_activities_list = c("In person work or school",
@@ -109,10 +107,6 @@ h_activities_list = c("Indoor restaurant or bar",
                       "Team sports (e.g. basketball, football)", 
                       "Visiting nursing home or hospital")
 
-# possible exercise_levels
-exercise_level_list = c("10 minutes or less" = "consistently_inactive",
-                    "11-149 miuntes" = "inconsistently_active",
-                    "150 minutes or more " = "consistently_active")
 # vaccine doses
 vaccine_labels = list(pfizer = "Pfizer-BioNTech",
                       moderna = "Moderna",

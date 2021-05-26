@@ -21,8 +21,7 @@ calculateRisk <- function(input) {
     "conditions" = as.list(input$conditions),
     "activities_high" = length(input$h_activities),
     "activities_medium" = length(input$m_activities),
-    "activities_low" = length(input$l_activities),
-    "exercise_level" = input$exercise_level)
+    "activities_low" = length(input$l_activities))
   
   if (input$has_vaccine){
     request_body$vaccine = input$vaccine
