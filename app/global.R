@@ -112,8 +112,8 @@ h_activities_list = c("Indoor restaurant or bar",
 
 # possible exercise_levels
 exercise_level_list = c("10 minutes or less" = "lte_10mpw",
-                    "11-149 miuntes" = "btw_11_149mpw",
-                    "150 minutes or more " = "gte_150mpw")
+                    "11-149 minutes" = "btw_11_149mpw",
+                    "150 minutes or more" = "gte_150mpw")
 # vaccine doses
 vaccine_labels = list(pfizer = "Pfizer-BioNTech",
                       moderna = "Moderna",
