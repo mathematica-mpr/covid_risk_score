@@ -48,22 +48,47 @@ renderMethodsHtml <- function() {
         tags$a("IHME ", href=urls$ihme_ifr),
         "to estimate the number of cases in your county that were not reported."),
       
-       tags$ul(tags$li("The methodology from ", tags$a("Russell et al (2020)", href = urls$russel_etal_2020),
-                       " uses the county-level case fatality rate (CFR) to estimate the percentage of cases that are not reported. ",
-                       "Because under-reporting has decreased since the beginning of the pandemic (in part due to increased access to testing), ",
-                       " we use a 90-day moving window for cases and deaths to calculate the county-level CFR. ",
-                       "Because the CFR is noisy for counties with few cases, we use an ", 
-                       tags$a("empirical Bayes", href = urls$empirical_bayes), " adjustment to shrink the county CFR ",
-                       "towards the state CFR.",
-                       "The result is that for counties with many cases, we essentially use the county-level CFR, ",
-                       "but for counties with only a few cases we use a CFR that is partway between the county and state CFRs. ")),
-  
+      tags$ul(tags$li("The methodology from ", tags$a("Russell et al (2020)", href = urls$russel_etal_2020),
+                      " uses the county-level case fatality rate (CFR) to estimate the percentage of cases that are not reported. ",
+                      "Because under-reporting has decreased since the beginning of the pandemic (in part due to increased access to testing), ",
+                      " we use a 90-day moving window for cases and deaths to calculate the county-level CFR. ",
+                      "Because the CFR is noisy for counties with few cases, we use an ", 
+                      tags$a("empirical Bayes", href = urls$empirical_bayes), " adjustment to shrink the county CFR ",
+                      "towards the state CFR.",
+                      "The result is that for counties with many cases, we essentially use the county-level CFR, ",
+                      "but for counties with only a few cases we use a CFR that is partway between the county and state CFRs. ")),
+      
       tags$li(
         "Estimations of the probability of having COVID-19 given symptoms are calculated using a logistic regression model published on Nature Medicine developed by ",
         tags$a("Menni et al (2020).", href = urls$menni_etall_2020),
         "This is the largest study so far using self-reported symptoms of more than 2.6 million participants to predict probable infection of COVID-19. "
-      )
-      ), # end of ol
+      ),
+      tags$li("The effects of wearing masks and hand hygiene on reducing the spread of SARS-CoV-2 and similar respiratory viruses were obtained from two systematic review and meta-analysis studies: ",
+              tags$a("Chu et al (2020) ", href = urls$chu_etal_2020),
+              "and ",
+              tags$a("Jefferson et al (2008). ", href = urls$jefferson_etal_2008),
+              "Without randomized trials, these systematic appraisals of the current best available evidence are useful to inform interim guidance. "),
+      tags$li("The efficacy rates of the Pfizer-BioNTech, Moderna, and Johnson and Johnson COVID-19 vaccines were obtained from FDA Emergency Use Authorization fact sheets ",
+              tags$a("FDA (2020a) ", href = urls$pfizer_eua_2020),
+              ", ",
+              tags$a("FDA (2020b) ", href = urls$moderna_eua_2020),
+              ", and",
+              tags$a("FDA (2021). ", href = urls$jandj_eua_2021),
+              "Each of the two-dose vaccines provide early protection after a number of days after the first dose. ",
+              "We incorporated the efficacy data on the first dose published by ",
+              tags$a("Polack et al (2020) ", href = urls$polack_etal_2020),
+              "and ",
+              tags$a("FDA (2020c). ", href = urls$moderna_fda_2020)),
+      tags$li("Activity risk levels for COVID-19 are based on a professional review panel completed by ", 
+              tags$a("BellAge", href = urls$bellage_activity_chart), 
+              ". To provide 19 and Me users with a general idea of how different activities affect risk of COVID-19 through community exposure,
+               we grouped the activities into three categories -- high, medium, and low risk -- and assigned an equivalent
+               number of direct contacts for each activity risk categories. 
+               Activities in the low risk category have a value of 0.5 direct contacts, medium is
+               1.5 direct contacts and high is 3 direct contacts. For each activity checked, the equivalent number of direct contacts is added to the number of direct 
+               contacts used to compute the risk score. For example, if two low risk activities are selected, the 19 and Me calculator 
+               adds 1 direct contact to the person's risk level." )
+    ), # end of ol
     tags$h4("Susceptibility:"),
     tags$ol(
       tags$li(
@@ -100,34 +125,6 @@ renderMethodsHtml <- function() {
               tags$a("Sallis et al (2021)", href = urls$sallis_etal_2021), "."
       ),
     ), #end of ol
-    tags$h4("Behaviors:"),
-    tags$ol(
-       tags$li("The effects of wearing masks and hand hygiene on reducing the spread of SARS-CoV-2 and similar respiratory viruses were obtained from two systematic review and meta-analysis studies: ",
-              tags$a("Chu et al (2020) ", href = urls$chu_etal_2020),
-              "and ",
-              tags$a("Jefferson et al (2008). ", href = urls$jefferson_etal_2008),
-              "Without randomized trials, these systematic appraisals of the current best available evidence are useful to inform interim guidance. "),
-       tags$li("The efficacy rates of the Pfizer-BioNTech, Moderna, and Johnson and Johnson COVID-19 vaccines were obtained from FDA Emergency Use Authorization fact sheets ",
-              tags$a("FDA (2020a) ", href = urls$pfizer_eua_2020),
-              ", ",
-              tags$a("FDA (2020b) ", href = urls$moderna_eua_2020),
-              ", and",
-              tags$a("FDA (2021). ", href = urls$jandj_eua_2021),
-              "Each of the two-dose vaccines provide early protection after a number of days after the first dose. ",
-              "We incorporated the efficacy data on the first dose published by ",
-              tags$a("Polack et al (2020) ", href = urls$polack_etal_2020),
-              "and ",
-              tags$a("FDA (2020c). ", href = urls$moderna_fda_2020)),
-       tags$li("Activity risk levels for COVID-19 are based on a professional review panel completed by ", 
-               tags$a("BellAge", href = urls$bellage_activity_chart), 
-               ". To provide 19 and Me users with a general idea of how different activities affect risk of COVID-19 through community exposure,
-               we grouped the activities into three categories -- high, medium, and low risk -- and assigned an equivalent
-               number of direct contacts for each activity risk categories. 
-               Activities in the low risk category have a value of 0.5 direct contacts, medium is
-               1.5 direct contacts and high is 3 direct contacts. For each activity checked, the equivalent number of direct contacts is added to the number of direct 
-               contacts used to compute the risk score. For example, if two low risk activities are selected, the 19 and Me calculator 
-               adds 1 direct contact to the person's risk level." )
-    ), # end of ol
     tags$h4("In the Works:"),
     tags$ul(
       tags$p("We are continuously working to update these assumptions as additional knowledge about the virus becomes available."),
@@ -135,12 +132,12 @@ renderMethodsHtml <- function() {
       tags$ul(
         tags$li("Efficacy of vaccines at preventing severe COVID-19 outcomes including hospitalization, ICU admission, and death."),
         tags$li("Risk of ", tags$a("post-COVID conditions", href = urls$cdc_post_covid_conditions), "for people with similar characteristics and behaviors as you")
-        ), # end of ul
+      ), # end of ul
       tags$br(),
       tags$p("If you have additional suggestions about the app, data sets, or features, Please let us know at", 
              tags$a("covid.risk.score@gmail.com", href="mailto:covid.risk.score@gmail.com"), 
              "or visit us on ", tags$a("GitHub", href="https://github.com/mathematica-mpr/covid_risk_score"))
-      )# end of ul for in teh works
+    ) # end of ul
   )
 }
 
