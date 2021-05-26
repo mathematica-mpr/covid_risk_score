@@ -128,8 +128,6 @@ renderMethodsHtml <- function() {
                contacts used to compute the risk score. For example, if two low risk activities are selected, the 19 and Me calculator 
                adds 1 direct contact to the person's risk level." )
     ), # end of ol
-    tags$p(""),
-    #tags$p("We'll be doing our best to update these assumptions as additional knowledge about the virus becomes available."),
     tags$h4("In the Works:"),
     tags$ul(
       tags$p("We are continuously working to update these assumptions as additional knowledge about the virus becomes available."),
@@ -137,8 +135,12 @@ renderMethodsHtml <- function() {
       tags$ul(
         tags$li("Efficacy of vaccines at preventing severe COVID-19 outcomes including hospitalization, ICU admission, and death."),
         tags$li("Risk of ", tags$a("post-COVID conditions", href = urls$cdc_post_covid_conditions), "for people with similar characteristics and behaviors as you")
-        ) # end of ul 
-      )# end of ul
+        ), # end of ul
+      tags$br(),
+      tags$p("If you have additional suggestions about the app, data sets, or features, Please let us know at", 
+             tags$a("covid.risk.score@gmail.com", href="mailto:covid.risk.score@gmail.com"), 
+             "or visit us on ", tags$a("GitHub", href="https://github.com/mathematica-mpr/covid_risk_score"))
+      )# end of ul for in teh works
   )
 }
 
@@ -219,9 +221,6 @@ renderFaqHtml <- function() {
            " The most recent update to the algorithm is Jan 15, 2021. We made three major changes:",
            " 1) Update the risk factors for severe COVID-19 illness based on the latest ",
            tags$a("CDC guidance (2021). ", href = urls$cdc_medicalconditions),
-           " 2) Add the vaccine efficacy data for the two vaccine approved in the US: Pfizer-BioNTech and Moderna. "),
-    faqQuestion("I have suggestion X, or know of data set Y, or want feature Z..."),
-    tags$p("Let us know at", tags$a("covid.risk.score@gmail.com", href="mailto:covid.risk.score@gmail.com"), 
-           "or visit us on ", tags$a("GitHub", href="https://github.com/mathematica-mpr/covid_risk_score"))
+           " 2) Add the vaccine efficacy data for the two vaccine approved in the US: Pfizer-BioNTech and Moderna. ")
   )
 }
