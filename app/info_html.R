@@ -62,9 +62,7 @@ renderMethodsHtml <- function() {
         "Estimations of the probability of having COVID-19 given symptoms are calculated using a logistic regression model published on Nature Medicine developed by ",
         tags$a("Menni et al (2020).", href = urls$menni_etall_2020),
         "This is the largest study so far using self-reported symptoms of more than 2.6 million participants to predict probable infection of COVID-19. "
-      ),
-      tags$li("Other methods of becoming infected (e.g. touching an infected surface) are not accounted for by this calculator. ",
-      "We are currently working on a new feature to consider the risk associated with different activities.")
+      )
       ), # end of ol
     tags$h4("Susceptibility:"),
     tags$ol(
