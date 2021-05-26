@@ -215,7 +215,7 @@ renderFaqHtml <- function() {
            tags$a("Zambrano et al (2020) .", href = urls$zambrano)),
     faqQuestion("When was the most recent update to the app and what is new?"),
     tags$p("The COVID-19 data behind this app is updated daily. We periodically update the algorithm used for risk score estimation.",
-           " The most recent update to the algorithm was on May 22, 2021. We made the following major changes:"),
+           " The most recent update to the algorithm was on May 24, 2021. We made the following major changes:"),
     tags$ol(
       tags$li("Update the risk factors for severe COVID-19 illness based on the latest ", tags$a("CDC guidance (2021). ", href = urls$cdc_medicalconditions)),
       tags$li("Add the vaccine efficacy data for the three vaccine approved in the US: Pfizer-BioNTech, Moderna, and Johnson & Johnson."),
