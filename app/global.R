@@ -31,7 +31,7 @@ urls  = list(
   cdc_if_sick = "https://www.cdc.gov/coronavirus/2019-ncov/if-you-are-sick/steps-when-sick.html",
   cdc_mm6909e1 = "https://www.cdc.gov/mmwr/volumes/69/wr/pdfs/mm6909e1-H.pdf",
   cdc_mm6912e2 = "https://www.cdc.gov/mmwr/volumes/69/wr/mm6912e2.htm",
-  cdc_mm6913e2 = "https://www.cdc.gov/mmwr/volumes/69/wr/mm6913e2.htm",
+  cdc_mm6913e2 = "https://www.cdc.gov/mmwr/volumes/70/wr/mm6913e2.htm",
   cdc_post_covid_conditions = "https://www.cdc.gov/coronavirus/2019-ncov/long-term-effects.html",
   cdc_ppe = "https://www.cdc.gov/coronavirus/2019-ncov/prevent-getting-sick/cloth-face-cover-guidance.html",
   cdc_prevention = "https://www.cdc.gov/coronavirus/2019-ncov/prevent-getting-sick/prevention.html",
@@ -44,6 +44,7 @@ urls  = list(
   cdc_test_info = "https://www.cdc.gov/coronavirus/2019-ncov/symptoms-testing/testing.html",
   cdc_vaccines = "https://www.cdc.gov/coronavirus/2019-ncov/vaccines/index.html",
   cdc_vaccinated_guidance = "https://www.cdc.gov/coronavirus/2019-ncov/vaccines/fully-vaccinated-guidance.html",
+  cdc_case_surv = "https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data/vbim-akqf/data",
   # USA Facts
   usafacts_data = "https://usafacts.org/visualizations/coronavirus-covid-19-spread-map/",
   # papers
@@ -58,6 +59,7 @@ urls  = list(
   simonnet_etall_2020 = "https://onlinelibrary.wiley.com/doi/full/10.1002/oby.22831?af=R", 
   chu_etal_2020 = "https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(20)31142-9/fulltext",
   jefferson_etal_2008 = "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2190272/",
+  ihme_ifr = "http://www.healthdata.org/sites/default/files/files/Projects/COVID/briefing_US_20201112.pdf",
   # misc
   empirical_bayes = "https://en.wikipedia.org/wiki/Empirical_Bayes_method",
   # Additional sources for ORs December 2020 update
