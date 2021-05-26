@@ -70,7 +70,7 @@ ui <- fluidPage(
           hr(),
           # Excerise Level
           radioButtons('exercise_level', "On average how many minutes per week do you engage in moderate to strenuous exercises (like brisk walking)?", 
-                       exercise_level_list, inline=TRUE, selected = "inconsistently_active"), 
+                       exercise_level_list, inline=TRUE, selected = "btw_11_149mpw"), 
           # Next Buttion
           actionButton('next2', "Next", class = "btn btn-info btn-block")
         ), # bsCollapsePanel
