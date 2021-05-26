@@ -5,12 +5,12 @@ server <- function(input, output, session) {
     updateCollapse(session, id = "collapse_main", open = "1. About You", close = "Introduction")
   })
   observeEvent(input$next1, {
-    updateCollapse(session, id = "collapse_main", open = "2. Your Health Status", 
+    updateCollapse(session, id = "collapse_main", open = "2. Pre-existing Conditions", 
                    close = "1. About You")
   })
   observeEvent(input$next2, {
     updateCollapse(session, id = "collapse_main", open = "3. Your Behavior", 
-                   close = "2. Your Health Status")
+                   close = "2. Pre-existing Conditions")
   })
   observeEvent(input$next3, {
     updateCollapse(session, id = "collapse_main", open = "4. Your Vaccination Status", 
