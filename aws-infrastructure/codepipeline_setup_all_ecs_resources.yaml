@@ -59,13 +59,6 @@ Metadata:
           Parameters:
             - TargetGroupName
 
-      - Label:
-          default: Manual Approval Configuration
-        Parameters:
-          - ManualApprovalCustomMessage
-          - ReviewURL
-          - SnsNotificationArn
-
 #####################################################################
                        # Mappings 
 #####################################################################
