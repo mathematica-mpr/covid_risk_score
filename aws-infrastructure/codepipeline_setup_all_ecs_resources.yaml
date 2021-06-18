@@ -16,7 +16,6 @@ Metadata:
             - PrivateSubnet2
             - PublicSubnet1
             - PublicSubnet2
-            - SecurityGroup
 
         - Label:
             default: Code build and pipeline configuration
@@ -135,13 +134,9 @@ Parameters:
     NoEcho: true
 
   VpcId:
-    Description: VPC within which security groups and subnets are assigned to ALB
+    Description: VPC id
     Type: AWS::EC2::VPC::Id
 
-  SecurityGroup:
-    Description: Security group that allows codebuild to work within VPC
-    Type: AWS::EC2::SecurityGroup::Id
-  
   PrivateSubnet1:
     Description: Private subnet1 to allow code build access to
     Type: AWS::EC2::Subnet::Id
@@ -409,6 +404,7 @@ Resources:
 
   BuildProject:
     Type: AWS::CodeBuild::Project
+    DependsOn: CodeBuildPolicy
     Properties:
       Name: !Ref CodeBuildProjectName
       ServiceRole: !Ref CodeBuildRole
@@ -426,7 +422,13 @@ Resources:
         - Name: ContainerRepositoryName
           Type: PLAINTEXT
           Value: !GetAtt EcrRepository.RepositoryUri
-
+      VpcConfig:
+        SecurityGroupIds: 
+          - !Ref TaskDefSecurityGroups
+        Subnets:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+        VpcId: !Ref VpcId
 
   CodeBuildRole:
     Type: AWS::IAM::Role
@@ -465,15 +467,6 @@ Resources:
           Resource: "*"
       Roles:
         - !Ref CodeBuildRole
-          
-      VpcConfig:
-        SecurityGroupIds: 
-          - !Ref SecurityGroup
-        Subnets:
-          - !Ref PrivateSubnet1
-          - !Ref PrivateSubnet2
-        VpcId: !Ref VpcId
-    DependsOn: CodeBuildPolicy
 
   CodePipeline:
     Type: AWS::CodePipeline::Pipeline
@@ -534,6 +527,7 @@ Resources:
                 ServiceName: !Ref ECSService
                 FileName: imagedefinitions.json
               RunOrder: 1
+              
   
   PipelineArtifactBucket:  
     Type: AWS::S3::Bucket
@@ -583,7 +577,7 @@ Resources:
             - ecr:DescribeImages
           Resource: "*"
       Roles:
-        - !RefCodePipelineServiceRole
+        - !Ref CodePipelineServiceRole
         
 
 ####################################################################
