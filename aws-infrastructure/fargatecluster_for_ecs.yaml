@@ -26,7 +26,7 @@ Metadata:
             - TaskDefFamily
             - ContainerPort
             - Protocol
-            - ImageURI
+            - imageUri
 
         - Label:
             default: Load balancer configuration
@@ -114,7 +114,7 @@ Parameters:
     Type: Number
     Default: 3838
 
-  ImageURI:
+  imageUri:
     Description: DockerImage URI
     Type: String
 
@@ -334,7 +334,7 @@ Resources:
       ExecutionRoleArn: !Ref ExecutionRole
       ContainerDefinitions:
         - Name: !Sub 'Shiny-Container'
-          Image: !Ref ImageURI
+          Image: !Ref imageUri
           Cpu: 1024
           Memory: 2048
           PortMappings:
