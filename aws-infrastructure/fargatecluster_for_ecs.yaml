@@ -1,0 +1,371 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: This template creates Code pipeline for deploying app on ECS service
+
+#####################################################################
+                       # Metadata 
+#####################################################################
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+        - Label:
+            default: Network configuration
+          Parameters:
+            - VpcId
+            - PrivateSubnet1
+            - PrivateSubnet2
+            - PublicSubnet1
+            - PublicSubnet2
+
+        - Label:
+            default: Docker Container configuration
+          Parameters:
+            - ECSCluster
+            - ECSService
+            - EcrRepoName
+            - TaskDefFamily
+            - ContainerPort
+            - Protocol
+            - ImageURI
+
+        - Label:
+            default: Load balancer configuration
+          Parameters:
+            - LoadBalancerName
+            - LoadBalancerType
+            - LoadBalancerScheme
+            - LoadBalancerIpType
+            - LoadBalancerCertArn
+            - SSLSecurityPolicy
+
+        - Label:
+            default: Target Group configuration
+          Parameters:
+            - TargetGroupName
+
+#####################################################################
+                       # Mappings 
+#####################################################################
+Mappings:
+  LbIpAddressType:
+    externalIP:
+      scheme1: internet-facing
+      addresstype1: ipv4
+
+####################################################################
+                       # PARAMETERS 
+####################################################################
+Parameters:
+  ApplicationName:
+    Description: Name of the application
+    Type: String
+    Default: covid-risk-score
+
+  VpcId:
+    Description: VPC to place the resources
+    Type: AWS::EC2::VPC::Id
+    Default: vpc-0ed5febf0504c32c0
+
+  PrivateSubnet1:
+    Description: Private subnet1 to allow code build access to
+    Type: AWS::EC2::Subnet::Id
+    Default: subnet-0bca08e8921e72f28
+
+  PrivateSubnet2:
+    Description: Private subnet2 to allow code build access to
+    Type: AWS::EC2::Subnet::Id
+    Default: subnet-0159507db3085e954
+
+  PublicSubnet1:
+    Description: Public subnet1 to route the traffic to target
+    Type: AWS::EC2::Subnet::Id
+    Default: subnet-04e1060fd2568f401
+
+  PublicSubnet2:
+    Description: Public subnet2 to route the traffic to target
+    Type: AWS::EC2::Subnet::Id
+    Default: subnet-03493a8fbc7aaf05d
+
+  ECSCluster:
+    Description: ECS Cluster name 
+    Type: String
+    Default: RShinyCluster
+    AllowedPattern: ^[A-Za-z][A-Za-z0-9-]*
+
+  ECSService:
+    Description: ECS Service name
+    Type: String
+    Default: CovidRiskScoreService
+    AllowedPattern: ^[A-Za-z][A-Za-z0-9-]*
+
+  TaskDefFamily:
+    Description: Task Definition Family Name
+    Type: String
+    Default: CovidRiskScoreTaskDef
+    AllowedPattern: ^[A-Za-z][A-Za-z0-9-]*
+    
+  EcrRepoName:
+    Description: Docker container repository name
+    Type: String
+    Default: covid-risk-score
+
+  ContainerPort:
+    Description: Dafault docker container Port exposed
+    Type: Number
+    Default: 3838
+
+  ImageURI:
+    Description: DockerImage URI
+    Type: String
+
+  Protocol:
+    Description: Protocol used for  PortMappings
+    Type: String
+    Default: tcp
+
+  LoadBalancerName:
+    Description: Load balancer name
+    Type: String
+    Default: CovidRiskScoreLB
+    AllowedPattern: ^[A-Za-z][A-Za-z0-9-]*
+  
+  LoadBalancerType:
+    Description: Choose the load balancer Type
+    Type: String
+    Default: application
+    AllowedValues:
+      - application
+
+  LoadBalancerScheme:
+    Description: Indicates if the load balancer in front of the ECS service is external
+    Type: String
+    Default: externalIP
+    AllowedValues:
+      - externalIP
+
+  LoadBalancerCertArn:
+    Description: Provide loadbalancer certificate ARN(optional) to associate with load balancer
+    Type: String
+    Default: arn:aws:acm:us-east-1:${AWS:Region}:certificate/bbf62eb3-0bcb-4400-b8a5-ec7a836cba0a
+
+  SSLSecurityPolicy:
+    Description: SSL security policy
+    Type: String
+    AllowedValues:
+      - ELBSecurityPolicy-FS-1-2-2019-08
+      - ELBSecurityPolicy-FS-1-2-Res-2020-10
+      - ELBSecurityPolicy-FS-1-1-Res-2019-08
+      - ELBSecurityPolicy-FS-1-2-Res-2019-08
+    Default: ELBSecurityPolicy-FS-1-2-Res-2020-10
+    
+  TargetGroupName:
+    Description: Target group name
+    Type: String
+    Default: CovidRiskScoreTG
+    AllowedPattern: ^[A-Za-z][A-Za-z0-9-]*
+
+#####################################################################
+                       # CONDITIONS 
+#####################################################################
+
+Conditions:
+  LoadBalancerCertificateArn: !Not [!Equals [!Ref LoadBalancerCertArn, '']]
+    
+###################################################################
+                       # RESOURCES 
+#####################################################################
+Resources:
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    DependsOn: [DefaultTargetGroup, AlbSecurityGroups]
+    Properties:
+      Name: !Ref LoadBalancerName
+      Type: !Ref LoadBalancerType
+      Scheme: !FindInMap [LbIpAddressType,!Ref LoadBalancerScheme, scheme1]
+      IpAddressType: !FindInMap [LbIpAddressType,!Ref LoadBalancerScheme, addresstype1]
+      Subnets: 
+        - !Ref PublicSubnet1
+        - !Ref PublicSubnet2
+      SecurityGroups: 
+        - !Ref AlbSecurityGroups
+      
+  HttpListener:
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Properties:
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: redirect
+          RedirectConfig:
+            Protocol: "HTTPS"
+            Port: "443"
+            Host: "#{host}"
+            Path: "/#{path}"
+            Query: "#{query}"
+            StatusCode: "HTTP_301"        
+      
+  HttpsListener:
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Condition: LoadBalancerCertificateArn
+    Properties:
+      Certificates:
+        - CertificateArn: !Ref LoadBalancerCertArn
+      DefaultActions:
+        - TargetGroupArn: !Ref DefaultTargetGroup
+          Type: forward
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 443
+      Protocol: HTTPS
+      SslPolicy: !Ref SSLSecurityPolicy
+
+  DefaultTargetGroup: 
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+    Properties:
+      Name: !Ref TargetGroupName
+      HealthCheckIntervalSeconds: 15
+      HealthCheckPath: '/'
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 10
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 2
+      Matcher:
+        HttpCode: 200
+      Port: !Ref ContainerPort
+      Protocol: HTTP
+      VpcId: !Ref VpcId
+      TargetType: ip
+      TargetGroupAttributes:
+      - Key: deregistration_delay.timeout_seconds
+        Value: 300
+      - Key : stickiness.enabled
+        Value: true
+ 
+  AlbSecurityGroups:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow HTTP and HTTPs inbound from everywhere
+      GroupName: AllowHTTPAndHTTPs
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+  EcrRepository: 
+    Type: AWS::ECR::Repository
+    Properties: 
+      RepositoryName: !Ref EcrRepoName
+
+  EcsCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Ref ECSCluster
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
+
+  EcsService:
+    Type: AWS::ECS::Service
+    DependsOn: [LoadBalancer, HttpsListener, TaskDefinition]
+    Properties:
+      LaunchType: FARGATE
+      Cluster:  !Ref EcsCluster
+      TaskDefinition: !Ref TaskDefinition
+      ServiceName: !Ref ECSService
+      SchedulingStrategy: REPLICA
+      DeploymentConfiguration: 
+        MaximumPercent: 200
+        MinimumHealthyPercent: 100
+      DesiredCount: 1
+      HealthCheckGracePeriodSeconds: 300
+      LoadBalancers:
+        - ContainerName: !Sub 'Shiny-Container'
+          ContainerPort: !Ref ContainerPort
+          TargetGroupArn: !Ref DefaultTargetGroup
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups: 
+              - !Ref TaskDefSecurityGroups
+          Subnets:
+              - !Ref PrivateSubnet1
+              - !Ref PrivateSubnet2
+              
+  EcsAutoScaling:
+    Type: AWS::AutoScalingPlans::ScalingPlan
+    DependsOn: EcsService
+    Properties:
+      ApplicationSource:
+        TagFilters:
+          - Key: !Sub '{ApplicationName}-AutoScaling'
+            Values:
+              - RshinyServiceAutoScale
+      ScalingInstructions:
+        - MaxCapacity: 10
+          MinCapacity: 1
+          ScalableDimension: ecs:service:DesiredCount
+          ServiceNamespace: ecs
+          ResourceId: !Join ['/', [service, !Ref ECSCluster, !Ref ECSService ] ]
+          TargetTrackingConfigurations:
+            - PredefinedScalingMetricSpecification:
+                PredefinedScalingMetricType: ALBRequestCountPerTarget
+              TargetValue: 50
+              ScaleOutCooldown: 60
+              ScaleInCooldown: 300
+
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    DependsOn: ExecutionRole
+    Properties:
+      Family: !Ref TaskDefFamily
+      Memory: 2048
+      Cpu: 1024
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+      - 'FARGATE'
+      # TaskRoleArn: None
+      ExecutionRoleArn: !Ref ExecutionRole
+      ContainerDefinitions:
+        - Name: !Sub 'Shiny-Container'
+          Image: !Ref ImageURI
+          Cpu: 1024
+          Memory: 2048
+          PortMappings:
+            - ContainerPort: !Ref ContainerPort
+              Protocol: !Ref Protocol
+
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub 'MathRole-ECSExecutionRole'
+      PermissionsBoundary: !Sub arn:aws:iam::${AWS::AccountId}:policy/Math-Boundary-Policy
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: 
+                - ecs-tasks.amazonaws.com
+            Action: 
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+
+  TaskDefSecurityGroups:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow container port to access the app exposed to docker container port
+      GroupName: RshinySecGroup
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: !Ref ContainerPort
+          ToPort: !Ref ContainerPort
+          SourceSecurityGroupId: !Ref AlbSecurityGroups

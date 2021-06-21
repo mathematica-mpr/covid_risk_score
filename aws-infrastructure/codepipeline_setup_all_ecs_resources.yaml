@@ -149,7 +149,7 @@ Parameters:
   ECSCluster:
     Description: ECS Cluster name 
     Type: String
-    Default: R shiny cluster
+    Default: RShinyCluster
     AllowedPattern: ^[A-Za-z][A-Za-z0-9-]*
 
   ECSService:
