@@ -14,7 +14,7 @@ phases:
     commands:
       - echo Building the Docker image...
       - export apiKey= X_API_KEY
-      - paramname= $(aws ssm get-parameter --name apiKey  --query "Parameter.Name" --output text)
+      - paramname= $(aws ssm get-parameter --name $apiKey  --query "Parameter.Name" --output text)
       - paramvalue= $(aws ssm get-parameter --name $apiKey --query "Parameter.Value" --output text)
       - result=${paramname}=${paramvalue} > .Renviron
       - docker build -f web.Dockerfile -t $REPOSITORY_URI:latest .
