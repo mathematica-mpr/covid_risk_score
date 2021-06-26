@@ -8,7 +8,7 @@ disclaimerpopupHTML <- function(){
     tags$p(style="color:#DF691A", "THE INFORMATION PROVIDED BY THIS TOOL IS NOT MEDICAL ADVICE AND CANNOT BE 
              USED TO DIAGNOSE OR TREAT ANY MEDICAL CONDITION.  See FAQ for more information.", class = "text-warning"),
     tags$p("COVID data behind this app is updated daily - last updated:", format(Sys.Date()-2, "%b %d, %Y"), class = "text-warning"),
-    tags$p("Our algorithm is updated periodically - last updated: May 26, 2021", class = "text-warning")
+    tags$p("Our algorithm is updated periodically - last updated: June 17, 2021", class = "text-warning")
   )
 }
 
@@ -68,7 +68,7 @@ renderMethodsHtml <- function() {
               "and ",
               tags$a("Jefferson et al (2008). ", href = urls$jefferson_etal_2008),
               "Without randomized trials, these systematic appraisals of the current best available evidence are useful to inform interim guidance. "),
-      tags$li("The efficacy rates of the Pfizer-BioNTech, Moderna, and Johnson and Johnson COVID-19 vaccines were obtained from FDA Emergency Use Authorization fact sheets ",
+      tags$li("The efficacy data of the Pfizer-BioNTech, Moderna, and Johnson and Johnson COVID-19 vaccines against infection were obtained from FDA Emergency Use Authorization fact sheets ",
               tags$a("FDA (2020a) ", href = urls$pfizer_eua_2020),
               ", ",
               tags$a("FDA (2020b) ", href = urls$moderna_eua_2020),
@@ -78,7 +78,11 @@ renderMethodsHtml <- function() {
               "We incorporated the efficacy data on the first dose published by ",
               tags$a("Polack et al (2020) ", href = urls$polack_etal_2020),
               "and ",
-              tags$a("FDA (2020c). ", href = urls$moderna_fda_2020)),
+              tags$a("FDA (2020c). ", href = urls$moderna_fda_2020),
+              "Based on a recent large scale study in older adults in England ",
+              tags$a("(Bernal et al 2021), ", href = urls$bernal_etal_2021),
+              "we estimated the effectiveness of vaccine against emergency hospital admissions and mortality. 
+              This is an imperfect proxy, and we will keep monitoring the literature and update the calculation as more data on other population segments become available. "),
       tags$li("Activity risk levels for COVID-19 are based on a professional review panel completed by ", 
               tags$a("BellAge", href = urls$bellage_activity_chart), 
               ". To provide 19 and Me users with a general idea of how different activities affect risk of COVID-19 through community exposure,
@@ -130,7 +134,6 @@ renderMethodsHtml <- function() {
       tags$p("We are continuously working to update these assumptions as additional knowledge about the virus becomes available."),
       tags$p("Below are some COVID-19 developments we are monitoring closely and are looking to incoporate into the methodology as data become available."),
       tags$ul(
-        tags$li("Efficacy of vaccines at preventing severe COVID-19 outcomes including hospitalization, ICU admission, and death."),
         tags$li("Risk of ", tags$a("post-COVID conditions", href = urls$cdc_post_covid_conditions), "for people with similar characteristics and behaviors as you")
       ), # end of ul
       tags$br(),
@@ -205,18 +208,16 @@ renderFaqHtml <- function() {
     faqQuestion("When you report 'probability of catching COVID-19 through community transmission', over what period of time does this refer to? Is this XX% chance per day?"),
     tags$p("We calculate the probability of community transmission as a function of the number of close contacts in a week and",
            "prevalence in your local community, so this is a weekly probability."),
-    faqQuestion("My hospitalization/ICU/death risk seems out of whack."),
-    tags$p("A lot is still unknown about the disease, and data sets are sparse, so our susceptibility scores are",
-           "good for ballpark estimates only. We'll update our tool with better numbers as they become available."),
     faqQuestion("Why is pregnancy added to the list of underlying conditions"),
-    tags$p("COVID-19 is a new disease. CDC recently revised its recommendations and started to suggest pregnancy increases the risks",
+    tags$p("CDC recently revised its recommendations and started to suggest pregnancy increases the risks",
            "of severe COVID-19 illness. Therefore we revised the list of medical conditions. ",
            "Odds ratio related to pregnancy was obtained from ",
            tags$a("Zambrano et al (2020) .", href = urls$zambrano)),
     faqQuestion("When was the most recent update to the app and what is new?"),
     tags$p("The COVID-19 data behind this app is updated daily. We periodically update the algorithm used for risk score estimation.",
-           " The most recent update to the algorithm was on May 26, 2021. We made the following major changes:"),
+           " The most recent update to the algorithm was on June 17, 2021. We made the following major changes:"),
     tags$ol(
+      tags$li("Add the vaccine efficacy against emergency hospital admission and death us based on a recent large scale study from the UK ", tags$a("(Bernal et al 2021). ", href = urls$bernal_etal_2021)),
       tags$li("Update the risk factors for severe COVID-19 illness based on the latest ", tags$a("CDC guidance (2021). ", href = urls$cdc_medicalconditions)),
       tags$li("Add the vaccine efficacy data for the three vaccine approved in the US: Pfizer-BioNTech, Moderna, and Johnson & Johnson."),
       tags$li("Add risk of COVID-19 explosure from activities"),
