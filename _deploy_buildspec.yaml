@@ -16,7 +16,7 @@ phases:
       - export apiKey=X_API_KEY
       - paramname=$(aws ssm get-parameter --name $apiKey  --query "Parameter.Name" --output text)
       - paramvalue=$(aws ssm get-parameter --name $apiKey --query "Parameter.Value" --output text)
-      - result=${paramname}=${paramvalue} > .Renviron
+      - result=${paramname} = ${paramvalue} > .Renviron
       - docker build -f web.Dockerfile -t $REPOSITORY_URI:latest .
       - echo Tagging the Docker image...
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
