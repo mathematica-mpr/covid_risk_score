@@ -17,8 +17,7 @@ phases:
       - paramname=$(aws ssm get-parameter --name $apiKey  --query "Parameter.Name" --output text)
       - paramvalue=$(aws ssm get-parameter --name $apiKey --query "Parameter.Value" --output text)
       - result=${paramname}=${paramvalue}
-      - echo $result >.Renviron 
-      - cat .Renviron | tr -d "\n"
+      - echo $result >.Renviron | tr -d "\n\r"
     
    #   - docker build -f web.Dockerfile -t $REPOSITORY_URI:latest .
    #   - echo Tagging the Docker image...
