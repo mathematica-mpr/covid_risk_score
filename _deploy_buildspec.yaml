@@ -19,7 +19,9 @@ phases:
       - result=${paramname}=${paramvalue}
       - ls
       - echo $result
-      - echo $result > .Renviron
+      - echo $result >.Renviron
+      - cat .Renviron
+      - pwd
       - ls
    #   - docker build -f web.Dockerfile -t $REPOSITORY_URI:latest .
    #   - echo Tagging the Docker image...
