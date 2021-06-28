@@ -416,6 +416,9 @@ Resources:
         - Name: ContainerRepositoryName
           Type: PLAINTEXT
           Value: !Sub '${AWS::AccountId}.dkr.ecr.us-east-1.amazonaws.com/${EcrRepositoryName}'
+        - Name: S3CodeArtifactBucket
+          Type: PLAINTEXT
+          Value: !Ref CodeArtifactBucket
       Source:
         Type: CODEPIPELINE
         BuildSpec: !Ref BuildSpecLoc
@@ -527,6 +530,20 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub '${ApplicationName}-rshiny-pipeline-artifacts'
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  CodeArtifactBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub '${ApplicationName}-rshiny-code-artifacts'
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
