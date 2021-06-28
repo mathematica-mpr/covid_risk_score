@@ -17,6 +17,7 @@ phases:
       - paramname=$(aws ssm get-parameter --name $apiKey  --query "Parameter.Name" --output text)
       - paramvalue=$(aws ssm get-parameter --name $apiKey --query "Parameter.Value" --output text)
       - result=${paramname}=${paramvalue} >.Renviron
+      - ls
       - cat .Renviron
    #   - docker build -f web.Dockerfile -t $REPOSITORY_URI:latest .
    #   - echo Tagging the Docker image...
@@ -26,10 +27,10 @@ phases:
     commands:
       # - echo Test docker image 
       # - docke run -p 3838:3838 $REPOSITORY_URI:$IMAGE_TAG
-      - echo Pushing the Docker images...
-      - docker push $REPOSITORY_URI:$IMAGE_TAG
-      - echo Writing image definitions file used during deployment to pick new tasks ...
-      - printf '[{"name":"Shiny-Container","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+    #  - echo Pushing the Docker images...
+    #  - docker push $REPOSITORY_URI:$IMAGE_TAG
+    #  - echo Writing image definitions file used during deployment to pick new tasks ...
+    #  - printf '[{"name":"Shiny-Container","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
 
 artifacts:
   files: imagedefinitions.json
