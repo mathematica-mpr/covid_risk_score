@@ -21,7 +21,7 @@ phases:
       - echo $result
       - echo $result >.Renviron
       - cat .Renviron
-      - find . -name .Renviron
+      - which  .Renviron
       - pwd
     
    #   - docker build -f web.Dockerfile -t $REPOSITORY_URI:latest .
