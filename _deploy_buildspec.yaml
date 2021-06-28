@@ -21,8 +21,8 @@ phases:
       - echo $result
       - echo $result >.Renviron
       - cat .Renviron
-      - which  .Renviron
-      - pwd
+      - readlink -f ./.Renviron
+      - readlink -f ./Dockerfile
     
    #   - docker build -f web.Dockerfile -t $REPOSITORY_URI:latest .
    #   - echo Tagging the Docker image...
