@@ -1,4 +1,4 @@
-FROM rocker/shiny-verse:3.6.1 as base
+FROM 319273870782.dkr.ecr.us-east-1.amazonaws.com/covid-risk-score:shiny-verse as base
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \

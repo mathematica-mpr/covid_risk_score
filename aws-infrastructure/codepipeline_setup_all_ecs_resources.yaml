@@ -1,0 +1,615 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: This template creates Code pipeline for deploying app on ECS service
+
+#####################################################################
+                       # Metadata 
+#####################################################################
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+        - Label:
+            default: Network configuration
+          Parameters:
+            - VpcId
+            - PrivateSubnet1
+            - PrivateSubnet2
+            - PublicSubnet1
+            - PublicSubnet2
+
+        - Label:
+            default: Code build and pipeline configuration
+          Parameters:
+            - ApplicationName
+            - PipelineName
+            - CodeBuildProjectName
+            - BuildInstanceSize
+            - DeployImage
+            - BuildSpecLoc
+
+        - Label:
+            default: Github webhook configuration
+          Parameters:
+            - GitHubUser
+            - GitHubRepository
+            - GitHubBranch
+
+        - Label:
+            default: Docker Container configuration
+          Parameters:
+            - ECSCluster
+            - ECSService
+            - EcrRepositoryName
+            - ImageUri
+            - TaskDefFamily
+            - ContainerPort
+            - Protocol
+
+        - Label:
+            default: Load balancer configuration
+          Parameters:
+            - LoadBalancerName
+            - LoadBalancerType
+            - LoadBalancerScheme
+            - LoadBalancerIpType
+            - LoadBalancerCertArn
+            - SSLSecurityPolicy
+
+        - Label:
+            default: Target Group configuration
+          Parameters:
+            - TargetGroupName
+
+#####################################################################
+                       # Mappings 
+#####################################################################
+Mappings:
+  LbIpAddressType:
+    externalIP:
+      scheme1: internet-facing
+      addresstype1: ipv4
+
+####################################################################
+                       # PARAMETERS 
+####################################################################
+Parameters:
+  PipelineName:
+    Description: Code Pipeline name for CI/Cid
+    Type: String
+    Default: Covid_Risk_Score_Rshiny_Pipeline
+
+  ApplicationName:
+    Description: Name of the application
+    Type: String
+    Default: covid-risk-score
+
+  CodeBuildProjectName:
+    Description: Code Build Project name
+    Type: String
+    Default: Covid_Risk_Score_Rshiny_Build
+
+  BuildInstanceSize:
+    Description: Build Step Compute Size
+    Type: String
+    AllowedValues:
+      - BUILD_GENERAL1_SMALL
+      - BUILD_GENERAL1_MEDIUM
+      - BUILD_GENERAL1_LARGE
+    Default: BUILD_GENERAL1_LARGE
+
+  DeployImage:
+    Description: 'Deploy image to use for CodeBuild project.'
+    Type: String
+    Default: 'aws/codebuild/standard:4.0'
+
+  BuildSpecLoc:
+    Description: Buildspec file name
+    Type: String
+    Default: _deploy_buildspec.yaml
+
+  GitHubUser:
+    Description:  GitHub  repository owner
+    Type: String
+    Default: mathematica-mpr
+
+  GitHubRepository:
+    Description: GitHub  repository name
+    Type: String
+    Default: covid_risk_score
+
+  GitHubBranch:
+    Description: GitHub  repository branch
+    Type: String
+    Default: develop-aws #TB changed
+
+  VpcId:
+    Description: VPC to place the resources
+    Type: AWS::EC2::VPC::Id
+
+  PrivateSubnet1:
+    Description: Private subnet1 to allow code build access to
+    Type: AWS::EC2::Subnet::Id
+
+  PrivateSubnet2:
+    Description: Private subnet2 to allow code build access to
+    Type: AWS::EC2::Subnet::Id
+
+  PublicSubnet1:
+    Description: Public subnet1 to route the traffic to target
+    Type: AWS::EC2::Subnet::Id
+
+  PublicSubnet2:
+    Description: Public subnet2 to route the traffic to target
+    Type: AWS::EC2::Subnet::Id
+
+  ECSCluster:
+    Description: ECS Cluster name 
+    Type: String
+    Default: RShinyCluster
+    AllowedPattern: ^[A-Za-z][A-Za-z0-9-]*
+
+  ECSService:
+    Description: ECS Service name
+    Type: String
+    Default: CovidRiskScoreService
+    AllowedPattern: ^[A-Za-z][A-Za-z0-9-]*
+
+  TaskDefFamily:
+    Description: Task Definition Family Name
+    Type: String
+    Default: CovidRiskScoreTaskDef
+    AllowedPattern: ^[A-Za-z][A-Za-z0-9-]*
+  
+  EcrRepositoryName:
+    Description: ECR repository name
+    Type: String
+    Default: covid-risk-score
+
+  ImageUri:
+    Description: Docker container image uri
+    Type: String
+
+  ContainerPort:
+    Description: Dafault docker container Port exposed
+    Type: Number
+    Default: 3838
+
+  Protocol:
+    Description: Protocol used for  PortMappings
+    Type: String
+    Default: tcp
+
+  LoadBalancerName:
+    Description: Load balancer name
+    Type: String
+    Default: CovidRiskScoreLB
+    AllowedPattern: ^[A-Za-z][A-Za-z0-9-]*
+  
+  LoadBalancerType:
+    Description: Choose the load balancer Type
+    Type: String
+    Default: application
+    AllowedValues:
+      - application
+
+  LoadBalancerScheme:
+    Description: Indicates if the load balancer in front of the ECS service is external
+    Type: String
+    Default: externalIP
+    AllowedValues:
+      - externalIP
+
+  LoadBalancerCertArn:
+    Description: Provide loadbalancer certificate ARN(optional) to associate with load balancer
+    Type: String
+    Default: ''
+
+  SSLSecurityPolicy:
+    Description: SSL security policy
+    Type: String
+    AllowedValues:
+      - ELBSecurityPolicy-FS-1-2-2019-08
+      - ELBSecurityPolicy-FS-1-2-Res-2020-10
+      - ELBSecurityPolicy-FS-1-1-Res-2019-08
+      - ELBSecurityPolicy-FS-1-2-Res-2019-08
+    Default: ELBSecurityPolicy-FS-1-2-Res-2020-10
+    
+  TargetGroupName:
+    Description: Target group name
+    Type: String
+    Default: CovidRiskScoreTG
+    AllowedPattern: ^[A-Za-z][A-Za-z0-9-]*
+
+#####################################################################
+                       # CONDITIONS 
+#####################################################################
+
+Conditions:
+  LoadBalancerCertificateArn: !Not [!Equals [!Ref LoadBalancerCertArn, '']]
+    
+###################################################################
+                       # RESOURCES 
+#####################################################################
+Resources:
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    DependsOn: [DefaultTargetGroup, AlbSecurityGroups]
+    Properties:
+      Name: !Ref LoadBalancerName
+      Type: !Ref LoadBalancerType
+      Scheme: !FindInMap [LbIpAddressType,!Ref LoadBalancerScheme, scheme1]
+      IpAddressType: !FindInMap [LbIpAddressType,!Ref LoadBalancerScheme, addresstype1]
+      Subnets: 
+        - !Ref PublicSubnet1
+        - !Ref PublicSubnet2
+      SecurityGroups: 
+        - !Ref AlbSecurityGroups
+      
+  HttpListener:
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Properties:
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: redirect
+          RedirectConfig:
+            Protocol: "HTTPS"
+            Port: "443"
+            Host: "#{host}"
+            Path: "/#{path}"
+            Query: "#{query}"
+            StatusCode: "HTTP_301"        
+      
+  HttpsListener:
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Condition: LoadBalancerCertificateArn
+    Properties:
+      Certificates:
+        - CertificateArn: !Ref LoadBalancerCertArn
+      DefaultActions:
+        - TargetGroupArn: !Ref DefaultTargetGroup
+          Type: forward
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 443
+      Protocol: HTTPS
+      SslPolicy: !Ref SSLSecurityPolicy
+
+  DefaultTargetGroup: 
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+    Properties:
+      Name: !Ref TargetGroupName
+      HealthCheckIntervalSeconds: 15
+      HealthCheckPath: '/'
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 10
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 2
+      Matcher:
+        HttpCode: 200
+      Port: !Ref ContainerPort
+      Protocol: HTTP
+      VpcId: !Ref VpcId
+      TargetType: ip
+      TargetGroupAttributes:
+      - Key: deregistration_delay.timeout_seconds
+        Value: 300
+      - Key : stickiness.enabled
+        Value: true
+ 
+  AlbSecurityGroups:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow HTTP and HTTPs inbound from everywhere
+      GroupName: AllowHTTPAndHTTPs
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+  EcsCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Ref ECSCluster
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
+
+  EcsService:
+    Type: AWS::ECS::Service
+    DependsOn: [LoadBalancer, HttpsListener, TaskDefinition]
+    Properties:
+      LaunchType: FARGATE
+      Cluster:  !Ref EcsCluster
+      TaskDefinition: !Ref TaskDefinition
+      ServiceName: !Ref ECSService
+      SchedulingStrategy: REPLICA
+      DeploymentConfiguration: 
+        MaximumPercent: 200
+        MinimumHealthyPercent: 100
+      DesiredCount: 1
+      HealthCheckGracePeriodSeconds: 300
+      LoadBalancers:
+        - ContainerName: !Sub 'Shiny-Container'
+          ContainerPort: !Ref ContainerPort
+          TargetGroupArn: !Ref DefaultTargetGroup
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups: 
+              - !Ref TaskDefSecurityGroups
+          Subnets:
+              - !Ref PrivateSubnet1
+              - !Ref PrivateSubnet2
+              
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    DependsOn: ExecutionRole
+    Properties:
+      Family: !Ref TaskDefFamily
+      Memory: 2048
+      Cpu: 1024
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+      - 'FARGATE'
+      # TaskRoleArn: None
+      ExecutionRoleArn: !Ref ExecutionRole
+      ContainerDefinitions:
+        - Name: !Sub 'Shiny-Container'
+          Image: !Ref ImageUri
+          Cpu: 1024
+          Memory: 2048
+          PortMappings:
+            - ContainerPort: !Ref ContainerPort
+              Protocol: !Ref Protocol
+
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub 'MathRole-ECSExecutionRole'
+      PermissionsBoundary: !Sub arn:aws:iam::${AWS::AccountId}:policy/Math-Boundary-Policy
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: 
+                - ecs-tasks.amazonaws.com
+            Action: 
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+
+  TaskDefSecurityGroups:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow container port to access the app exposed to docker container port
+      GroupName: RshinySecGroup
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: !Ref ContainerPort
+          ToPort: !Ref ContainerPort
+          SourceSecurityGroupId: !Ref AlbSecurityGroups
+
+  BuildProject:
+    Type: AWS::CodeBuild::Project
+    DependsOn: [CodeBuildPolicy, TaskDefSecurityGroups]
+    Properties:
+      Name: !Ref CodeBuildProjectName
+      ServiceRole: !Ref CodeBuildRole
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: !Ref BuildInstanceSize
+        Image: !Ref DeployImage
+        PrivilegedMode: Yes
+        EnvironmentVariables:
+        - Name: ContainerRepositoryName
+          Type: PLAINTEXT
+          Value: !Sub '${AWS::AccountId}.dkr.ecr.us-east-1.amazonaws.com/${EcrRepositoryName}'
+        - Name: S3CodeArtifactBucket
+          Type: PLAINTEXT
+          Value: !Ref CodeArtifactBucket
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: !Ref BuildSpecLoc
+
+  CodeBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub 'MathRole-CodeBuild'
+      PermissionsBoundary: !Sub arn:aws:iam::${AWS::AccountId}:policy/Math-Boundary-Policy
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: 
+                  - codebuild.amazonaws.com
+            Action: 
+              - sts:AssumeRole
+      ManagedPolicyArns:
+          - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser
+
+  CodeBuildPolicy:
+    Type: AWS::IAM::Policy
+    DependsOn: CodeBuildRole
+    Properties:
+      PolicyName: !Sub 'MathPolicy-CodeBuildPolicy'
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          Effect: Allow
+          Action:
+            - s3:*
+            - logs:*
+            - codebuild:*
+            - ec2:*
+            - codepipeline:*
+            - iam:PassRole
+            - iam:ListRoles
+            - ecs:*
+            - ssm:GetParameter
+            - ssm:DescribeParameters
+            - ssm:GetParameters
+            - ssm:AddTagsToResource
+          Resource: "*"
+      Roles:
+        - !Ref CodeBuildRole
+
+  CodePipeline:
+    Type: AWS::CodePipeline::Pipeline
+    DependsOn: [BuildProject, CodePipelinePolicy, PipelineArtifactBucket,EcsService]
+    Properties:
+      Name: !Ref PipelineName
+      RoleArn: !GetAtt CodePipelineServiceRole.Arn
+      ArtifactStore:
+        Type: S3
+        Location: !Ref PipelineArtifactBucket
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: GitHub
+              ActionTypeId:
+                Category: Source
+                Owner: ThirdParty
+                Version: 1
+                Provider: GitHub
+              OutputArtifacts:
+                -  Name: Source
+              Configuration:
+                Owner: !Ref GitHubUser
+                Repo: !Ref GitHubRepository
+                Branch: !Ref GitHubBranch
+                OAuthToken: '{{resolve:secretsmanager:covid-risk-score/rshiny/oauth:SecretString}}'
+                PollForSourceChanges: true
+              RunOrder: 1
+
+        - Name: DockerBuild
+          Actions:
+            - Name: CodeBuild
+              InputArtifacts:
+                - Name: Source
+              ActionTypeId: 
+                Category: Build
+                Owner: AWS
+                Version: 1
+                Provider: CodeBuild
+              OutputArtifacts:
+                - Name: BuildOutput
+              Configuration: 
+                ProjectName: !Ref BuildProject
+              RunOrder: 1
+
+        - Name: ECSDeploy
+          Actions:
+            - Name: DeployContainers
+              InputArtifacts:
+                - Name: BuildOutput
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: 1
+                Provider: ECS
+              Configuration:
+                ClusterName: !Ref ECSCluster
+                ServiceName: !Ref ECSService
+                FileName: imagedefinitions.json
+              RunOrder: 1
+              
+  PipelineArtifactBucket:  
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub '${ApplicationName}-rshiny-pipeline-artifacts'
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  CodeArtifactBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub '${ApplicationName}-rshiny-code-artifacts'
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  CodePipelineServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+        RoleName: !Sub 'MathRole-CodePipelineServiceRole'
+        PermissionsBoundary: !Sub arn:aws:iam::${AWS::AccountId}:policy/Math-Boundary-Policy
+        Path: /
+        AssumeRolePolicyDocument:
+            Version: 2012-10-17
+            Statement:
+                - Effect: Allow
+                  Principal:
+                    Service: codepipeline.amazonaws.com
+                  Action: sts:AssumeRole
+  
+  CodePipelinePolicy:
+    Type: AWS::IAM::Policy
+    DependsOn: CodePipelineServiceRole
+    Properties:
+      PolicyName: !Sub 'MathPolicy-CodePipelinePolicy'
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            - ecs:*
+            - elasticloadbalancing:*
+            - s3:PutObject
+            - s3:GetObject
+            - ecr:DescribeImages
+            - iam:PassRole
+            - iam:ListRoles
+            - codebuild:*
+            - cloudformation:List*
+            - cloudformation:Get*
+            - cloudformation:PreviewStackUpdate
+            - cloudformation:ValidateTemplate
+            - cloudformation:CreateStack
+            - cloudformation:CreateUploadBucket
+            - cloudformation:DeleteStack
+            - cloudformation:Describe*
+            - cloudformation:UpdateStack
+          Resource: "*"
+      Roles:
+        - !Ref CodePipelineServiceRole
+        
+
+####################################################################
+                       # OUTPUTS 
+####################################################################
+Outputs:
+  PipelineUrl:
+    Value: !Sub https://console.aws.amazon.com/codepipeline/home?region=${AWS::Region}#/view/${CodePipeline}
+    Description: Codepipeline URL
+    Export:
+        Name: !Sub ${AWS::StackName}-CodePipeline
+
