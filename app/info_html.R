@@ -7,7 +7,7 @@ disclaimerpopupHTML <- function(){
     tags$p("Your use of this tool is subject to these ", tags$a("Terms of Use.", href="https://19andme-pub-0812304701987.s3.amazonaws.com/COVID-19+Risk+Calculator+Terms+of+Use+-+042220.pdf")),
     tags$p(style="color:#DF691A", "THE INFORMATION PROVIDED BY THIS TOOL IS NOT MEDICAL ADVICE AND CANNOT BE 
              USED TO DIAGNOSE OR TREAT ANY MEDICAL CONDITION.  See FAQ for more information.", class = "text-warning"),
-    tags$p("COVID data behind this app is updated daily - last updated:", format(Sys.Date()-2, "%b %d, %Y"), class = "text-warning"),
+    tags$p("COVID-19 data behind this app is updated daily - last updated:", format(Sys.Date()-2, "%b %d, %Y"), class = "text-warning"),
     tags$p("Our algorithm is updated periodically - last updated: June 17, 2021", class = "text-warning")
   )
 }
@@ -38,8 +38,8 @@ renderMethodsHtml <- function() {
         tags$a("the USAFacts published data on COVID-19 cases & deaths ", href = urls$usafacts_data),
         " and the average length of sickness reported by ", 
         tags$a("Wolfel et al (2020)", href = urls$wolfer_etall_2020), " and the ",
-        tags$a("COVID Symptom Study. ", href = urls$covid_symptom_study), 
-        "USAFacts reports all Kansas city cases under Jackson County, MO even though three other counties overlap Kansas City, ", 
+        tags$a("COVID-19 Symptom Study. ", href = urls$covid_symptom_study), 
+        "USAFacts reports all Kansas City cases under Jackson County, MO even though three other counties overlap Kansas City, ", 
         "so we report cases for all four of these counties aggregated together into 'Kansas City and surrounding counties'."),
       tags$li(
         "Due to rapid spread and insufficient testing during the COVID-19 pandemic, there are likely additional unreported cases beyond the 
@@ -104,7 +104,7 @@ renderMethodsHtml <- function() {
       ),
       tags$li("Estimations of risk factors associated with sex and underlying medical conditions were obtained from multiple studies. ", 
               "Odds ratios are adjusted for age, sex, and other underlying conditions. ", 
-              "When an odds ratio is below 1 with a confidence interval containing 1, we round up to 1 so that no chronic conditions will decrease the COVID risk score",
+              "When an odds ratio is below 1 with a confidence interval containing 1, we round up to 1 so that no chronic conditions will decrease the COVID-19 risk score",
               "When no odds ratio is available for a given condition and outcome, ",
               "we use the same odds ratio as for another outcome (ex. use the same odds ratio for hospitalization and ICU risk). ",
               "In selecting studies to include, we prioritize large, US-based studies that are peer-reviewed and published in distinguished journals like Lancet, Nature, NEJM. ",
@@ -132,9 +132,9 @@ renderMethodsHtml <- function() {
     tags$h4("In the Works:"),
     tags$ul(
       tags$p("We are continuously working to update these assumptions as additional knowledge about the virus becomes available."),
-      tags$p("Below are some COVID-19 developments we are monitoring closely and are looking to incoporate into the methodology as data become available."),
+      tags$p("Below are some COVID-19 developments we are monitoring closely and are looking to incorporate into the methodology as data become available."),
       tags$ul(
-        tags$li("Risk of ", tags$a("post-COVID conditions", href = urls$cdc_post_covid_conditions), "for people with similar characteristics and behaviors as you")
+        tags$li("Risk of ", tags$a("post-COVID-19 conditions", href = urls$cdc_post_covid_conditions), "for people with similar characteristics and behaviors as you")
       ), # end of ul
       tags$br(),
       tags$p("If you have additional suggestions about the app, data sets, or features, Please let us know at", 
@@ -158,14 +158,14 @@ renderFaqHtml <- function() {
                 used to diagnose or treat any medical condition, so how should I best use the information provided 
                 by the tool?"),
     tags$p("This tool provides you with an estimation of your personal susceptibility or risk of contracting 
-           COVID 19 based on the information you input into the tool.  We believe that having this information 
+           COVID-19 based on the information you input into the tool.  We believe that having this information 
            can help you make better decisions when going about your daily activities.  Whatever your personal 
-           risk of contracting COVID 19 may be, you should always follow the ", 
+           risk of contracting COVID-19 may be, you should always follow the ", 
            tags$a("CDC’s guidelines", href="https://www.cdc.gov/coronavirus/2019-ncov/communication/guidance-list.html?Sort=Date%3A%3Adesc"), 
            " and any other guidelines provided by your state or local public health officials.  It is also very important to remember that even 
            if your risk is low, following the ",  
            tags$a("CDC’s guidelines", href="https://www.cdc.gov/coronavirus/2019-ncov/communication/guidance-list.html?Sort=Date%3A%3Adesc"), 
-           " will help prevent spreading COVID 19 to others."),
+           " will help prevent spreading COVID-19 to others."),
     faqQuestion("Are my data captured by the app?"),
     tags$p("No, we do not collect or store any data you put in. We want this app to be a tool that can serve you."),
     faqQuestion("Why is my score so high?"),
@@ -192,8 +192,8 @@ renderFaqHtml <- function() {
     faqQuestion("My specific medical condition isn't listed. What do I do?"),
     tags$p("Try using \"other conditions\" to get a catch-all estimate of your susceptibility."),
     faqQuestion("How is my sex assigned at birth used in risk score calculations?"),
-    tags$p("For exposure risk, the ", tags$a("Menni et al (2020)", href = urls$menni_etall_2020), " model inclused 
-           self-reported 'sex at birth' as a binary independent varriable with 1 indicative of male participants and 0 representing 
+    tags$p("For exposure risk, the ", tags$a("Menni et al (2020)", href = urls$menni_etall_2020), " model included 
+           self-reported 'sex at birth' as a binary independent variable with 1 indicative of male participants and 0 representing 
            females. Therefore for the app, if sex assigned at birth selected is 'Other' or 'Prefer not to say', 
            for the estimations of probability of symptomatic COVID-19, we code these inputs as having a 'sex at birth' equal to 0.5."),  
     tags$p("For susceptibility, we used the original data from ", tags$a("Verity et al (2020)", href = urls$verity_etal_2020), 
@@ -220,7 +220,7 @@ renderFaqHtml <- function() {
       tags$li("Add the vaccine efficacy against emergency hospital admission and death us based on a recent large scale study from the UK ", tags$a("(Bernal et al 2021). ", href = urls$bernal_etal_2021)),
       tags$li("Update the risk factors for severe COVID-19 illness based on the latest ", tags$a("CDC guidance (2021). ", href = urls$cdc_medicalconditions)),
       tags$li("Add the vaccine efficacy data for the three vaccine approved in the US: Pfizer-BioNTech, Moderna, and Johnson & Johnson."),
-      tags$li("Add risk of COVID-19 explosure from activities"),
+      tags$li("Add risk of COVID-19 exposure from activities"),
       tags$li("Modify risk of severe COVID-19 illness based on exercises level")
     ) # end of ul
   )
