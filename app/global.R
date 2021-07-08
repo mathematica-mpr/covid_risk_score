@@ -73,6 +73,7 @@ urls  = list(
   moderna_eua_2020 = "https://www.fda.gov/media/144637/download", #moderna vaccine factsheet for hcp
   pfizer_eua_2020 = "https://www.fda.gov/media/144413/download", #pfizer vaccine factsheet for hcp
   jandj_eua_2021 = "https://www.fda.gov/media/146217/download",
+  bernal_etal_2021 = "https://www.bmj.com/content/373/bmj.n1088", #pfizer and astrazeneca vax against hosp and death
   # Activity risk level
   bellage_activity_chart = "https://bellage.org/wp-content/uploads/2020/09/BellAge-COVID19-Activity-Risk-Chart.pdf",
   # excerise level and severe covid
