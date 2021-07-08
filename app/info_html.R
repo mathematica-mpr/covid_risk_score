@@ -39,7 +39,7 @@ renderMethodsHtml <- function() {
         " and the average length of sickness reported by ", 
         tags$a("Wolfel et al (2020)", href = urls$wolfer_etall_2020), " and the ",
         tags$a("COVID Symptom Study. ", href = urls$covid_symptom_study), 
-        "USAFacts reports all Kansas city cases under Jackson County, MO even though three other counties overlap Kansas City, ", 
+        "USAFacts reports all Kansas City cases under Jackson County, MO even though three other counties overlap Kansas City, ", 
         "so we report cases for all four of these counties aggregated together into 'Kansas City and surrounding counties'."),
       tags$li(
         "Due to rapid spread and insufficient testing during the COVID-19 pandemic, there are likely additional unreported cases beyond the 
@@ -132,7 +132,7 @@ renderMethodsHtml <- function() {
     tags$h4("In the Works:"),
     tags$ul(
       tags$p("We are continuously working to update these assumptions as additional knowledge about the virus becomes available."),
-      tags$p("Below are some COVID-19 developments we are monitoring closely and are looking to incoporate into the methodology as data become available."),
+      tags$p("Below are some COVID-19 developments we are monitoring closely and are looking to incorporate into the methodology as data become available."),
       tags$ul(
         tags$li("Risk of ", tags$a("post-COVID conditions", href = urls$cdc_post_covid_conditions), "for people with similar characteristics and behaviors as you")
       ), # end of ul
@@ -192,8 +192,8 @@ renderFaqHtml <- function() {
     faqQuestion("My specific medical condition isn't listed. What do I do?"),
     tags$p("Try using \"other conditions\" to get a catch-all estimate of your susceptibility."),
     faqQuestion("How is my sex assigned at birth used in risk score calculations?"),
-    tags$p("For exposure risk, the ", tags$a("Menni et al (2020)", href = urls$menni_etall_2020), " model inclused 
-           self-reported 'sex at birth' as a binary independent varriable with 1 indicative of male participants and 0 representing 
+    tags$p("For exposure risk, the ", tags$a("Menni et al (2020)", href = urls$menni_etall_2020), " model included 
+           self-reported 'sex at birth' as a binary independent variable with 1 indicative of male participants and 0 representing 
            females. Therefore for the app, if sex assigned at birth selected is 'Other' or 'Prefer not to say', 
            for the estimations of probability of symptomatic COVID-19, we code these inputs as having a 'sex at birth' equal to 0.5."),  
     tags$p("For susceptibility, we used the original data from ", tags$a("Verity et al (2020)", href = urls$verity_etal_2020), 
@@ -220,7 +220,7 @@ renderFaqHtml <- function() {
       tags$li("Add the vaccine efficacy against emergency hospital admission and death us based on a recent large scale study from the UK ", tags$a("(Bernal et al 2021). ", href = urls$bernal_etal_2021)),
       tags$li("Update the risk factors for severe COVID-19 illness based on the latest ", tags$a("CDC guidance (2021). ", href = urls$cdc_medicalconditions)),
       tags$li("Add the vaccine efficacy data for the three vaccine approved in the US: Pfizer-BioNTech, Moderna, and Johnson & Johnson."),
-      tags$li("Add risk of COVID-19 explosure from activities"),
+      tags$li("Add risk of COVID-19 exposure from activities"),
       tags$li("Modify risk of severe COVID-19 illness based on exercises level")
     ) # end of ul
   )
