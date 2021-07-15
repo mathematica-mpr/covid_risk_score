@@ -8,7 +8,7 @@ disclaimerpopupHTML <- function(){
     tags$p(style="color:#DF691A", "THE INFORMATION PROVIDED BY THIS TOOL IS NOT MEDICAL ADVICE AND CANNOT BE 
              USED TO DIAGNOSE OR TREAT ANY MEDICAL CONDITION.  See FAQ for more information.", class = "text-warning"),
     tags$p("COVID-19 data behind this app is updated daily - last updated:", format(Sys.Date()-2, "%b %d, %Y"), class = "text-warning"),
-    tags$p("Our algorithm is updated periodically - last updated: June 17, 2021", class = "text-warning")
+    tags$p("Our algorithm is updated periodically - last updated: July 14, 2021", class = "text-warning")
   )
 }
 
@@ -68,12 +68,15 @@ renderMethodsHtml <- function() {
               "and ",
               tags$a("Jefferson et al (2008). ", href = urls$jefferson_etal_2008),
               "Without randomized trials, these systematic appraisals of the current best available evidence are useful to inform interim guidance. "),
-      tags$li("The efficacy data of the Pfizer-BioNTech, Moderna, and Johnson and Johnson COVID-19 vaccines against infection were obtained from FDA Emergency Use Authorization fact sheets ",
+      tags$li("The efficacy data of the Pfizer-BioNTech, Moderna, Johnson and Johnson, and AstraZeneca COVID-19 vaccines against infection were obtained from 
+              FDA Emergency Use Authorization fact sheets and peer-reviewed journal articles",
               tags$a("FDA (2020a) ", href = urls$pfizer_eua_2020),
               ", ",
               tags$a("FDA (2020b) ", href = urls$moderna_eua_2020),
-              ", and",
-              tags$a("FDA (2021). ", href = urls$jandj_eua_2021),
+              ", ",
+              tags$a("FDA (2021) ", href = urls$jandj_eua_2021),
+              ", and ",
+              tags$a("Voysey et al (2021). ", href = urls$voysey_etal_2021),
               "Each of the two-dose vaccines provide early protection after a number of days after the first dose. ",
               "We incorporated the efficacy data on the first dose published by ",
               tags$a("Polack et al (2020) ", href = urls$polack_etal_2020),
@@ -215,13 +218,10 @@ renderFaqHtml <- function() {
            tags$a("Zambrano et al (2020) .", href = urls$zambrano)),
     faqQuestion("When was the most recent update to the app and what is new?"),
     tags$p("The COVID-19 data behind this app is updated daily. We periodically update the algorithm used for risk score estimation.",
-           " The most recent update to the algorithm was on June 17, 2021. We made the following major changes:"),
+           " The most recent update to the algorithm was on July 14, 2021. We made the following major changes:"),
     tags$ol(
-      tags$li("Add the vaccine efficacy against emergency hospital admission and death us based on a recent large scale study from the UK ", tags$a("(Bernal et al 2021). ", href = urls$bernal_etal_2021)),
-      tags$li("Update the risk factors for severe COVID-19 illness based on the latest ", tags$a("CDC guidance (2021). ", href = urls$cdc_medicalconditions)),
-      tags$li("Add the vaccine efficacy data for the three vaccine approved in the US: Pfizer-BioNTech, Moderna, and Johnson & Johnson."),
-      tags$li("Add risk of COVID-19 exposure from activities"),
-      tags$li("Modify risk of severe COVID-19 illness based on exercises level")
+      tags$li("Add the AstraZeneca vaccine efficacy figures as it is relevant for other countries outside the U.S."),
+      tags$li("Add the vaccine efficacy against emergency hospital admission and death us based on a recent large scale study from the UK ", tags$a("(Bernal et al 2021). ", href = urls$bernal_etal_2021))
     ) # end of ul
   )
 }
