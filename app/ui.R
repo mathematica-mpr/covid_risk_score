@@ -122,7 +122,7 @@ ui <- fluidPage(
                            1:2),
               ),
             sliderInput("days_since_last_dose",  doses_days_labels[2],
-                        min=0, max=14, value=0),
+                        min=0, max=21, value=0),
             ),
                         
           actionButton('go', "Calculate", class = "btn btn-primary btn-block")
