@@ -39,7 +39,14 @@ ui <- fluidPage(
           title = "1. About You",
           radioButtons('country', "What is your country?", 
                        c("United States" = "us", "Belgium" = "be"), selected = "us", inline=TRUE),
-          textInput('zip', label = HTML("What is your 5-digit zip code? <sub class = 'text-info'>This tool is designed for the United States.</sub>")),
+          conditionalPanel(
+            condition = "input.country == 'us'",
+            textInput('zip', label = HTML("What is your 5-digit zip code?"))
+            ),
+          conditionalPanel(
+            condition = "input.country == 'be'",
+            textInput('zip', label = HTML("What is your 4-digit postal code?"))
+          ),
           textInput('age', label = "What is your age?"),
           radioButtons('sex', "What sex were you assigned at birth?", 
                        c("Male" = "male", "Female" = "female",  "Other" = "sex_other", "Prefer not to say" = "sex_other"), inline=TRUE),
