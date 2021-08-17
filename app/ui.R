@@ -37,6 +37,8 @@ ui <- fluidPage(
         ),
         bsCollapsePanel(
           title = "1. About You",
+          radioButtons('country', "What is your country?", 
+                       c("United States" = "us", "Belgium" = "be"), selected = "us", inline=TRUE),
           textInput('zip', label = HTML("What is your 5-digit zip code? <sub class = 'text-info'>This tool is designed for the United States.</sub>")),
           textInput('age', label = "What is your age?"),
           radioButtons('sex', "What sex were you assigned at birth?", 
