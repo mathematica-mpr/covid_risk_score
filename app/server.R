@@ -51,7 +51,7 @@ server <- function(input, output, session) {
     # hit the API
     # do not proceed if go was not clicked at all
     validate(need(input$go > 0, ""))
-    validate(need(nchar(input$zip) >= 5, ""))
+    validate(need((input$country == "us" & nchar(input$zip) >= 5) | (input$country == "be" & nchar(input$zip) >= 4), ""))
     api_return <- calculateRisk(input)
     
     if (is.null(api_return$message)) {
