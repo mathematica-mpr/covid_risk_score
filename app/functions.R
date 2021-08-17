@@ -9,6 +9,7 @@ bool2char <- function(bol){
 # function makes API call ------------------------------------------------------
 calculateRisk <- function(input) {
   request_body <- list(
+    "country" = input$country,
     "zip" = input$zip,
     "age"= as.numeric(input$age),
     "sex" = input$sex,
@@ -105,8 +106,8 @@ renderScoreHtml <- function(risk) {
     formatDynamicString(round(score)), 
     case_when(
       score<30 ~ paste0(
-        ", which is (relatively) safe. Even so, it's a good time to make sure that you know how to ",
-        tags$a("protect yourself & others. ", href = urls$cdc_get_ready)),
+        ", which is (relatively) safe. Even so, it's a good time to make sure that you're ",
+        tags$a("prepared! ", href = urls$cdc_get_ready)),
       score>70 ~ paste0(
         ", which is quite serious. Avoiding exposure, practicing good hygiene, and making sure you have ",
         tags$a("a plan in place ", href = urls$cdc_prevention), 
