@@ -4,7 +4,7 @@ disclaimerpopupHTML <- function(){
   tagList(
     tags$p("This tool works best on Google Chrome and mobile.", class = "text-warning"),
     tags$p("Currently this tool is designed for use in the United States. We do not retain any information that you provide in connection with your use of the tool."),
-    tags$p("Your use of this tool is subject to these ", tags$a("Terms of Use.", href="https://19andme-pub-0812304701987.s3.amazonaws.com/COVID-19+Risk+Calculator+Terms+of+Use+-+042220.pdf")),
+    tags$p("Your use of this tool is subject to these ", tags$a("Terms of Use.", href="https://covid-risk-score-rshiny-code-artifacts.s3.amazonaws.com/COVID-19+Risk+Calculator+Terms+of+Use+-+042220.pdf")),
     tags$p(style="color:#DF691A", "THE INFORMATION PROVIDED BY THIS TOOL IS NOT MEDICAL ADVICE AND CANNOT BE 
              USED TO DIAGNOSE OR TREAT ANY MEDICAL CONDITION.  See FAQ for more information.", class = "text-warning"),
     tags$p("COVID-19 data behind this app is updated daily - last updated:", format(Sys.Date()-2, "%b %d, %Y"), class = "text-warning"),
@@ -218,10 +218,10 @@ renderFaqHtml <- function() {
            tags$a("Zambrano et al (2020) .", href = urls$zambrano)),
     faqQuestion("When was the most recent update to the app and what is new?"),
     tags$p("The COVID-19 data behind this app is updated daily. We periodically update the algorithm used for risk score estimation.",
-           " The most recent update to the algorithm was on July 14, 2021. We made the following major changes:"),
+           " The most recent update to the algorithm was on August 11, 2021. We made the following major changes:"),
     tags$ol(
-      tags$li("Add the AstraZeneca vaccine efficacy figures as it is relevant for other countries outside the U.S."),
-      tags$li("Add the vaccine efficacy against emergency hospital admission and death us based on a recent large scale study from the UK ", tags$a("(Bernal et al 2021). ", href = urls$bernal_etal_2021))
+      tags$li("Add covid data for Belgium postal codes and NIS codes"),
+      tags$li("Add new optional input parameter 'country' which takes the 2 letter country code. If no country code is provided, the default value is 'us'")
     ) # end of ul
   )
 }
