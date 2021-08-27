@@ -462,6 +462,8 @@ Resources:
             - ssm:DescribeParameters
             - ssm:GetParameters
             - ssm:AddTagsToResource
+            - sns:ListTopics
+            - sns:Publish
           Resource: "*"
       Roles:
         - !Ref CodeBuildRole
