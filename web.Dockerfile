@@ -1,4 +1,4 @@
-FROM sha256:8d17ac6ce0f0d7fd6f6d4254425b5bec4e538b9bcc0df66a93985d4f31cca01a as base
+FROM sha256:8d17ac6ce0f0d7fd6f6d4254425b5bec4e538b9bcc0df66a93985d4f31cca01a as base 
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
