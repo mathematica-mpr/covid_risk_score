@@ -13,3 +13,5 @@ RUN R -e "install.packages(c('rlang','shiny', 'shinythemes', 'shinyjs', 'shinycs
 RUN R -e "install.packages('git2r', type='source', configure.vars='autobrew=yes')"
 RUN R -e "devtools::install_github('rstudio/renv')"
 RUN R -e "install.packages(c('aws.signature', 'aws.ec2metadata', 'aws.s3'), repos = c(cloudyr = 'http://cloudyr.github.io/drat', getOption('repos')))"
+
+COPY .Renviron .Renviron
