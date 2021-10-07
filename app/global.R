@@ -45,6 +45,8 @@ urls  = list(
   cdc_vaccines = "https://www.cdc.gov/coronavirus/2019-ncov/vaccines/index.html",
   cdc_vaccinated_guidance = "https://www.cdc.gov/coronavirus/2019-ncov/vaccines/fully-vaccinated-guidance.html",
   cdc_case_surv = "https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data/vbim-akqf/data",
+  cdc_vax_science_brief = "https://www.cdc.gov/coronavirus/2019-ncov/science/science-briefs/fully-vaccinated-people.html",
+  cdc_delta_variant = "https://www.cdc.gov/coronavirus/2019-ncov/variants/delta-variant.html",
   # USA Facts
   usafacts_data = "https://usafacts.org/visualizations/coronavirus-covid-19-spread-map/",
   # papers
@@ -74,6 +76,7 @@ urls  = list(
   pfizer_eua_2020 = "https://www.fda.gov/media/144413/download", #pfizer vaccine factsheet for hcp
   jandj_eua_2021 = "https://www.fda.gov/media/146217/download",
   bernal_etal_2021 = "https://www.bmj.com/content/373/bmj.n1088", #pfizer and astrazeneca vax against hosp and death
+  bernal_etal_2021b = "https://www.medrxiv.org/content/10.1101/2021.05.22.21257658v1", #pfizer and astrazeneca vax against delta variant
   voysey_etal_2021 = "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3777268", # astrazeneca vaccine efficacy against symptomatic infections
   # Activity risk level
   bellage_activity_chart = "https://bellage.org/wp-content/uploads/2020/09/BellAge-COVID19-Activity-Risk-Chart.pdf",

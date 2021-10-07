@@ -8,7 +8,8 @@ disclaimerpopupHTML <- function(){
     tags$p(style="color:#DF691A", "THE INFORMATION PROVIDED BY THIS TOOL IS NOT MEDICAL ADVICE AND CANNOT BE 
              USED TO DIAGNOSE OR TREAT ANY MEDICAL CONDITION.  See FAQ for more information.", class = "text-warning"),
     tags$p("COVID-19 data behind this app is updated daily - last updated:", format(Sys.Date()-2, "%b %d, %Y"), class = "text-warning"),
-    tags$p("Our algorithm is updated periodically - last updated: August 11, 2021", class = "text-warning")
+    tags$p("Our algorithm is updated periodically - last updated: September 24, 2021", class = "text-warning"),
+    tags$p("Our latest addition to the algorithm is to account for the Delta variant of SARS-CoV-2, see more details under FAQ", class = "text-warning")
   )
 }
 
@@ -216,12 +217,26 @@ renderFaqHtml <- function() {
            "of severe COVID-19 illness. Therefore we revised the list of medical conditions. ",
            "Odds ratio related to pregnancy was obtained from ",
            tags$a("Zambrano et al (2020) .", href = urls$zambrano)),
+    faqQuestion("Are vaccinated individuals less likely to transmit COVID-19 to others around them?"),
+    tags$p("According to the ", tags$a("CDC (2021) , ", href = urls$cdc_vax_science_brief), " data from multiple studies in different countries suggest that people vaccinated with Pfizer-BioNTech COVID-19 vaccine
+            who develop COVID-19 have a lower viral load than unvaccinated people. This observation may indicate reduced transmissibility", 
+            "as viral load has been identified as a key driver of transmission. ", "However, infections in fully vaccinated persons are more commonly
+           observed with the Delta variant than with other SARS-CoV-2 variants. Infections with the Delta variant in vaccinated persons potentially have reduced transmissibility than infections in unvaccinated persons", 
+           "although additional studies are needed. "),
+    faqQuestion("How are you accounting for the dominance of the Delta variant?"),
+    tags$p("Delta variant has changed the pandemic in two ways: increased transmission and decreased vaccination effectiveness. ",
+           "Therefore, we have updated the transmissibility parameter in the model to account for the more contagious Delta variant. ",
+           tags$a("The CDC (2021)", href = urls$cdc_delta_variant), " estimates that the Delta variant is more than 2x as contagious as previous variants. ",
+           "Vaccines in the US are still highly effective, including against the Delta variant, but they are not 100% effective. ",
+           "We modified the algorithm to account for reduced vaccine protection against Delta variant infections, using the recent data from ",
+           "a recent study from ", tags$a("Bernal et al (2021b) .", href = urls$bernal_etal_2021b)),
     faqQuestion("When was the most recent update to the app and what is new?"),
     tags$p("The COVID-19 data behind this app is updated daily. We periodically update the algorithm used for risk score estimation.",
-           " The most recent update to the algorithm was on August 11, 2021. We made the following major changes:"),
+           " The most recent update to the algorithm was on September 24th, 2021. We made the following major changes:"),
     tags$ol(
-      tags$li("Add covid data for Belgium postal codes and NIS codes"),
-      tags$li("Add new optional input parameter 'country' which takes the 2 letter country code. If no country code is provided, the default value is 'us'")
+      tags$li("Update the baseline probability of hospitalization/ICU/death by age group using the latest CDC surveillance data as of September 2021."),
+      tags$li("Update the household transmissibility to account for the increased transmission of the Delta variants."),
+      tags$li("Update the vaccine efficacy against infection given that Delta variant has become the dominant strain of COVID-19 in the US. ")
     ) # end of ul
   )
 }
