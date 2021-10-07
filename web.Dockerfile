@@ -1,4 +1,4 @@
-FROM 319273870782.dkr.ecr.us-east-1.amazonaws.com/covid-risk-score:shiny-verse as base
+FROM rocker/shiny-verse:4.1.0 as base 
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
@@ -8,8 +8,11 @@ RUN apt-get update \
     libudunits2-dev \
     libgdal-dev \
     ca-certificates \
+    libharfbuzz-dev\
+    libfribidi-dev\
+    libgit2-dev\
     curl \
-  && R -e "install.packages(c('rlang','shiny', 'shinythemes', 'shinyjs', 'shinycssloaders', 'shinyBS', 'tidycensus' , 'assertr', 'flexdashboard', 'httr'), repos='http://cran.rstudio.com/')" \
+  && R -e "install.packages(c('rlang','shiny', 'shinythemes', 'shinyjs', 'shinycssloaders', 'shinyBS', 'tidycensus' , 'assertr', 'flexdashboard', 'httr'), dependencies=TRUE, repos='https://cloud.r-project.org/')" \
   && R -e "install.packages('git2r', type='source', configure.vars='autobrew=yes')" \
   && R -e "install.packages(c('aws.signature', 'aws.ec2metadata', 'aws.s3'), repos = c(cloudyr = 'http://cloudyr.github.io/drat', getOption('repos')))" \
   &&  rm -rf /tmp/downloaded_packages

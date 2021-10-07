@@ -9,7 +9,6 @@ How 19andMe Works?
 
 <img src = "https://raw.githubusercontent.com/mathematica-mpr/covid_risk_score/main/app/www/How_19andMe_Works.png" alt = "19andme workflow">
 
-
 ## Contents
 
 * app/
