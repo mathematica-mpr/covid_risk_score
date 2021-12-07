@@ -232,11 +232,11 @@ renderFaqHtml <- function() {
            "a recent study from ", tags$a("Bernal et al (2021b) .", href = urls$bernal_etal_2021b)),
     faqQuestion("When was the most recent update to the app and what is new?"),
     tags$p("The COVID-19 data behind this app is updated daily. We periodically update the algorithm used for risk score estimation.",
-           " The most recent update to the algorithm was on September 24th, 2021. We made the following major changes:"),
+           " The most recent update to the algorithm was on January 6th, 2022. We made the following major changes:"),
     tags$ol(
       tags$li("Update the baseline probability of hospitalization/ICU/death by age group using the latest CDC surveillance data as of September 2021."),
-      tags$li("Update the household transmissibility to account for the increased transmission of the Delta variants."),
-      tags$li("Update the vaccine efficacy against infection given that Delta variant has become the dominant strain of COVID-19 in the US. ")
+      tags$li("Update the province-level adjusted case fatality rate for Belgium using data until 2021-10-21"),
+      tags$li("Refactor vaccine effectiveness against infection hospitalization, icu, and mortality overtime")
     ) # end of ul
   )
 }
