@@ -29,21 +29,9 @@ server <- function(input, output, session) {
     }
     if (!input$has_vaccine) {
       # clear vaccine conditional input when collapsed
-      updateRadioButtons(session, "vaccine", selected = "pfizer")
-      updateSelectInput(session, "doses", selected = 1)
-      updateSelectInput(session, "days_since_last_dose", selected = 0)
-    } else {
-      if (as.numeric(vaccines[[input$vaccine]][["doses"]])==1){  
-        # set doses to 1 for 1-dose vaccine (no ui element for doses)
-        updateSelectInput(session, "doses", selected = 1)
-      }
-      # Change label for days input depending on number of doses
-      session$sendCustomMessage(
-        'update_label',
-        list(
-          id = 'days_since_last_dose',
-          html = doses_days_labels[as.numeric(vaccines[[input$vaccine]][["doses"]])]))
-    }
+      updateRadioButtons(session, "vaccine", selected = character(0))
+      updateSelectInput(session, "months_last_vaccination", selected = character(0))
+    } 
   })
   
   # reactive values and lists --------------------------------------------------

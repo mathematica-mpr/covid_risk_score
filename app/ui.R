@@ -121,18 +121,12 @@ ui <- fluidPage(
           checkboxInput('has_vaccine', div("I have received at least one dose of a COVID-19 vaccine")),
           conditionalPanel(
             condition = "input.has_vaccine == true",
-            radioButtons('vaccine', "Which of the available COVID-19 vaccines did you receive?",
+            radioButtons('vaccine', "Which of the available COVID-19 vaccines did you receive most recently?",
                          choiceNames = unname(vaccine_labels), choiceValues = names(vaccine_labels),
                          inline=TRUE),
-            conditionalPanel(
-              condition = "input.vaccine != 'johnsonandjohnson'",
-              selectInput('doses', "How many doses of this vaccine have you received?",
-                           1:2),
-              ),
-            sliderInput("days_since_last_dose",  doses_days_labels[2],
-                        min=0, max=21, value=0),
+            radioButtons('months_last_vaccination', "When was your most recent COVID-19 vaccine, including the booster?", 
+                         c("Within one month" = "lt_1mo", "1-6 months ago" = "1_6mo", "More than 6 months ago" = "gt_6mo"), inline=TRUE),
             ),
-                        
           actionButton('go', "Calculate", class = "btn btn-primary btn-block")
         ) # bsCollapsePanel
       ), # bsCollapse
