@@ -19,7 +19,7 @@ source("functions.R")
 # urls class to store our urls
 urls  = list(
   # Mathematica COVID Score API
-  covid_score_api =  "https://us-api.covid19.mathematica.org/score",
+  covid_score_api = "https://us-api.covid19.mathematica.org/score",
   covid_score_api_dev =  "https://awsdev.us-api.covid19.mathematica.org/score",
   # CCDC
   ccdc_vol2_2020 = "https://www.unboundmedicine.com/medline/citation/32064853/[The_epidemiological_characteristics_of_an_outbreak_of_2019_novel_coronavirus_diseases__COVID_19__in_China]",
@@ -124,30 +124,3 @@ vaccine_labels = list(pfizer = "Pfizer-BioNTech",
                       moderna = "Moderna",
                       johnsonandjohnson = "Johnson & Johnson",
                       astrazeneca = "AstraZeneca")
-
-vaccines = list(pfizer=
-                  list(efficacy=.95,
-                       doses=2,
-                       days_between_doses=21,
-                       days_after_final_dose=7),
-                moderna=
-                  list(efficacy=.941,
-                       doses=2,
-                       days_between_doses=28,
-                       days_after_final_dose=14),
-                johnsonandjohnson=
-                  list(efficacy=.66,
-                       doses=1,
-                       days_between_doses=NA,
-                       days_after_final_dose=14),
-                astrazeneca = 
-                  list(efficacy = .824,
-                       doses = 2,
-                       days_between_doses = 84,
-                       days_after_final_dose = 14))
-
-total_vaccines_str = "three"
-
-doses_days_labels <- c("How many days ago did you receive your vaccine? <sub class = 'text-info'>If more than 21 days ago, select 21.</sub>", 
-                       "How many days ago did you receive your most recent dose? <sub class = 'text-info'>If more than 21 days ago, select 21.</sub>")
-
