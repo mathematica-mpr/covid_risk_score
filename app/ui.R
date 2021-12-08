@@ -125,7 +125,7 @@ ui <- fluidPage(
                          choiceNames = unname(vaccine_labels), choiceValues = names(vaccine_labels),
                          inline=TRUE),
             radioButtons('months_last_vaccination', "When was your most recent COVID-19 vaccine, including the booster?", 
-                         c("Within one month" = "lt_1mo", "1-6 months ago" = "1_6mo", "More than 6 months ago" = "gt_6mo"), inline=TRUE),
+                         months_last_vaccination_labels, inline=TRUE),
             ),
           actionButton('go', "Calculate", class = "btn btn-primary btn-block")
         ) # bsCollapsePanel

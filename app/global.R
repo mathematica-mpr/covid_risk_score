@@ -124,3 +124,5 @@ vaccine_labels = list(pfizer = "Pfizer-BioNTech",
                       moderna = "Moderna",
                       johnsonandjohnson = "Johnson & Johnson",
                       astrazeneca = "AstraZeneca")
+
+months_last_vaccination_labels = c("Within one month" = "lt_1mo", "1-6 months ago" = "1_6mo", "More than 6 months ago" = "gt_6mo")
