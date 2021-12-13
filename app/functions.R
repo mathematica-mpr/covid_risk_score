@@ -139,7 +139,7 @@ renderVaccinesHtml <- function(risk, has_vaccine, vaccine, months_last_vaccinati
       months_last_vaccination_text <- HTML(paste0("Congratulations on receiving the ", vaccine_labels[vaccine], " COVID-19 vaccine! ", 
                      "The vaccine reaches its full efficacy at around 14 days after vaccination. ",
                      "We estimate that the full efficacy of the ", vaccine_labels[vaccine]))
-    } else if (months_last_vaccination == "1_6mo"){
+    } else if (months_last_vaccination == "btw_1_6mo"){
       # last vaccine within 1-6 month
       months_last_vaccination_text <- HTML(paste0("Congratulations on receiving the ", vaccine_labels[vaccine], " COVID-19 vaccine! ",
                                              "Between 1 and 6 months after last vaccination, we estimate that the efficacy of the ", vaccine_labels[vaccine]))
