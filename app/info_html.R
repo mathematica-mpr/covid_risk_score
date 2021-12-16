@@ -69,24 +69,11 @@ renderMethodsHtml <- function() {
               "and ",
               tags$a("Jefferson et al (2008). ", href = urls$jefferson_etal_2008),
               "Without randomized trials, these systematic appraisals of the current best available evidence are useful to inform interim guidance. "),
-      tags$li("The efficacy data of the Pfizer-BioNTech, Moderna, Johnson and Johnson, and AstraZeneca COVID-19 vaccines against infection were obtained from 
-              FDA Emergency Use Authorization fact sheets and peer-reviewed journal articles",
-              tags$a("FDA (2020a) ", href = urls$pfizer_eua_2020),
-              ", ",
-              tags$a("FDA (2020b) ", href = urls$moderna_eua_2020),
-              ", ",
-              tags$a("FDA (2021) ", href = urls$jandj_eua_2021),
-              ", and ",
-              tags$a("Voysey et al (2021). ", href = urls$voysey_etal_2021),
-              "Each of the two-dose vaccines provide early protection after a number of days after the first dose. ",
-              "We incorporated the efficacy data on the first dose published by ",
-              tags$a("Polack et al (2020) ", href = urls$polack_etal_2020),
-              "and ",
-              tags$a("FDA (2020c). ", href = urls$moderna_fda_2020),
-              "Based on a recent large scale study in older adults in England ",
-              tags$a("(Bernal et al 2021), ", href = urls$bernal_etal_2021),
-              "we estimated the effectiveness of vaccine against emergency hospital admissions and mortality. 
-              This is an imperfect proxy, and we will keep monitoring the literature and update the calculation as more data on other population segments become available. "),
+      tags$li("The efficacy data of the Pfizer-BioNTech, Moderna, Johnson and Johnson, and AstraZeneca COVID-19 vaccines against infection based on 
+              a recent large-scale study in the United Kingdom on vaccine efficacy the B.1.617.2 (Delta) Variant completed by ",
+              tags$a("Bernal et al (2021)", href = urls$bernal_etal_2021b),
+              ". Then we estimated vaccine effectiveness over time based on a systematic review and meta-regression completed by ", 
+              tags$a("Feilkin et al (2021)", href = urls$feilkin_etal_2021), "."),
       tags$li("Activity risk levels for COVID-19 are based on a professional review panel completed by ", 
               tags$a("BellAge", href = urls$bellage_activity_chart), 
               ". To provide 19 and Me users with a general idea of how different activities affect risk of COVID-19 through community exposure,
@@ -132,6 +119,13 @@ renderMethodsHtml <- function() {
       tags$li("Odds ratios for hospitalization, ICU admission, and death associated with exercise level were obtained from ",
               tags$a("Sallis et al (2021)", href = urls$sallis_etal_2021), "."
       ),
+      tags$li("Based on a recent large scale study in older adults in England ",
+              tags$a("(Bernal et al 2021), ", href = urls$bernal_etal_2021),
+              "we estimated the effectiveness of vaccine against emergency hospital admissions and mortality. 
+              This is an imperfect proxy, and we will keep monitoring the literature and update the calculation as more data on other population segments become available. 
+              Then we estimated vaccine effectiveness over time based on a systematic review and meta-regression completed by ", 
+              tags$a("Feilkin et al (2021)", href = urls$feilkin_etal_2021), "."),
+      
     ), #end of ol
     tags$h4("In the Works:"),
     tags$ul(

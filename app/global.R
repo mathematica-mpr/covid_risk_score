@@ -78,6 +78,7 @@ urls  = list(
   bernal_etal_2021 = "https://www.bmj.com/content/373/bmj.n1088", #pfizer and astrazeneca vax against hosp and death
   bernal_etal_2021b = "https://www.medrxiv.org/content/10.1101/2021.05.22.21257658v1", #pfizer and astrazeneca vax against delta variant
   voysey_etal_2021 = "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3777268", # astrazeneca vaccine efficacy against symptomatic infections
+  feilkin_etal_2021 = "http://dx.doi.org/10.2139/ssrn.3961378", # vaccine effectiveness over time systematic review and meta-regression
   # Activity risk level
   bellage_activity_chart = "https://bellage.org/wp-content/uploads/2020/09/BellAge-COVID19-Activity-Risk-Chart.pdf",
   # excerise level and severe covid
