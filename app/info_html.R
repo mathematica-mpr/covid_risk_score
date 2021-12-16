@@ -71,7 +71,7 @@ renderMethodsHtml <- function() {
               "Without randomized trials, these systematic appraisals of the current best available evidence are useful to inform interim guidance. "),
       tags$li("The efficacy data of the Pfizer-BioNTech, Moderna, Johnson and Johnson, and AstraZeneca COVID-19 vaccines against infection based on 
               a recent large-scale study in the United Kingdom on vaccine efficacy the B.1.617.2 (Delta) Variant completed by ",
-              tags$a("Bernal et al (2021)", href = urls$bernal_etal_2021b),
+              tags$a("Bernal et al (2021b)", href = urls$bernal_etal_2021b),
               ". Then we estimated vaccine effectiveness over time based on a systematic review and meta-regression completed by ", 
               tags$a("Feilkin et al (2021)", href = urls$feilkin_etal_2021), "."),
       tags$li("Activity risk levels for COVID-19 are based on a professional review panel completed by ", 
@@ -120,7 +120,7 @@ renderMethodsHtml <- function() {
               tags$a("Sallis et al (2021)", href = urls$sallis_etal_2021), "."
       ),
       tags$li("Based on a recent large scale study in older adults in England ",
-              tags$a("(Bernal et al 2021), ", href = urls$bernal_etal_2021),
+              tags$a("(Bernal et al 2021a), ", href = urls$bernal_etal_2021a),
               "we estimated the effectiveness of vaccine against emergency hospital admissions and mortality. 
               This is an imperfect proxy, and we will keep monitoring the literature and update the calculation as more data on other population segments become available. 
               Then we estimated vaccine effectiveness over time based on a systematic review and meta-regression completed by ", 
