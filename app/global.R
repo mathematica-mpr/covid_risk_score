@@ -75,7 +75,7 @@ urls  = list(
   moderna_eua_2020 = "https://www.fda.gov/media/144637/download", #moderna vaccine factsheet for hcp
   pfizer_eua_2020 = "https://www.fda.gov/media/144413/download", #pfizer vaccine factsheet for hcp
   jandj_eua_2021 = "https://www.fda.gov/media/146217/download",
-  bernal_etal_2021 = "https://www.bmj.com/content/373/bmj.n1088", #pfizer and astrazeneca vax against hosp and death
+  bernal_etal_2021a = "https://www.bmj.com/content/373/bmj.n1088", #pfizer and astrazeneca vax against hosp and death
   bernal_etal_2021b = "https://www.medrxiv.org/content/10.1101/2021.05.22.21257658v1", #pfizer and astrazeneca vax against delta variant
   voysey_etal_2021 = "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3777268", # astrazeneca vaccine efficacy against symptomatic infections
   feilkin_etal_2021 = "http://dx.doi.org/10.2139/ssrn.3961378", # vaccine effectiveness over time systematic review and meta-regression
