@@ -58,7 +58,6 @@ renderMethodsHtml <- function() {
                       "towards the state CFR.",
                       "The result is that for counties with many cases, we essentially use the county-level CFR, ",
                       "but for counties with only a few cases we use a CFR that is partway between the county and state CFRs. ")),
-      
       tags$li(
         "Estimations of the probability of having COVID-19 given symptoms are calculated using a logistic regression model published on Nature Medicine developed by ",
         tags$a("Menni et al (2020).", href = urls$menni_etall_2020),
@@ -69,8 +68,12 @@ renderMethodsHtml <- function() {
               "and ",
               tags$a("Jefferson et al (2008). ", href = urls$jefferson_etal_2008),
               "Without randomized trials, these systematic appraisals of the current best available evidence are useful to inform interim guidance. "),
-      tags$li("The efficacy data of the Pfizer-BioNTech, Moderna, Johnson and Johnson, and AstraZeneca COVID-19 vaccines against infection based on 
-              a recent large-scale study in the United Kingdom on vaccine efficacy the B.1.617.2 (Delta) Variant completed by ",
+      tags$li("The efficacy data of the Pfizer-BioNTech, Moderna, Johnson and Johnson, and AstraZeneca COVID-19 vaccines against infection were obtained from 
+              FDA Emergency Use Authorization fact sheets and peer-reviewed journal articles",
+              tags$a("FDA (2020a)", href = urls$pfizer_eua_2020), ", ", tags$a("FDA (2020b)", href = urls$moderna_eua_2020), ", ",
+              tags$a("FDA (2021)", href = urls$jandj_eua_2021), ", and ", tags$a("Voysey et al (2021)", href = urls$voysey_etal_2021),
+              ". We adjusted these vaccine efficacy rates to account for the Delta variant by using 
+               a recent large-scale study in the United Kingdom on vaccine efficacy the B.1.617.2 (Delta) variant completed by ",
               tags$a("Bernal et al (2021b)", href = urls$bernal_etal_2021b),
               ". Then we estimated vaccine effectiveness over time based on a systematic review and meta-regression completed by ", 
               tags$a("Feilkin et al (2021)", href = urls$feilkin_etal_2021), "."),
