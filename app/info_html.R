@@ -8,7 +8,7 @@ disclaimerpopupHTML <- function(){
     tags$p(style="color:#DF691A", "THE INFORMATION PROVIDED BY THIS TOOL IS NOT MEDICAL ADVICE AND CANNOT BE 
              USED TO DIAGNOSE OR TREAT ANY MEDICAL CONDITION.  See FAQ for more information.", class = "text-warning"),
     tags$p("COVID-19 data behind this app is updated daily - last updated:", format(Sys.Date()-2, "%b %d, %Y"), class = "text-warning"),
-    tags$p("Our algorithm is updated periodically - last updated: September 24, 2021", class = "text-warning"),
+    tags$p("Our algorithm is updated periodically - last updated: December 20, 2021", class = "text-warning"),
     tags$p("Our latest addition to the algorithm is to account for the Delta variant of SARS-CoV-2, see more details under FAQ", class = "text-warning")
   )
 }
@@ -232,11 +232,12 @@ renderFaqHtml <- function() {
            "a recent study from ", tags$a("Bernal et al (2021b) .", href = urls$bernal_etal_2021b)),
     faqQuestion("When was the most recent update to the app and what is new?"),
     tags$p("The COVID-19 data behind this app is updated daily. We periodically update the algorithm used for risk score estimation.",
-           " The most recent update to the algorithm was on January 6th, 2022. We made the following major changes:"),
+           " The most recent update to the algorithm was on December 20, 2021. We made the following major changes:"),
     tags$ol(
-      tags$li("Update the baseline probability of hospitalization/ICU/death by age group using the latest CDC surveillance data as of September 2021."),
-      tags$li("Update the province-level adjusted case fatality rate for Belgium using data until 2021-10-21"),
-      tags$li("Refactor vaccine effectiveness against infection hospitalization, icu, and mortality overtime")
+      tags$li("Update the province-level adjusted case fatality rate for Belgium using data until 2021-12-07"),
+      tags$li("Modify the vaccination section to 1) account for the waning vaccine effectiveness against infection and 
+              severe illness over time and 2) account for the effect of booster shots"), 
+      tags$li("Update the baseline probability of hospitalization/ICU/death by age group using the latest CDC surveillance data as of September 2021.")
     ) # end of ul
   )
 }
