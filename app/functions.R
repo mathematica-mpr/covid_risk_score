@@ -124,9 +124,9 @@ renderVaccinesHtml <- function(risk, has_vaccine, vaccine, months_last_vaccinati
   # Case where not vaccinated
   if (!has_vaccine){
     # no doses
-    text <- tags$p("There are currently vaccines against COVID-19 authorized for use in the United States. 
-                   All of the approved vaccines are safe and highly effective at preventing symptomatic COVID-19. ", 
-           tags$a("Click here ", href=urls$cdc_vaccines), "for more information and to check when you might be eligible for vaccination.")
+    text <- tags$p("The approved against COVID-19 vaccines are safe and highly effective at preventing symptomatic COVID-19. ", 
+           tags$a("Click here", href=urls$cdc_vaccines), " for more information and to check when you might be eligible for vccination. ", 
+           tags$a("Click here", href=urls$who_vaccines), " for a full list of vaccines approved for Use by the World Health Organization (WHO).")
   } else if (!is.na(months_last_vaccination)) {
     # if has vaccination
     infection_efficacy_perc <- formatPercent(risk$vaccine_reduction$infection_efficacy)
