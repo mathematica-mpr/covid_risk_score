@@ -164,10 +164,7 @@ renderVaccinesHtml <- function(risk, has_vaccine, vaccine, months_last_vaccinati
   div(formatResultsHeader("Vaccine information"), text, 
       tags$p("After you have been vaccinated, be sure to follow the ",
              tags$a("CDC guidance for fully vaccinated individuals ", href=urls$cdc_vaccinated_guidance),
-             "to protect your family, friends, and community.",  
-             "Early evidence from vaccine trials suggests that some or all of the vaccines may provide additional protection against hospitalization and death, ", 
-             "however this conclusion is only preliminary due to the small number of individuals in the treatment groups who contracted COVID-19."
-      ))
+             "to protect your family, friends, and community."))
 }
 
 # function to create exporsure risk HTML output --------------------------------
