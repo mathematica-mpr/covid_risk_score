@@ -121,7 +121,7 @@ ui <- fluidPage(
           checkboxInput('has_vaccine', div("I have received at least one dose of a COVID-19 vaccine")),
           conditionalPanel(
             condition = "input.has_vaccine == true",
-            radioButtons('vaccine', "Which of the available COVID-19 vaccines did you receive most recently?",
+            radioButtons('vaccine', "Which of the available COVID-19 vaccines did you receive most recently, including the booster?",
                          choiceNames = unname(vaccine_labels), choiceValues = names(vaccine_labels),
                          inline=TRUE),
             radioButtons('months_last_vaccination', "When was your most recent COVID-19 vaccine, including the booster?", 
