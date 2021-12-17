@@ -9,7 +9,7 @@ disclaimerpopupHTML <- function(){
              USED TO DIAGNOSE OR TREAT ANY MEDICAL CONDITION.  See FAQ for more information.", class = "text-warning"),
     tags$p("COVID-19 data behind this app is updated daily - last updated:", format(Sys.Date()-2, "%b %d, %Y"), class = "text-warning"),
     tags$p("Our algorithm is updated periodically - last updated: December 20, 2021", class = "text-warning"),
-    tags$p("Our latest addition to the algorithm is to account for the Delta variant of SARS-CoV-2, see more details under FAQ", class = "text-warning")
+    tags$p("Our latest addition to the algorithm is to account for the waning immunity of vaccines against infection and severe illness and to account for the effect of booster shots, see more details under FAQ", class = "text-warning")
   )
 }
 
