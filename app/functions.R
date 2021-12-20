@@ -51,7 +51,7 @@ formatPercent<-function(probability) {
   return (formatNumber(100 * probability, "%"))
 }
 formatProbability<-function(probability) {
-  return (round(100 / probability))
+  return (formatDynamicString(format(round(100/probability), big.mark=",")))
 }
 
 renderOutputIntroHtml <- function() {
