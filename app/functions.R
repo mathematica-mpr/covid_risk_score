@@ -202,7 +202,7 @@ renderSusceptibilityHtml <- function(risk) {
     formatProbability(risk$hosp_risk),
     " people will be hospitalized if infected, one person in a group of ",
     formatProbability(risk$icu_risk),
-    " people will require an ICU, and on person in a group of ",
+    " people will require an ICU, and one person in a group of ",
     formatProbability(risk$death_risk),
     " people will not survive."
   )))
