@@ -19,7 +19,7 @@ source("functions.R")
 # urls class to store our urls
 urls  = list(
   # Mathematica COVID Score API
-  covid_score_api =  "https://us-api.covid19.mathematica.org/score",
+  covid_score_api = "https://us-api.covid19.mathematica.org/score",
   covid_score_api_dev =  "https://awsdev.us-api.covid19.mathematica.org/score",
   # CCDC
   ccdc_vol2_2020 = "https://www.unboundmedicine.com/medline/citation/32064853/[The_epidemiological_characteristics_of_an_outbreak_of_2019_novel_coronavirus_diseases__COVID_19__in_China]",
@@ -75,9 +75,11 @@ urls  = list(
   moderna_eua_2020 = "https://www.fda.gov/media/144637/download", #moderna vaccine factsheet for hcp
   pfizer_eua_2020 = "https://www.fda.gov/media/144413/download", #pfizer vaccine factsheet for hcp
   jandj_eua_2021 = "https://www.fda.gov/media/146217/download",
-  bernal_etal_2021 = "https://www.bmj.com/content/373/bmj.n1088", #pfizer and astrazeneca vax against hosp and death
+  bernal_etal_2021a = "https://www.bmj.com/content/373/bmj.n1088", #pfizer and astrazeneca vax against hosp and death
   bernal_etal_2021b = "https://www.medrxiv.org/content/10.1101/2021.05.22.21257658v1", #pfizer and astrazeneca vax against delta variant
   voysey_etal_2021 = "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3777268", # astrazeneca vaccine efficacy against symptomatic infections
+  feilkin_etal_2021 = "http://dx.doi.org/10.2139/ssrn.3961378", # vaccine effectiveness over time systematic review and meta-regression
+  who_vaccines = "https://covid19.trackvaccines.org/agency/who", # Vaccines Approved for Use by WHO
   # Activity risk level
   bellage_activity_chart = "https://bellage.org/wp-content/uploads/2020/09/BellAge-COVID19-Activity-Risk-Chart.pdf",
   # excerise level and severe covid
@@ -125,29 +127,4 @@ vaccine_labels = list(pfizer = "Pfizer-BioNTech",
                       johnsonandjohnson = "Johnson & Johnson",
                       astrazeneca = "AstraZeneca")
 
-vaccines = list(pfizer=
-                  list(efficacy=.95,
-                       doses=2,
-                       days_between_doses=21,
-                       days_after_final_dose=7),
-                moderna=
-                  list(efficacy=.941,
-                       doses=2,
-                       days_between_doses=28,
-                       days_after_final_dose=14),
-                johnsonandjohnson=
-                  list(efficacy=.66,
-                       doses=1,
-                       days_between_doses=NA,
-                       days_after_final_dose=14),
-                astrazeneca = 
-                  list(efficacy = .824,
-                       doses = 2,
-                       days_between_doses = 84,
-                       days_after_final_dose = 14))
-
-total_vaccines_str = "three"
-
-doses_days_labels <- c("How many days ago did you receive your vaccine? <sub class = 'text-info'>If more than 21 days ago, select 21.</sub>", 
-                       "How many days ago did you receive your most recent dose? <sub class = 'text-info'>If more than 21 days ago, select 21.</sub>")
-
+months_last_vaccination_labels = c("Within one month" = "lt_1mo", "1-6 months ago" = "btw_1_6mo", "More than 6 months ago" = "gt_6mo")
