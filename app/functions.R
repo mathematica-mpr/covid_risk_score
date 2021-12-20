@@ -200,7 +200,11 @@ renderSusceptibilityHtml <- function(risk) {
   tags$p(HTML(paste0(
     "Among people who are the same age, sex, and health status as you and get sick from COVID-19, we estimate that one person in a group of ", 
     formatProbability(risk$hosp_risk),
-    " people will be hospitalized if infected."
+    " people will be hospitalized if infected, one person in a group of ",
+    formatProbability(risk$icu_risk),
+    " people will require an ICU, and on person in a group of ",
+    formatProbability(risk$death_risk),
+    " people will not survive."
   )))
   # tags$p(HTML(paste0(
   #   "Among people who are the same age, sex, and health status as you and get sick from COVID-19, the risk of hospitalization is ", 
