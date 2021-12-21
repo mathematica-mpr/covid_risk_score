@@ -27,8 +27,7 @@ calculateRisk <- function(input) {
   
   if (input$has_vaccine){
     request_body$vaccine = input$vaccine
-    request_body$doses = as.numeric(input$doses)
-    request_body$days_since_last_dose = input$days_since_last_dose
+    request_body$months_last_vaccination = input$months_last_vaccination
   }
   
   resp <- POST(urls$covid_score_api, add_headers("x-api-key" = Sys.getenv("X_API_KEY")), body = request_body, encode = "json")
@@ -120,53 +119,52 @@ renderScoreHtml <- function(risk) {
   )))
 }
 
-renderVaccinesHtml <- function(go, has_vaccine, vaccine, doses, days){
-  validate(need(go, ""))
+renderVaccinesHtml <- function(risk, has_vaccine, vaccine, months_last_vaccination){
   
   # Case where not vaccinated
   if (!has_vaccine){
     # no doses
-    text <- tags$p("There are currently", total_vaccines_str, "vaccines against COVID-19 authorized for use in the United States. ",
-           "All of the approved vaccines are safe and highly effective at preventing symptomatic COVID-19. ", 
-           tags$a("Click here ", href=urls$cdc_vaccines), "for more information and to check when you might be eligible for vaccination.")
-  } else if (doses < vaccines[[vaccine]][["doses"]]){
-    # some but not all doses
-    text <- tags$p("Congratulations on receiving your first dose of the ", vaccine_labels[vaccine], " COVID-19 vaccine!",
-           "Be sure to get your second dose of the vaccine ", vaccines[[vaccine]]$days_between_doses,
-           " days after the first. ", tags$a("Click here ", href=urls$cdc_vaccines), 
-           "for more information about the United States' vaccination program.")
-  } else {
-    # all doses
-    if (days<vaccines[[vaccine]]$days_after_final_dose){
-      # before efficacy threshold
-      text <- tags$p("Congratulations on receiving", 
-                     ifelse(vaccines[[vaccine]]$doses==1, "the ", "both doses of the "), 
-                     vaccine_labels[vaccine], " COVID-19 vaccine!",
-                     "This vaccine reaches its full ", formatPercent(vaccines[[vaccine]]$efficacy),
-                     " efficacy at around ", vaccines[[vaccine]]$days_after_final_dose,
-                     ifelse(vaccines[[vaccine]]$doses==1, "days after vaccination. ", "days after the second dose. "), 
-                     "Your immunity will build up over the next few days. ",
-                     tags$a("Click here ", href=urls$cdc_vaccines), 
-                     "for more information about the United States' vaccination program.")
-    } else {
-      # after efficacy threshold
-      text <- tags$p("Congratulations on receiving", 
-                     ifelse(vaccines[[vaccine]]$doses==1, "the ", "both doses of the "), 
-                     vaccine_labels[vaccine], " COVID-19 vaccine!",
-                     "This vaccine reduces your risk of contracting symptomatic COVID-19 by ",
-                     formatPercent(vaccines[[vaccine]]$efficacy), ". ",
-                     tags$a("Click here ", href=urls$cdc_vaccines), 
-                     "for more information about the United States' vaccination program.")
+    text <- tags$p("The approved against COVID-19 vaccines are safe and highly effective at preventing symptomatic COVID-19. ", 
+           tags$a("Click here", href=urls$cdc_vaccines), " for more information and to check when you might be eligible for vccination. ", 
+           tags$a("Click here", href=urls$who_vaccines), " for a full list of vaccines approved for Use by the World Health Organization (WHO).")
+  } else if (!is.na(months_last_vaccination)) {
+    # if has vaccination
+    infection_efficacy_perc <- formatPercent(risk$vaccine_reduction$infection_efficacy)
+    hosp_efficacy_perc <- formatPercent(risk$vaccine_reduction$hosp_efficacy)
+    icu_efficacy_perc <- formatPercent(risk$vaccine_reduction$icu_efficacy)
+    death_efficacy_perc <- formatPercent(risk$vaccine_reduction$death_efficacy)
+    
+    if (months_last_vaccination == "lt_1mo"){
+      # last vaccine within 1 month 
+      months_last_vaccination_text <- HTML(paste0("Congratulations on receiving the ", vaccine_labels[vaccine], " COVID-19 vaccine! ", 
+                     "The vaccine reaches its full efficacy at around 14 days after vaccination. ",
+                     "We estimate that the full efficacy of the ", vaccine_labels[vaccine]))
+    } else if (months_last_vaccination == "btw_1_6mo"){
+      # last vaccine within 1-6 month
+      months_last_vaccination_text <- HTML(paste0("Congratulations on receiving the ", vaccine_labels[vaccine], " COVID-19 vaccine! ",
+                                             "Between 1 and 6 months after last vaccination, we estimate that the efficacy of the ", vaccine_labels[vaccine]))
+      
+    } else if (months_last_vaccination == "gt_6mo"){
+      # last vaccine within greater than 6 month
+      months_last_vaccination_text <- HTML(paste0("Congratulations on receiving the ", vaccine_labels[vaccine], " COVID-19 vaccine! ",
+                     "Be sure check if you are eligible to receive a booster shot. ",
+                     "More than 6 months after last vaccination, we estimate that the efficacy of the ", vaccine_labels[vaccine]))
     }
+    
+    reduction_text <- HTML(paste0( " COVID-19 vaccine is a ",  
+                             infection_efficacy_perc, "reduction in risk of infection; a ", 
+                             hosp_efficacy_perc, "reduction in risk of hospitalization; a ", 
+                             infection_efficacy_perc, "reduction in risk of ICU addmission; and a ", 
+                             infection_efficacy_perc, "reduction in risk of death due to COVID-19. ", 
+                             tags$a("Click here ", href=urls$cdc_vaccines), "for more information about the United States' vaccination program."))
+    
+    text <- tags$p(months_last_vaccination_text, reduction_text)
   }
   
   div(formatResultsHeader("Vaccine information"), text, 
       tags$p("After you have been vaccinated, be sure to follow the ",
              tags$a("CDC guidance for fully vaccinated individuals ", href=urls$cdc_vaccinated_guidance),
-             "to protect your family, friends, and community.",  
-             "Early evidence from vaccine trials suggests that some or all of the vaccines may provide additional protection against hospitalization and death, ", 
-             "however this conclusion is only preliminary due to the small number of individuals in the treatment groups who contracted COVID-19."
-      ))
+             "to protect your family, friends, and community."))
 }
 
 # function to create exporsure risk HTML output --------------------------------

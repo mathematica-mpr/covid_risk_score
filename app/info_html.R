@@ -8,8 +8,8 @@ disclaimerpopupHTML <- function(){
     tags$p(style="color:#DF691A", "THE INFORMATION PROVIDED BY THIS TOOL IS NOT MEDICAL ADVICE AND CANNOT BE 
              USED TO DIAGNOSE OR TREAT ANY MEDICAL CONDITION.  See FAQ for more information.", class = "text-warning"),
     tags$p("COVID-19 data behind this app is updated daily - last updated:", format(Sys.Date()-2, "%b %d, %Y"), class = "text-warning"),
-    tags$p("Our algorithm is updated periodically - last updated: November 16, 2021", class = "text-warning"),
-    tags$p("Our latest addition to the algorithm is to account for the Delta variant of SARS-CoV-2, see more details under FAQ", class = "text-warning")
+    tags$p("Our algorithm is updated periodically - last updated: December 20, 2021", class = "text-warning"),
+    tags$p("Our latest addition to the algorithm is to account for the waning immunity of vaccines against infection and severe illness and to account for the effect of booster shots, see more details under FAQ", class = "text-warning")
   )
 }
 
@@ -58,7 +58,6 @@ renderMethodsHtml <- function() {
                       "towards the state CFR.",
                       "The result is that for counties with many cases, we essentially use the county-level CFR, ",
                       "but for counties with only a few cases we use a CFR that is partway between the county and state CFRs. ")),
-      
       tags$li(
         "Estimations of the probability of having COVID-19 given symptoms are calculated using a logistic regression model published on Nature Medicine developed by ",
         tags$a("Menni et al (2020).", href = urls$menni_etall_2020),
@@ -71,22 +70,13 @@ renderMethodsHtml <- function() {
               "Without randomized trials, these systematic appraisals of the current best available evidence are useful to inform interim guidance. "),
       tags$li("The efficacy data of the Pfizer-BioNTech, Moderna, Johnson and Johnson, and AstraZeneca COVID-19 vaccines against infection were obtained from 
               FDA Emergency Use Authorization fact sheets and peer-reviewed journal articles",
-              tags$a("FDA (2020a) ", href = urls$pfizer_eua_2020),
-              ", ",
-              tags$a("FDA (2020b) ", href = urls$moderna_eua_2020),
-              ", ",
-              tags$a("FDA (2021) ", href = urls$jandj_eua_2021),
-              ", and ",
-              tags$a("Voysey et al (2021). ", href = urls$voysey_etal_2021),
-              "Each of the two-dose vaccines provide early protection after a number of days after the first dose. ",
-              "We incorporated the efficacy data on the first dose published by ",
-              tags$a("Polack et al (2020) ", href = urls$polack_etal_2020),
-              "and ",
-              tags$a("FDA (2020c). ", href = urls$moderna_fda_2020),
-              "Based on a recent large scale study in older adults in England ",
-              tags$a("(Bernal et al 2021), ", href = urls$bernal_etal_2021),
-              "we estimated the effectiveness of vaccine against emergency hospital admissions and mortality. 
-              This is an imperfect proxy, and we will keep monitoring the literature and update the calculation as more data on other population segments become available. "),
+              tags$a("FDA (2020a)", href = urls$pfizer_eua_2020), ", ", tags$a("FDA (2020b)", href = urls$moderna_eua_2020), ", ",
+              tags$a("FDA (2021)", href = urls$jandj_eua_2021), ", and ", tags$a("Voysey et al (2021)", href = urls$voysey_etal_2021),
+              ". We adjusted these vaccine efficacy rates to account for the Delta variant by using 
+               a recent large-scale study in the United Kingdom on vaccine efficacy the B.1.617.2 (Delta) variant completed by ",
+              tags$a("Bernal et al (2021b)", href = urls$bernal_etal_2021b),
+              ". Then we estimated vaccine effectiveness over time based on a systematic review and meta-regression completed by ", 
+              tags$a("Feilkin et al (2021)", href = urls$feilkin_etal_2021), "."),
       tags$li("Activity risk levels for COVID-19 are based on a professional review panel completed by ", 
               tags$a("BellAge", href = urls$bellage_activity_chart), 
               ". To provide 19 and Me users with a general idea of how different activities affect risk of COVID-19 through community exposure,
@@ -132,6 +122,13 @@ renderMethodsHtml <- function() {
       tags$li("Odds ratios for hospitalization, ICU admission, and death associated with exercise level were obtained from ",
               tags$a("Sallis et al (2021)", href = urls$sallis_etal_2021), "."
       ),
+      tags$li("Based on a recent large scale study in older adults in England ",
+              tags$a("(Bernal et al 2021a), ", href = urls$bernal_etal_2021a),
+              "we estimated the effectiveness of vaccine against emergency hospital admissions and mortality. 
+              This is an imperfect proxy, and we will keep monitoring the literature and update the calculation as more data on other population segments become available. 
+              Then we estimated vaccine effectiveness over time based on a systematic review and meta-regression completed by ", 
+              tags$a("Feilkin et al (2021)", href = urls$feilkin_etal_2021), "."),
+      
     ), #end of ol
     tags$h4("In the Works:"),
     tags$ul(
@@ -232,11 +229,12 @@ renderFaqHtml <- function() {
            "a recent study from ", tags$a("Bernal et al (2021b) .", href = urls$bernal_etal_2021b)),
     faqQuestion("When was the most recent update to the app and what is new?"),
     tags$p("The COVID-19 data behind this app is updated daily. We periodically update the algorithm used for risk score estimation.",
-           " The most recent update to the algorithm was on September 24th, 2021. We made the following major changes:"),
+           " The most recent update to the algorithm was on December 20, 2021. We made the following major changes:"),
     tags$ol(
-      tags$li("Update the baseline probability of hospitalization/ICU/death by age group using the latest CDC surveillance data as of September 2021."),
-      tags$li("Update the household transmissibility to account for the increased transmission of the Delta variants."),
-      tags$li("Update the vaccine efficacy against infection given that Delta variant has become the dominant strain of COVID-19 in the US. ")
+      tags$li("Update the province-level adjusted case fatality rate for Belgium using data until 2021-12-07"),
+      tags$li("Modify the vaccination section to 1) account for the waning vaccine effectiveness against infection and 
+              severe illness over time and 2) account for the effect of booster shots"), 
+      tags$li("Update the baseline probability of hospitalization/ICU/death by age group using the latest CDC surveillance data as of September 2021.")
     ) # end of ul
   )
 }
