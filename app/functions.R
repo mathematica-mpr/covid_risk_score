@@ -154,8 +154,8 @@ renderVaccinesHtml <- function(risk, has_vaccine, vaccine, months_last_vaccinati
     reduction_text <- HTML(paste0( " COVID-19 vaccine is a ",  
                              infection_efficacy_perc, "reduction in risk of infection; a ", 
                              hosp_efficacy_perc, "reduction in risk of hospitalization; a ", 
-                             infection_efficacy_perc, "reduction in risk of ICU addmission; and a ", 
-                             infection_efficacy_perc, "reduction in risk of death due to COVID-19. ", 
+                             icu_efficacy_perc, "reduction in risk of ICU addmission; and a ", 
+                             death_efficacy_perc, "reduction in risk of death due to COVID-19. ", 
                              tags$a("Click here ", href=urls$cdc_vaccines), "for more information about the United States' vaccination program."))
     
     text <- tags$p(months_last_vaccination_text, reduction_text)
