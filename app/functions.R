@@ -50,6 +50,9 @@ formatNumber<-function(number, unit) {
 formatPercent<-function(probability) {
   return (formatNumber(100 * probability, "%"))
 }
+formatProbability<-function(probability) {
+  return (formatDynamicString(format(round(1/probability), big.mark=",")))
+}
 
 renderOutputIntroHtml <- function() {
   tagList(
@@ -195,12 +198,19 @@ renderExposureHtml <- function(risk, symptoms) {
 # function to create susceptibility HTML output --------------------------------------
 renderSusceptibilityHtml <- function(risk) {
   tags$p(HTML(paste0(
-    "Among people who are the same age, sex, and health status as you and get sick from COVID-19, the risk of hospitalization is ", 
+    "Among people who are the same age, sex, and health status as you and get sick from COVID-19, the risk of hospitalization is ",
     formatPercent(risk$hosp_risk),
     ", the risk of requiring an ICU is ",
     formatPercent(risk$icu_risk),
-    ", and the risk of not surviving is ",
-    formatPercent(risk$death_risk), "."
+    ", and the risk of death is ",
+    formatPercent(risk$death_risk),
+    ". Put another way, we estimate that one person in a group of ", 
+    formatProbability(risk$hosp_risk),
+    " people will be hospitalized if infected, one person in a group of ",
+    formatProbability(risk$icu_risk),
+    " people will require an ICU, and one person in a group of ",
+    formatProbability(risk$death_risk),
+    " people will not survive."
   )))
 }
 
