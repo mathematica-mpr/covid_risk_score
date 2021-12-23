@@ -198,7 +198,13 @@ renderExposureHtml <- function(risk, symptoms) {
 # function to create susceptibility HTML output --------------------------------------
 renderSusceptibilityHtml <- function(risk) {
   tags$p(HTML(paste0(
-    "Among people who are the same age, sex, and health status as you and get sick from COVID-19, we estimate that one person in a group of ", 
+    "Among people who are the same age, sex, and health status as you and get sick from COVID-19, the risk of hospitalization is ",
+    formatPercent(risk$hosp_risk),
+    ", the risk of requiring an ICU is ",
+    formatPercent(risk$icu_risk),
+    ", and the risk of death is ",
+    formatPercent(risk$death_risk),
+    ". Put another way, we estimate that one person in a group of ", 
     formatProbability(risk$hosp_risk),
     " people will be hospitalized if infected, one person in a group of ",
     formatProbability(risk$icu_risk),
@@ -206,14 +212,6 @@ renderSusceptibilityHtml <- function(risk) {
     formatProbability(risk$death_risk),
     " people will not survive."
   )))
-  # tags$p(HTML(paste0(
-  #   "Among people who are the same age, sex, and health status as you and get sick from COVID-19, the risk of hospitalization is ", 
-  #   formatPercent(risk$hosp_risk),
-  #   ", the risk of requiring an ICU is ",
-  #   formatPercent(risk$icu_risk),
-  #   ", and the risk of not surviving is ",
-  #   formatPercent(risk$death_risk), "."
-  # )))
 }
 
 # function to create hand and ppe HTML output ----------------------------------
