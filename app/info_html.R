@@ -10,7 +10,7 @@ disclaimerpopupHTML <- function(){
              USED TO DIAGNOSE OR TREAT ANY MEDICAL CONDITION.  See FAQ for more information.", class = "text-warning"),
     tags$p("COVID-19 data behind this app is updated daily - last updated:", format(Sys.Date()-2, "%b %d, %Y"), class = "text-warning"),
     tags$p(paste0("Our algorithm is updated periodically - last updated: ", latest_verison_date) , class = "text-warning"),
-    tags$p("Our latest addition to the algorithm is to account for the waning immunity of vaccines against infection and severe illness and to account for the effect of booster shots, see more details under FAQ", class = "text-warning")
+    tags$p("Our latest addition to the algorithm is to account for the waning immunity of vaccines against infection and severe illness and to account for the effect of booster shots, see more details under the \"Change Log\" tab", class = "text-warning")
   )
 }
 
@@ -230,14 +230,9 @@ renderFaqHtml <- function() {
            "a recent study from ", tags$a("Bernal et al (2021b) .", href = urls$bernal_etal_2021b)),
     faqQuestion("When was the most recent update to the app and what is new?"),
     tags$p("The COVID-19 data behind this app is updated daily. We periodically update the algorithm used for risk score estimation.",
-           " The most recent update to the algorithm was on December 20, 2021. We made the following major changes:"),
-    tags$ol(
-      tags$li("Update the province-level adjusted case fatality rate for Belgium using data until 2021-12-07"),
-      tags$li("Modify the vaccination section to 1) account for the waning vaccine effectiveness against infection and 
-              severe illness over time and 2) account for the effect of booster shots"), 
-      tags$li("Update the baseline probability of hospitalization/ICU/death by age group using the latest CDC surveillance data as of September 2021.")
-    ) # end of ul
-  )
+           " Visit the \"Change Log\" tab to see the most recent update to the algorithm.")
+    
+  )# end of tag list
 }
 
 # function makes CHANGELOG API call -------------------------------------------------
