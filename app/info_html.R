@@ -238,3 +238,13 @@ renderFaqHtml <- function() {
     ) # end of ul
   )
 }
+
+# function makes CHANGELOG API call -------------------------------------------------
+renderChangelogHtml <- function() {
+  changelog_r <- GET("https://us-api.covid19.mathematica.org/change-log",
+                     add_headers("x-api-key" = Sys.getenv("X_API_KEY")))
+  changelog_md <- content(changelog_r, "text", encoding = "UTF-8")
+  changelog_html <- HTML(markdown::markdownToHTML(text = changelog_md))
+  return (changelog_html)
+}
+
