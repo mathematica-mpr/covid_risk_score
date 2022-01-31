@@ -152,9 +152,11 @@ server <- function(input, output, session) {
   
   ## render CHANGELOG page ---------------------------------------------------
   output$changelog <- renderUI({
-    r <- GET("https://awsdev.us-api.covid19.mathematica.org/change-log",
+    # TODO: make wrapper function for this process
+    changelog_r <- GET("https://awsdev.us-api.covid19.mathematica.org/change-log",
              add_headers("x-api-key" = Sys.getenv("X_API_KEY")))
-    content(r, "text", encoding = "UTF-8")
+    changelog_md <- content(changelog_r, "text", encoding = "UTF-8")
+    HTML(markdown::markdownToHTML(text = changelog_md))
   })
   
 }
