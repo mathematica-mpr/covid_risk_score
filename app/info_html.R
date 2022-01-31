@@ -131,19 +131,11 @@ renderMethodsHtml <- function() {
               tags$a("Feilkin et al (2021)", href = urls$feilkin_etal_2021), "."),
       
     ), #end of ol
-    tags$h4("In the Works:"),
-    tags$ul(
-      tags$p("We are continuously working to update these assumptions as additional knowledge about the virus becomes available."),
-      tags$p("Below are some COVID-19 developments we are monitoring closely and are looking to incorporate into the methodology as data become available."),
-      tags$ul(
-        tags$li("Risk of ", tags$a("post-COVID-19 conditions", href = urls$cdc_post_covid_conditions), "for people with similar characteristics and behaviors as you")
-      ), # end of ul
-      tags$br(),
-      tags$p("If you have additional suggestions about the app, data sets, or features, Please let us know at", 
-             tags$a("covid.risk.score@gmail.com", href="mailto:covid.risk.score@gmail.com"), 
-             "or visit us on ", tags$a("GitHub", href="https://github.com/mathematica-mpr/covid_risk_score"))
-    ) # end of ul
-  )
+    tags$br(),
+    tags$p("If you have additional suggestions about the app, data sets, or features, Please let us know at", 
+           tags$a("covid.risk.score@gmail.com", href="mailto:covid.risk.score@gmail.com"), 
+           "or visit us on ", tags$a("GitHub", href="https://github.com/mathematica-mpr/covid_risk_score"))
+  ) # end of ul
 }
 
 # helper function for rendering FAQ's
