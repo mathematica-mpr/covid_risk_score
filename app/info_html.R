@@ -2,6 +2,7 @@
 # disclaimer popup
 disclaimerpopupHTML <- function(){
   latest_verison_date <- get_latest_verison_date()
+  latest_cahnges <- get_latest_changes()
   tagList(
     tags$p("This tool works best on Google Chrome and mobile.", class = "text-warning"),
     tags$p("Currently this tool is designed for use in the United States. We do not retain any information that you provide in connection with your use of the tool."),
@@ -10,7 +11,7 @@ disclaimerpopupHTML <- function(){
              USED TO DIAGNOSE OR TREAT ANY MEDICAL CONDITION.  See FAQ for more information.", class = "text-warning"),
     tags$p("COVID-19 data behind this app is updated daily - last updated:", format(Sys.Date()-2, "%b %d, %Y"), class = "text-warning"),
     tags$p(paste0("Our algorithm is updated periodically - last updated: ", latest_verison_date) , class = "text-warning"),
-    tags$p("Our latest addition to the algorithm is to account for the waning immunity of vaccines against infection and severe illness and to account for the effect of booster shots, see more details under the \"Change Log\" tab", class = "text-warning")
+    HTML(markdown::markdownToHTML(text = latest_cahnges))
   )
 }
 
@@ -244,3 +245,15 @@ get_latest_verison_date <- function() {
   return (formated_date)
 }
 
+# function find lastest changes -------------------------------------------------
+get_latest_changes <- function() {
+  changelog_r <- GET(urls$covid_change_log_api, add_headers("x-api-key" = Sys.getenv("X_API_KEY")))
+  changelog_md <- content(changelog_r, "text", encoding = "UTF-8")
+  lastest_version <- strsplit(changelog_md, split = "\n\n## ")[[1]][2]
+  last_changes <- strsplit(lastest_version, split = "\n")[[1]]
+  # find strings that are versions
+  is_change <- grepl("^\\- ", last_changes)
+  # find most resent versions
+  changes <- last_changes[is_change]
+  return (changes)
+}
