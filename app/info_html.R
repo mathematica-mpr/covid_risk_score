@@ -2,7 +2,8 @@
 # disclaimer popup
 disclaimerpopupHTML <- function(){
   latest_verison_date <- get_latest_verison_date()
-  latest_cahnges <- get_latest_changes()
+  #TODO: add back in latest changes
+  #latest_changes <- get_latest_changes()
   tagList(
     tags$p("This tool works best on Google Chrome and mobile.", class = "text-warning"),
     tags$p("Currently this tool is designed for use in the United States. We do not retain any information that you provide in connection with your use of the tool."),
@@ -10,8 +11,8 @@ disclaimerpopupHTML <- function(){
     tags$p(style="color:#DF691A", "THE INFORMATION PROVIDED BY THIS TOOL IS NOT MEDICAL ADVICE AND CANNOT BE 
              USED TO DIAGNOSE OR TREAT ANY MEDICAL CONDITION.  See FAQ for more information.", class = "text-warning"),
     tags$p("COVID-19 data behind this app is updated daily - last updated:", format(Sys.Date()-2, "%b %d, %Y"), class = "text-warning"),
-    tags$p(paste0("Our algorithm is updated periodically - last updated: ", latest_verison_date) , class = "text-warning"),
-    HTML(markdown::markdownToHTML(text = latest_cahnges))
+    tags$p(paste0("Our algorithm is updated periodically - last updated: ", latest_verison_date) , class = "text-warning")#,
+    #HTML(markdown::markdownToHTML(text = latest_changes))
   )
 }
 
@@ -247,6 +248,7 @@ get_latest_verison_date <- function() {
 
 # function find lastest changes -------------------------------------------------
 get_latest_changes <- function() {
+  # TODO: Optimize the CHANGELOG API calls
   changelog_r <- GET(urls$covid_change_log_api, add_headers("x-api-key" = Sys.getenv("X_API_KEY")))
   changelog_md <- content(changelog_r, "text", encoding = "UTF-8")
   lastest_version <- strsplit(changelog_md, split = "\n\n## ")[[1]][2]
