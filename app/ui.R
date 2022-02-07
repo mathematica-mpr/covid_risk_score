@@ -149,7 +149,7 @@ ui <- fluidPage(
         # tabPanel("Map"),
         tabPanel("Method", htmlOutput("methods")),
         tabPanel("FAQ", htmlOutput("faq")),
-        tabPanel("Change Log", uiOutput("changelog"))
+        tabPanel("Change Log", htmlOutput("changelog"))
       ),
       width = 8
     ) # mainPanel
