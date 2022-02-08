@@ -2,8 +2,7 @@
 # disclaimer popup
 disclaimerpopupHTML <- function(){
   
-  # get changelog
-  changelog_html <- renderChangelogHtml()
+  changelog_html <- renderChangelogHtml() # get changelog
   # find lastest version date
   latest_verison_date <- str_extract(changelog_html, "[0-9]{4}\\-[0-9]{2}\\-[0-9]{2}")
   latest_verison_date_formated <- format(as.Date(latest_verison_date),  format="%B %d, %Y")
@@ -142,7 +141,6 @@ renderMethodsHtml <- function() {
               This is an imperfect proxy, and we will keep monitoring the literature and update the calculation as more data on other population segments become available. 
               Then we estimated vaccine effectiveness over time based on a systematic review and meta-regression completed by ", 
               tags$a("Feilkin et al (2021)", href = urls$feilkin_etal_2021), "."),
-      
     ), #end of ol
     tags$br(),
     tags$p("If you have additional suggestions about the app, data sets, or features, Please let us know at", 
@@ -236,7 +234,6 @@ renderFaqHtml <- function() {
     faqQuestion("When was the most recent update to the app and what is new?"),
     tags$p("The COVID-19 data behind this app is updated daily. We periodically update the algorithm used for risk score estimation.",
            " Visit the \"Change Log\" tab to see the most recent update to the algorithm.")
-    
   )# end of tag list
 }
 

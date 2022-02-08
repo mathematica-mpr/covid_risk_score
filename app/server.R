@@ -154,7 +154,6 @@ server <- function(input, output, session) {
   output$changelog <- renderUI({
     # in app/info_html.R
     renderChangelogHtml()
-    
   })
   
 }
