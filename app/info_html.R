@@ -8,7 +8,10 @@ disclaimerpopupHTML <- function(){
   latest_verison_date <- str_extract(changelog_html, "[0-9]{4}\\-[0-9]{2}\\-[0-9]{2}")
   latest_verison_date_formated <- format(as.Date(latest_verison_date),  format="%B %d, %Y")
   #find lastest changes
-  last_changes <- str_extract(changelog_html, "<h4>((.|\n)*?)(?=\n\n<h3>)") %>% str_replace_all("<h4>", "<h5>")
+  last_changes <- str_extract(changelog_html, "<h4>((.|\n)*?)(?=\n\n<h3>)") %>% 
+    str_replace_all("h4>", "h5>") %>%
+    str_replace_all("<h5>", "<h5 class=\"text-warning\">") %>%
+    str_replace_all("<li>", "<li class=\"text-warning\">")
   last_changes_formated <- HTML(markdown::markdownToHTML(text = last_changes, fragment.only = T))
   
   tagList(
