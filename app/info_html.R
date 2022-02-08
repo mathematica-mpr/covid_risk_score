@@ -3,7 +3,7 @@
 disclaimerpopupHTML <- function(){
   latest_verison_date <- get_latest_verison_date()
   #TODO: add back in latest changes
-  #latest_changes <- get_latest_changes()
+  latest_changes <- get_latest_changes()
   tagList(
     tags$p("This tool works best on Google Chrome and mobile.", class = "text-warning"),
     tags$p("Currently this tool is designed for use in the United States. We do not retain any information that you provide in connection with your use of the tool."),
@@ -11,8 +11,8 @@ disclaimerpopupHTML <- function(){
     tags$p(style="color:#DF691A", "THE INFORMATION PROVIDED BY THIS TOOL IS NOT MEDICAL ADVICE AND CANNOT BE 
              USED TO DIAGNOSE OR TREAT ANY MEDICAL CONDITION.  See FAQ for more information.", class = "text-warning"),
     tags$p("COVID-19 data behind this app is updated daily - last updated:", format(Sys.Date()-2, "%b %d, %Y"), class = "text-warning"),
-    tags$p(paste0("Our algorithm is updated periodically - last updated: ", latest_verison_date) , class = "text-warning")#,
-    #HTML(markdown::markdownToHTML(text = latest_changes))
+    tags$p(paste0("Our algorithm is updated periodically - last updated: ", latest_verison_date) , class = "text-warning"),
+    latest_changes
   )
 }
 
@@ -239,8 +239,7 @@ renderChangelogHtml <- function() {
 
 # function find lastest version date -------------------------------------------------
 get_latest_verison_date <- function() {
-  changelog_r <- GET(urls$covid_change_log_api, add_headers("x-api-key" = Sys.getenv("X_API_KEY")))
-  changelog_md <- content(changelog_r, "text", encoding = "UTF-8")
+  changelog_md <- renderChangelogHtml()
   lastest_date <- str_extract(changelog_md, "[0-9]{4}\\-[0-9]{2}\\-[0-9]{2}")
   formated_date <- format(as.Date(lastest_date),  format="%B %d, %Y")
   return (formated_date)
@@ -248,14 +247,9 @@ get_latest_verison_date <- function() {
 
 # function find lastest changes -------------------------------------------------
 get_latest_changes <- function() {
-  # TODO: Optimize the CHANGELOG API calls
-  changelog_r <- GET(urls$covid_change_log_api, add_headers("x-api-key" = Sys.getenv("X_API_KEY")))
-  changelog_md <- content(changelog_r, "text", encoding = "UTF-8")
-  lastest_version <- strsplit(changelog_md, split = "\n\n## ")[[1]][2]
-  last_changes <- strsplit(lastest_version, split = "\n")[[1]]
-  # find strings that are versions
-  is_change <- grepl("^\\- ", last_changes)
-  # find most resent versions
-  changes <- last_changes[is_change]
-  return (changes)
+  changelog_html <- renderChangelogHtml()
+  last_changes <- str_extract(changelog_html, "<h4>((.|\n)*?)<h3>")
+  last_changes_format <- HTML(markdown::markdownToHTML(text = last_changes, fragment.only = T))
+  
+  return (last_changes_format)
 }
