@@ -1,18 +1,26 @@
 
 # disclaimer popup
 disclaimerpopupHTML <- function(){
-  latest_verison_date <- get_latest_verison_date()
-  #TODO: add back in latest changes
-  latest_changes <- get_latest_changes()
+  
+  # get changelog
+  changelog_html <- renderChangelogHtml()
+  # find lastest version date
+  latest_verison_date <- str_extract(changelog_html, "[0-9]{4}\\-[0-9]{2}\\-[0-9]{2}")
+  latest_verison_date_formated <- format(as.Date(latest_verison_date),  format="%B %d, %Y")
+  #find lastest changes
+  last_changes <- str_extract(changelog_html, "<h4>((.|\n)*?)<h3>")
+  last_changes_formated <- HTML(markdown::markdownToHTML(text = last_changes, fragment.only = T))
+  
   tagList(
     tags$p("This tool works best on Google Chrome and mobile.", class = "text-warning"),
     tags$p("Currently this tool is designed for use in the United States. We do not retain any information that you provide in connection with your use of the tool."),
     tags$p("Your use of this tool is subject to these ", tags$a("Terms of Use.", href="https://covid-risk-score-rshiny-code-artifacts.s3.amazonaws.com/COVID-19+Risk+Calculator+Terms+of+Use+-+042220.pdf")),
     tags$p(style="color:#DF691A", "THE INFORMATION PROVIDED BY THIS TOOL IS NOT MEDICAL ADVICE AND CANNOT BE 
              USED TO DIAGNOSE OR TREAT ANY MEDICAL CONDITION.  See FAQ for more information.", class = "text-warning"),
-    tags$p("COVID-19 data behind this app is updated daily - last updated:", format(Sys.Date()-2, "%b %d, %Y"), class = "text-warning"),
-    tags$p(paste0("Our algorithm is updated periodically - last updated: ", latest_verison_date) , class = "text-warning"),
-    latest_changes
+    tags$p("COVID-19 data behind this app is updated daily - last updated:", format(Sys.Date()-2, "%B %d, %Y"), class = "text-warning"),
+    tags$p(paste0("Our algorithm is updated periodically - last updated: ", latest_verison_date_formated) , class = "text-warning"),
+    tags$p("Our latest addition to the algorithm are: ", class = "text-warning"),
+    last_changes_formated
   )
 }
 
@@ -237,19 +245,3 @@ renderChangelogHtml <- function() {
   return (changelog_html)
 }
 
-# function find lastest version date -------------------------------------------------
-get_latest_verison_date <- function() {
-  changelog_md <- renderChangelogHtml()
-  lastest_date <- str_extract(changelog_md, "[0-9]{4}\\-[0-9]{2}\\-[0-9]{2}")
-  formated_date <- format(as.Date(lastest_date),  format="%B %d, %Y")
-  return (formated_date)
-}
-
-# function find lastest changes -------------------------------------------------
-get_latest_changes <- function() {
-  changelog_html <- renderChangelogHtml()
-  last_changes <- str_extract(changelog_html, "<h4>((.|\n)*?)<h3>")
-  last_changes_format <- HTML(markdown::markdownToHTML(text = last_changes, fragment.only = T))
-  
-  return (last_changes_format)
-}
