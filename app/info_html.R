@@ -8,9 +8,7 @@ disclaimerpopupHTML <- function(){
   latest_verison_date_formated <- format(as.Date(latest_verison_date),  format="%B %d, %Y")
   #find lastest changes
   last_changes <- str_extract(changelog_html, "<h4>((.|\n)*?)(?=\n\n<h3>)") %>% 
-    str_replace_all("h4>", "h5>") %>%
-    str_replace_all("<h5>", "<h5 class=\"text-warning\">") %>%
-    str_replace_all("<li>", "<li class=\"text-warning\">")
+    str_replace_all("h4>", "h5>")
   last_changes_formated <- HTML(markdown::markdownToHTML(text = last_changes, fragment.only = T))
   
   tagList(
@@ -20,8 +18,8 @@ disclaimerpopupHTML <- function(){
     tags$p(style="color:#DF691A", "THE INFORMATION PROVIDED BY THIS TOOL IS NOT MEDICAL ADVICE AND CANNOT BE 
              USED TO DIAGNOSE OR TREAT ANY MEDICAL CONDITION.  See FAQ for more information.", class = "text-warning"),
     tags$p("COVID-19 data behind this app is updated daily - last updated:", format(Sys.Date()-2, "%B %d, %Y"), class = "text-warning"),
-    tags$p(paste0("Our algorithm is updated periodically - last updated: ", latest_verison_date_formated) , class = "text-warning"),
-    tags$p("Our latest addition to the algorithm are: ", class = "text-warning"),
+    tags$p(paste0("Our algorithm is updated periodically - last updated: ", latest_verison_date_formated)),
+    tags$p("Our latest addition to the algorithm are: "),
     last_changes_formated
   )
 }
