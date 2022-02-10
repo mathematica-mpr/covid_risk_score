@@ -1,15 +1,26 @@
 
 # disclaimer popup
 disclaimerpopupHTML <- function(){
+  
+  changelog_html <- renderChangelogHtml() # get changelog
+  # find lastest version date
+  latest_verison_date <- str_extract(changelog_html, "[0-9]{4}\\-[0-9]{2}\\-[0-9]{2}")
+  latest_verison_date_formated <- format(as.Date(latest_verison_date),  format="%B %d, %Y")
+  #find lastest changes
+  last_changes <- str_extract(changelog_html, "<h4>((.|\n)*?)(?=\n\n<h3>)") %>% 
+    str_replace_all("h4>", "h5>")
+  last_changes_formated <- HTML(markdown::markdownToHTML(text = last_changes, fragment.only = T))
+  
   tagList(
     tags$p("This tool works best on Google Chrome and mobile.", class = "text-warning"),
     tags$p("Currently this tool is designed for use in the United States. We do not retain any information that you provide in connection with your use of the tool."),
     tags$p("Your use of this tool is subject to these ", tags$a("Terms of Use.", href="https://covid-risk-score-rshiny-code-artifacts.s3.amazonaws.com/COVID-19+Risk+Calculator+Terms+of+Use+-+042220.pdf")),
     tags$p(style="color:#DF691A", "THE INFORMATION PROVIDED BY THIS TOOL IS NOT MEDICAL ADVICE AND CANNOT BE 
              USED TO DIAGNOSE OR TREAT ANY MEDICAL CONDITION.  See FAQ for more information.", class = "text-warning"),
-    tags$p("COVID-19 data behind this app is updated daily - last updated:", format(Sys.Date()-2, "%b %d, %Y"), class = "text-warning"),
-    tags$p("Our algorithm is updated periodically - last updated: December 20, 2021", class = "text-warning"),
-    tags$p("Our latest addition to the algorithm is to account for the waning immunity of vaccines against infection and severe illness and to account for the effect of booster shots, see more details under FAQ", class = "text-warning")
+    tags$p("COVID-19 data behind this app is updated daily - last updated:", format(Sys.Date()-2, "%B %d, %Y"), class = "text-warning"),
+    tags$p(paste0("Our algorithm is updated periodically - last updated: ", latest_verison_date_formated)),
+    tags$p("Our latest addition to the algorithm are: "),
+    last_changes_formated
   )
 }
 
@@ -128,21 +139,12 @@ renderMethodsHtml <- function() {
               This is an imperfect proxy, and we will keep monitoring the literature and update the calculation as more data on other population segments become available. 
               Then we estimated vaccine effectiveness over time based on a systematic review and meta-regression completed by ", 
               tags$a("Feilkin et al (2021)", href = urls$feilkin_etal_2021), "."),
-      
     ), #end of ol
-    tags$h4("In the Works:"),
-    tags$ul(
-      tags$p("We are continuously working to update these assumptions as additional knowledge about the virus becomes available."),
-      tags$p("Below are some COVID-19 developments we are monitoring closely and are looking to incorporate into the methodology as data become available."),
-      tags$ul(
-        tags$li("Risk of ", tags$a("post-COVID-19 conditions", href = urls$cdc_post_covid_conditions), "for people with similar characteristics and behaviors as you")
-      ), # end of ul
-      tags$br(),
-      tags$p("If you have additional suggestions about the app, data sets, or features, Please let us know at", 
-             tags$a("covid.risk.score@gmail.com", href="mailto:covid.risk.score@gmail.com"), 
-             "or visit us on ", tags$a("GitHub", href="https://github.com/mathematica-mpr/covid_risk_score"))
-    ) # end of ul
-  )
+    tags$br(),
+    tags$p("If you have additional suggestions about the app, data sets, or features, Please let us know at", 
+           tags$a("covid.risk.score@gmail.com", href="mailto:covid.risk.score@gmail.com"), 
+           "or visit us on ", tags$a("GitHub", href="https://github.com/mathematica-mpr/covid_risk_score"))
+  ) # end of ul
 }
 
 # helper function for rendering FAQ's
@@ -229,12 +231,15 @@ renderFaqHtml <- function() {
            "a recent study from ", tags$a("Bernal et al (2021b) .", href = urls$bernal_etal_2021b)),
     faqQuestion("When was the most recent update to the app and what is new?"),
     tags$p("The COVID-19 data behind this app is updated daily. We periodically update the algorithm used for risk score estimation.",
-           " The most recent update to the algorithm was on December 20, 2021. We made the following major changes:"),
-    tags$ol(
-      tags$li("Update the province-level adjusted case fatality rate for Belgium using data until 2021-12-07"),
-      tags$li("Modify the vaccination section to 1) account for the waning vaccine effectiveness against infection and 
-              severe illness over time and 2) account for the effect of booster shots"), 
-      tags$li("Update the baseline probability of hospitalization/ICU/death by age group using the latest CDC surveillance data as of September 2021.")
-    ) # end of ul
-  )
+           " Visit the \"Change Log\" tab to see the most recent update to the algorithm.")
+  )# end of tag list
 }
+
+# function makes CHANGELOG API call -------------------------------------------------
+renderChangelogHtml <- function() {
+  changelog_r <- GET(urls$covid_change_log_api, add_headers("x-api-key" = Sys.getenv("X_API_KEY")))
+  changelog_md <- content(changelog_r, "text", encoding = "UTF-8") %>% gsub("\n###", "\n\n###", .) %>% gsub("##", "###", .)
+  changelog_html <- HTML(markdown::markdownToHTML(text = changelog_md, fragment.only = T))
+  return (changelog_html)
+}
+
