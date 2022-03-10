@@ -150,4 +150,10 @@ server <- function(input, output, session) {
     renderFaqHtml()
   })
   
+  ## render CHANGELOG page ---------------------------------------------------
+  output$changelog <- renderUI({
+    # in app/info_html.R
+    renderChangelogHtml()
+  })
+  
 }

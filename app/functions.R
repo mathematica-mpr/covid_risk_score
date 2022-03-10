@@ -6,7 +6,7 @@ bool2char <- function(bol){
   stringr::str_to_sentence(bol)
 }
 
-# function makes API call ------------------------------------------------------
+# function makes score API call -------------------------------------------------
 calculateRisk <- function(input) {
   request_body <- list(
     "country" = input$country,
