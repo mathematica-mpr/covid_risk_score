@@ -419,6 +419,9 @@ Resources:
         - Name: S3CodeArtifactBucket
           Type: PLAINTEXT
           Value: !Ref CodeArtifactBucket
+        - Name: BaseImageAccountId
+          Type: PLAINTEXT
+          Value: !Sub '${AWS::AccountId}'
       Source:
         Type: CODEPIPELINE
         BuildSpec: !Ref BuildSpecLoc
@@ -609,7 +612,7 @@ Resources:
 Outputs:
   PipelineUrl:
     Value: !Sub https://console.aws.amazon.com/codepipeline/home?region=${AWS::Region}#/view/${CodePipeline}
-    Description: Codepipeline URL
+    Description: Codepipeline location
     Export:
         Name: !Sub ${AWS::StackName}-CodePipeline
 

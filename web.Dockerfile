@@ -1,4 +1,5 @@
-FROM rocker/shiny-verse:4.1.0 as base 
+ARG AWS_ACCOUNT_ID
+FROM ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/shiny-verse-base-image:4.1.0
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
