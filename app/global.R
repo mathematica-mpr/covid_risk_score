@@ -52,7 +52,7 @@ urls  = list(
   usafacts_data = "https://usafacts.org/visualizations/coronavirus-covid-19-spread-map/",
   # papers
   caramelo_etal_2020 = "https://www.medrxiv.org/content/10.1101/2020.02.24.20027268v1",
-  russel_etal_2020 = "https://cmmid.github.io/topics/covid19/global_cfr_estimates.html",
+  russel_etal_2020 = "https://bmcmedicine.biomedcentral.com/articles/10.1186/s12916-020-01790-9",
   verity_etal_2020 = "https://www.thelancet.com/journals/laninf/article/PIIS1473-3099(20)30243-7/fulltext",
   open_safely = "https://www.nature.com/articles/s41586-020-2521-4:",
   jin_etal_2020 = "https://www.nature.com/articles/s41591-020-01191-8",
