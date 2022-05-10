@@ -102,8 +102,9 @@ renderLocationHtml <- function(risk) {
 # function to create risk_score HTML output ------------------------------------
 renderScoreHtml <- function(risk) {
   score<- risk$risk_score
+  moving_casecount <- risk$moving_casecount
   
-  tags$p(HTML(paste0(
+  text_score <- tags$p(HTML(paste0(
     "The risk score for people with similar characteristics and behaviors as you is ",
     formatDynamicString(round(score)), 
     case_when(
@@ -118,8 +119,18 @@ renderScoreHtml <- function(risk) {
         ". Please take the time to review ",
         tags$a("this page", href = urls$cdc_prevention),
         " to make sure you're well prepared in the days to come.")
-    )
-  )))
+    ))))
+  
+  if (moving_casecount == 0){
+    # if there are no reported cases in last 14 days
+    warning_text <- tags$p(style="color:#DF691A", 
+                           "WARNING: There are zero reported cases in the last 14 days. This could be due to USAFacts no longer reporting recent covid cases or deaths fr the county. 
+                           For more information, please check the ", tags$a("USAFacts", href = urls$usafacts_data), " or state agency's health department website.", 
+                           class = "text-warning")
+    return(div(warning_text, text_score))
+  } else {
+    return(text_score)
+  }
 }
 
 # function to create vaccines HTML output ------------------------------------
