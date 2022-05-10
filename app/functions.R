@@ -122,6 +122,7 @@ renderScoreHtml <- function(risk) {
   )))
 }
 
+# function to create vaccines HTML output ------------------------------------
 renderVaccinesHtml <- function(risk, has_vaccine, vaccine, months_last_vaccination){
   
   # Case where not vaccinated
