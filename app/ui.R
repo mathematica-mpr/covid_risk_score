@@ -67,7 +67,7 @@ ui <- fluidPage(
           hr(),
           # Pre-Existing conditions inputs
           checkboxInput('has_preexisting', div("I have ", tags$a("underlying medical complications", 
-                                                                 href = urls$cdc_high_risk))),
+                                                                 href = urls$cdc_medicalconditions))),
           conditionalPanel(
             condition = "input.has_preexisting == true",
             checkboxGroupInput("conditions", "Conditions", # this is written this way to allow html math in obesity test
