@@ -124,7 +124,7 @@ renderScoreHtml <- function(risk) {
   if (moving_casecount == 0){
     # if there are no reported cases in last 14 days
     warning_text <- tags$p(style="color:#DF691A", 
-                           "WARNING: There are zero reported cases in the last 14 days. This could be due to USAFacts no longer reporting recent covid cases or deaths fr the county. 
+                           "WARNING: There are zero reported cases in the last 14 days. This could be due to USAFacts no longer reporting recent covid cases or deaths for the county. 
                            For more information, please check the ", tags$a("USAFacts", href = urls$usafacts_data), " or state agency's health department website.", 
                            class = "text-warning")
     return(div(warning_text, text_score))
