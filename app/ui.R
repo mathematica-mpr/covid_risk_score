@@ -30,7 +30,7 @@ ui <- fluidPage(
                is better than no estimate."),
           tags$p("This tool works best on Google Chrome and mobile.", class = "text-warning"),
           tags$p("We do not retain any information that you provide in connection with your use of the tool."),
-          tags$p("Your use of this tool is subject to these ", tags$a("Terms of Use.", href="https://covid-risk-score-rshiny-code-artifacts.s3.amazonaws.com/COVID-19+Risk+Calculator+Terms+of+Use+-+042220.pdf")),
+          tags$p("Your use of this tool is subject to these ", tags$a("Terms of Use.", href=urls$terms_of_use)),
           tags$p(style="color:#DF691A", "THE INFORMATION PROVIDED BY THIS TOOL IS NOT MEDICAL ADVICE AND CANNOT BE 
              USED TO DIAGNOSE OR TREAT ANY MEDICAL CONDITION.  See FAQ for more information.", class = "text-warning"),
           actionButton('next0', "Next", class = "btn btn-info btn-block")
@@ -67,7 +67,7 @@ ui <- fluidPage(
           hr(),
           # Pre-Existing conditions inputs
           checkboxInput('has_preexisting', div("I have ", tags$a("underlying medical complications", 
-                                                                 href = urls$cdc_high_risk))),
+                                                                 href = urls$cdc_medicalconditions))),
           conditionalPanel(
             condition = "input.has_preexisting == true",
             checkboxGroupInput("conditions", "Conditions", # this is written this way to allow html math in obesity test
