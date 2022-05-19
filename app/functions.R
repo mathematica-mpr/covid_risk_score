@@ -31,7 +31,7 @@ calculateRisk <- function(input) {
   }
   
   resp <- POST(urls$covid_score_api, add_headers("x-api-key" = Sys.getenv("X_API_KEY")), body = request_body, encode = "json")
-  #resp <- POST(urls$covid_score_api_dev, body = request_body, encode = "json")
+  #resp <- POST(urls$covid_score_api_dev, add_headers("x-api-key" = Sys.getenv("X_API_KEY_DEV")), body = request_body, encode = "json")
   api_return <- content(resp)
 
   return (api_return)
