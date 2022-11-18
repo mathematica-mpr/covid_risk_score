@@ -126,7 +126,7 @@ renderMethodsHtml <- function() {
               "The risk factors of mortality were also complemented by ",
               tags$a("FAIR Health, ", href = urls$fairhealth), 
               "and ",
-              tags$a("CDC MMWR (2020b). ", href = urls$cdc_mm6913e2),
+              tags$a("CDC MMWR (2020). ", href = urls$cdc_mm6913e2),
               "We keep the list of comorbidities included in the app to be consistent with the CDC list of medical conditions that increase the risk of severe illness ",
               tags$a("(CDC 2021). ", href = urls$cdc_medicalconditions)
       ),
