@@ -40,7 +40,7 @@ urls  = list(
   cdc_vaccinated_guidance = "https://www.cdc.gov/coronavirus/2019-ncov/vaccines/fully-vaccinated-guidance.html",
   cdc_case_surv = "https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data/vbim-akqf/data",
   cdc_vax_science_brief = "https://www.cdc.gov/coronavirus/2019-ncov/science/science-briefs/fully-vaccinated-people.html",
-  cdc_delta_variant = "https://www.cdc.gov/coronavirus/2019-ncov/variants/delta-variant.html",
+  cdc_delta_variant = "https://web.archive.org/web/20210901003835/https://www.cdc.gov/coronavirus/2019-ncov/variants/delta-variant.html",
   # USA Facts
   usafacts_data = "https://usafacts.org/visualizations/coronavirus-covid-19-spread-map/",
   # papers
