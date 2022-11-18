@@ -57,7 +57,7 @@ renderMethodsHtml <- function() {
         "Due to rapid spread and insufficient testing during the COVID-19 pandemic, there are likely additional unreported cases beyond the 
         officially reported cases. We use the methodology reported by ",  tags$a("Russell et al (2020)", href = urls$russel_etal_2020), 
         "and the infection fatality rate used in the economic analysis by ",
-        tags$a("Savinkina et al (2022)", href=urls$savinkina_etal_2022),
+        tags$a("Xue et al (2022)", href=urls$xue_etal_2022),
         "to estimate the number of cases in your county that were not reported."),
       
       tags$ul(tags$li("The methodology from ", tags$a("Russell et al (2020)", href = urls$russel_etal_2020),
