@@ -40,7 +40,7 @@ urls  = list(
   cdc_vaccinated_guidance = "https://www.cdc.gov/coronavirus/2019-ncov/vaccines/fully-vaccinated-guidance.html",
   cdc_case_surv = "https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data/vbim-akqf/data",
   cdc_vax_science_brief = "https://www.cdc.gov/coronavirus/2019-ncov/science/science-briefs/fully-vaccinated-people.html",
-  cdc_delta_variant = "https://www.cdc.gov/coronavirus/2019-ncov/variants/delta-variant.html",
+  cdc_delta_variant = "https://web.archive.org/web/20210901003835/https://www.cdc.gov/coronavirus/2019-ncov/variants/delta-variant.html",
   # USA Facts
   usafacts_data = "https://usafacts.org/visualizations/coronavirus-covid-19-spread-map/",
   # papers
@@ -54,7 +54,7 @@ urls  = list(
   menni_etall_2020 = "https://www.nature.com/articles/s41591-020-0916-2",
   chu_etal_2020 = "https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(20)31142-9/fulltext",
   jefferson_etal_2008 = "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2190272/",
-  ihme_ifr = "http://www.healthdata.org/sites/default/files/files/Projects/COVID/briefing_US_20201112.pdf",
+  xue_etal_2022 = "https://www.sciencedirect.com/science/article/pii/S1201971222002958",
   # misc
   empirical_bayes = "https://en.wikipedia.org/wiki/Empirical_Bayes_method",
   # Additional sources for ORs December 2020 update
