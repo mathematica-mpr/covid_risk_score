@@ -1,10 +1,10 @@
 .html-widget.gauge svg {
-  height: 66%; 
-  width: 66%; 
+  height: auto; 
+  width: auto; 
   display: block; 
   margin-left: auto;
   margin-right: auto; 
-  margin-bottom:-10%;
+  margin-bottom: auto;
   }
   
 #go{
