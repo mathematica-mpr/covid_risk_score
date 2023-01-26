@@ -17,7 +17,7 @@ disclaimerpopupHTML <- function(){
     tags$p("Your use of this tool is subject to these ", tags$a("Terms of Use.", href="https://covid-risk-score-rshiny-code-artifacts.s3.amazonaws.com/COVID-19+Risk+Calculator+Terms+of+Use+-+042220.pdf")),
     tags$p(style="color:#DF691A", "THE INFORMATION PROVIDED BY THIS TOOL IS NOT MEDICAL ADVICE AND CANNOT BE 
              USED TO DIAGNOSE OR TREAT ANY MEDICAL CONDITION.  See FAQ for more information.", class = "text-warning"),
-    tags$p("COVID-19 data behind this app is updated daily - last updated:", format(Sys.Date()-2, "%B %d, %Y"), class = "text-warning"),
+    tags$p("COVID-19 data behind this app is from USAFacts. Please check the",  tags$a("USAFacts website", href = urls$usafacts_data), " for date of last update.", class = "text-warning"),
     tags$p(paste0("Our algorithm is updated periodically - last updated: ", latest_verison_date_formated)),
     tags$p("Our latest addition to the algorithm are: "),
     last_changes_formated
