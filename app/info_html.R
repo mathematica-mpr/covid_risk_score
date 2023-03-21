@@ -18,6 +18,7 @@ disclaimerpopupHTML <- function(){
     tags$p(style="color:#DF691A", "THE INFORMATION PROVIDED BY THIS TOOL IS NOT MEDICAL ADVICE AND CANNOT BE 
              USED TO DIAGNOSE OR TREAT ANY MEDICAL CONDITION.  See FAQ for more information.", class = "text-warning"),
     tags$p("COVID-19 data behind this app is from USAFacts. Please check the",  tags$a("USAFacts website", href = urls$usafacts_data), " for date of last update.", class = "text-warning"),
+    # TODO: update to explain app is not being updated
     tags$p(paste0("Our algorithm is updated periodically - last updated: ", latest_verison_date_formated)),
     tags$p("Our latest addition to the algorithm are: "),
     last_changes_formated
@@ -230,6 +231,8 @@ renderFaqHtml <- function() {
            "We modified the algorithm to account for reduced vaccine protection against Delta variant infections, using the recent data from ",
            "a recent study from ", tags$a("Bernal et al (2021b) .", href = urls$bernal_etal_2021b)),
     faqQuestion("When was the most recent update to the app and what is new?"),
+    # TODO: update message about the updates not happening any more and add thank you
+    #tags$p("We are no longer updating the COVID-19 data behind this app nor the algorithm used for risk score estimation. ",
     tags$p("The COVID-19 data behind this app is updated daily. We periodically update the algorithm used for risk score estimation.",
            " Visit the \"Change Log\" tab to see the most recent update to the algorithm.")
   )# end of tag list

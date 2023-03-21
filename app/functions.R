@@ -103,7 +103,7 @@ renderLocationHtml <- function(risk) {
 renderScoreHtml <- function(risk) {
   score<- risk$risk_score
   moving_casecount <- risk$moving_casecount
-  
+  # TODO: add warning that the risk score and information provided might not be up to date
   text_score <- tags$p(HTML(paste0(
     "The risk score for people with similar characteristics and behaviors as you is ",
     formatDynamicString(round(score)), 

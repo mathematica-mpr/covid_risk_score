@@ -20,6 +20,7 @@ ui <- fluidPage(
         open = c("Introduction"),
         bsCollapsePanel(
           title = "Introduction",
+          # TODO: maybe add a warning that the app is no longer being maintained but can still be interacted with
           tags$p("This tool synthesizes reported COVID-19 geographic case data and rapidly evolving
                scientific research to help you ballpark how much risk this disease poses to you."),
           tags$p("We believe people make the right decisions when empowered with neither fear, nor 
