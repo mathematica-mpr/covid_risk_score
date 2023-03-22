@@ -1,27 +1,15 @@
 
 # disclaimer popup
 disclaimerpopupHTML <- function(){
-  
-  changelog_html <- renderChangelogHtml() # get changelog
-  # find lastest version date
-  latest_verison_date <- str_extract(changelog_html, "[0-9]{4}\\-[0-9]{2}\\-[0-9]{2}")
-  latest_verison_date_formated <- format(as.Date(latest_verison_date),  format="%B %d, %Y")
-  #find lastest changes
-  last_changes <- str_extract(changelog_html, "<h4>((.|\n)*?)(?=\n\n<h3>)") %>% 
-    str_replace_all("h4>", "h5>")
-  last_changes_formated <- HTML(markdown::markdownToHTML(text = last_changes, fragment.only = T))
-  
+  # return
   tagList(
     tags$p("This tool works best on Google Chrome and mobile.", class = "text-warning"),
-    tags$p("Currently this tool is designed for use in the United States. We do not retain any information that you provide in connection with your use of the tool."),
-    tags$p("Your use of this tool is subject to these ", tags$a("Terms of Use.", href="https://covid-risk-score-rshiny-code-artifacts.s3.amazonaws.com/COVID-19+Risk+Calculator+Terms+of+Use+-+042220.pdf")),
+    tags$p("We do not retain any information that you provide in connection with your use of the tool."), 
+    tags$p("Your use of this tool is subject to these ", tags$a("Terms of Use.", href=urls$terms_of_use)),
     tags$p(style="color:#DF691A", "THE INFORMATION PROVIDED BY THIS TOOL IS NOT MEDICAL ADVICE AND CANNOT BE 
              USED TO DIAGNOSE OR TREAT ANY MEDICAL CONDITION.  See FAQ for more information.", class = "text-warning"),
-    tags$p("COVID-19 data behind this app is from USAFacts. Please check the",  tags$a("USAFacts website", href = urls$usafacts_data), " for date of last update.", class = "text-warning"),
-    # TODO: update to explain app is not being updated
-    tags$p(paste0("Our algorithm is updated periodically - last updated: ", latest_verison_date_formated)),
-    tags$p("Our latest addition to the algorithm are: "),
-    last_changes_formated
+    tags$p("On March 31, 2023, the 19andMe api was discontinued and is no longer being maintained.  
+          For demonstration purposes, the tools returns risk scores as of April 6th, 2022.", class = "text-warning")
   )
 }
 
