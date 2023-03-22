@@ -219,10 +219,18 @@ renderFaqHtml <- function() {
            "We modified the algorithm to account for reduced vaccine protection against Delta variant infections, using the recent data from ",
            "a recent study from ", tags$a("Bernal et al (2021b) .", href = urls$bernal_etal_2021b)),
     faqQuestion("When was the most recent update to the app and what is new?"),
-    # TODO: update message about the updates not happening any more and add thank you
-    #tags$p("We are no longer updating the COVID-19 data behind this app nor the algorithm used for risk score estimation. ",
-    tags$p("The COVID-19 data behind this app is updated daily. We periodically update the algorithm used for risk score estimation.",
-           " Visit the \"Change Log\" tab to see the most recent update to the algorithm.")
+    tags$p("We are no longer updating the COVID-19 data behind this app nor the algorithm used for risk score estimation. ",
+           "Visit the \"Change Log\" tab to see the past updates to the algorithm."),
+    faqQuestion("Why is the tool calculating risk scores as of April 6th 2022?"),
+    tags$p("On March 31, 2023, the 19andMe api was discontinued and is no longer being maintained.  ",
+           "For demonstration purposes, the tools returns risk scores as of April 6th, 2022.  ", 
+           "We choose the date April 6th 2022 for two reasons.  ",
+           "First, at-home testing becomes widely available in the spring of 2022.  ",
+           "Second, since spring of 2022 since the official case counts became less reliable.  ",
+           "Missouri is the first state that stopped reporting case data to ", tags$a("USAFacts", href = urls$usafacts_data), ", and they stopped on April 6th, 2022.  ",
+           "Therefore, freezing the app as of April 6th 2022 will allow most users from anywhere in the country to test out the full functionality of the app.  "),
+    tags$p("The 19andMe team at ", tags$a("Mathematica", href = "https://www.mathematica.org/"), " thanks you for your support through using, testing, and improving the tool.  ", 
+           "We hope the tool has helped you through the COVID-19 public health emergency by empowering you with up-to-date information and personalized risk scores.")
   )# end of tag list
 }
 
