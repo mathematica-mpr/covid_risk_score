@@ -20,7 +20,6 @@ ui <- fluidPage(
         open = c("Introduction"),
         bsCollapsePanel(
           title = "Introduction",
-          # TODO: maybe add a warning that the app is no longer being maintained but can still be interacted with
           tags$p("This tool synthesizes reported COVID-19 geographic case data and rapidly evolving
                scientific research to help you ballpark how much risk this disease poses to you."),
           tags$p("We believe people make the right decisions when empowered with neither fear, nor 
@@ -34,6 +33,7 @@ ui <- fluidPage(
           tags$p("Your use of this tool is subject to these ", tags$a("Terms of Use.", href=urls$terms_of_use)),
           tags$p(style="color:#DF691A", "THE INFORMATION PROVIDED BY THIS TOOL IS NOT MEDICAL ADVICE AND CANNOT BE 
              USED TO DIAGNOSE OR TREAT ANY MEDICAL CONDITION.  See FAQ for more information.", class = "text-warning"),
+          tags$p("For demonstration purposes, the tools returns risk scores as of April 6th, 2022.", class = "text-warning"),
           actionButton('next0', "Next", class = "btn btn-info btn-block")
         ),
         bsCollapsePanel(
