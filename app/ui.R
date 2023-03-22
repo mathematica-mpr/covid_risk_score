@@ -33,7 +33,7 @@ ui <- fluidPage(
           tags$p("Your use of this tool is subject to these ", tags$a("Terms of Use.", href=urls$terms_of_use)),
           tags$p(style="color:#DF691A", "THE INFORMATION PROVIDED BY THIS TOOL IS NOT MEDICAL ADVICE AND CANNOT BE 
              USED TO DIAGNOSE OR TREAT ANY MEDICAL CONDITION.  See FAQ for more information.", class = "text-warning"),
-          tags$p("For demonstration purposes, the tools returns risk scores as of April 6th, 2022.", class = "text-warning"),
+          tags$p("For demonstration purposes, the tool returns risk scores as of April 6th, 2022.", class = "text-warning"),
           actionButton('next0', "Next", class = "btn btn-info btn-block")
         ),
         bsCollapsePanel(

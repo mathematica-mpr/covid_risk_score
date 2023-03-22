@@ -104,7 +104,7 @@ renderLocationHtml <- function(risk) {
 renderScoreHtml <- function(risk) {
   score<- risk$risk_score
   moving_casecount <- risk$moving_casecount
-  text_score <- div(tags$p("WARNING: For demonstration purposes, the tools returns risk scores as of April 6th, 2022.", class = "text-warning"),
+  text_score <- div(tags$p("WARNING: For demonstration purposes, the tool returns risk scores as of April 6th, 2022.", class = "text-warning"),
                     tags$p(HTML(paste0(
     "The risk score for people with similar characteristics and behaviors as you is ",
     formatDynamicString(round(score)), 
