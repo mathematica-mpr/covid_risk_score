@@ -104,8 +104,8 @@ renderLocationHtml <- function(risk) {
 renderScoreHtml <- function(risk) {
   score<- risk$risk_score
   moving_casecount <- risk$moving_casecount
-  # TODO: add warning that the risk score and information provided might not be up to date
-  text_score <- tags$p(HTML(paste0(
+  text_score <- div(tags$p("WARNING: For demonstration purposes, the tools returns risk scores as of April 6th, 2022.", class = "text-warning"),
+                    tags$p(HTML(paste0(
     "The risk score for people with similar characteristics and behaviors as you is ",
     formatDynamicString(round(score)), 
     case_when(
@@ -120,7 +120,7 @@ renderScoreHtml <- function(risk) {
         ". Please take the time to review ",
         tags$a("this page", href = urls$cdc_prevention),
         " to make sure you're well prepared in the days to come.")
-    ))))
+    )))))
   
   if (moving_casecount == 0){
     # if there are no reported cases in last 14 days
