@@ -8,8 +8,8 @@ disclaimerpopupHTML <- function(){
     tags$p("Your use of this tool is subject to these ", tags$a("Terms of Use.", href=urls$terms_of_use)),
     tags$p(style="color:#DF691A", "THE INFORMATION PROVIDED BY THIS TOOL IS NOT MEDICAL ADVICE AND CANNOT BE 
              USED TO DIAGNOSE OR TREAT ANY MEDICAL CONDITION.  See FAQ for more information.", class = "text-warning"),
-    tags$p("On March 31, 2023, the 19andMe api was discontinued and is no longer being maintained.  
-          For demonstration purposes, the tool returns risk scores as of April 6th, 2022.", class = "text-warning")
+    tags$p("The 19andMe app and API are no longer being updated as of March 31st, 2023. 
+           For demonstration purposes, the tool returns risk scores as of April 6th, 2022.", class = "text-warning")
   )
 }
 
